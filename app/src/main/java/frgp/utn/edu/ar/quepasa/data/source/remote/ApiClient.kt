@@ -7,10 +7,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
+import frgp.utn.edu.ar.quepasa.domain.repository.ApiResponseHandler
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton
 import retrofit2.converter.gson.GsonConverterFactory
+
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,4 +42,11 @@ object ApiClient {
     fun provideApiService(retrofit: Retrofit): AuthService {
         return retrofit.create(AuthService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideApiResponseHandler(): ApiResponseHandler {
+        return ApiResponseHandler()
+    }
+
 }

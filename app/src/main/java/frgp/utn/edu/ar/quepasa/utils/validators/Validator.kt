@@ -10,7 +10,7 @@ open class Validator<out T>(
     private var errors: Set<String> = setOf()
 
     protected fun invalidate(reason: String) {
-        this.errors.plus(reason)
+        this.errors = this.errors.plus(reason)
         this.valid = false
     }
 
@@ -18,8 +18,11 @@ open class Validator<out T>(
     fun isValid(): Boolean { return this.valid }
     fun getErrors(): Set<String> { return this.errors }
     protected fun getValue(): T { return this.value }
-    fun build(): T {
-        return getValue()
+    fun build(): Validator<T> {
+        if(isValid()) {
+            this.errors = setOf()
+        }
+        return this
     }
     fun asValidationError(): ValidationError? {
         if(!isValid()) return ValidationError(getField(), getErrors().toTypedArray())

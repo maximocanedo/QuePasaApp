@@ -21,11 +21,13 @@ class SignUpUseCase @Inject constructor(
             .doesntHaveIllegalCharacters()
             .doesntHaveTwoDotsOrUnderscoresInARow()
             .asValidationError()
-        if(usernameValidationResult != null) return ApiResponse.ValidationError(usernameValidationResult)
+        if(usernameValidationResult != null)
+            return ApiResponse.ValidationError(usernameValidationResult)
         val nameValidationResult = NameValidator(request.name)
             .validateCompoundNames()
             .asValidationError()
-        if(nameValidationResult != null) return ApiResponse.ValidationError(nameValidationResult)
+        if(nameValidationResult != null)
+            return ApiResponse.ValidationError(nameValidationResult)
         val passwordValidationResult = PasswordValidator(request.password)
             .hasOneDigit()
             .hasOneLowerCaseLetter()
@@ -33,8 +35,8 @@ class SignUpUseCase @Inject constructor(
             .hasOneSpecialCharacter()
             .lengthIsEightCharactersOrMore()
             .asValidationError()
-        if(passwordValidationResult != null) return ApiResponse.ValidationError(passwordValidationResult)
-
+        if(passwordValidationResult != null)
+            return ApiResponse.ValidationError(passwordValidationResult)
         return authRepository.signUp(request)
     }
 

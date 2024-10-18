@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields
 
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ fun UsernameField(
 ) {
     var isValid: Boolean by remember { mutableStateOf(true) };
     var error: String by remember { mutableStateOf("") }
-    TextField(
+    OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = {

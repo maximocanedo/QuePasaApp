@@ -10,6 +10,13 @@ class PasswordValidator(private val value: String): Validator<String>(value, "pa
         }
         return this
     }
+
+    fun match(password: String): PasswordValidator {
+        if(!getValue().equals(password))
+            super.invalidate("Las contraseñas no coinciden. ")
+        return this
+    }
+
     fun hasOneUpperCaseLetter(): PasswordValidator {
         var hasOneUpperCaseLetter = false
         for (c in getValue().toCharArray()) {

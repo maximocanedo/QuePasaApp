@@ -17,7 +17,7 @@ import frgp.utn.edu.ar.quepasa.utils.validators.users.PasswordValidator
 
 
 @Composable
-fun SignupPasswordField(
+fun RepeatPasswordField(
     modifier: Modifier,
     value: String,
     validator: (String) -> PasswordValidator,
@@ -39,7 +39,7 @@ fun SignupPasswordField(
             onChange(it)
         },
         isError = !isValid,
-        label = { Text("Contraseña") },
+        label = { Text("Repita la contraseña") },
         supportingText = { Text(error) },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
@@ -49,17 +49,14 @@ fun SignupPasswordField(
 
 @Preview
 @Composable
-fun SignupPasswordFieldPreview() {
+fun RepeatPasswordFieldPreview() {
+    var initialPassword by remember { mutableStateOf("Hallo") }
     var password by remember { mutableStateOf("") }
-    SignupPasswordField(
+    RepeatPasswordField(
         modifier = Modifier,
         validator = {
             PasswordValidator(it)
-                .hasOneDigit()
-                .hasOneLowerCaseLetter()
-                .hasOneUpperCaseLetter()
-                .hasOneSpecialCharacter()
-                .lengthIsEightCharactersOrMore()
+                .match(initialPassword)
         },
         onChange = { password = it },
         onValidityChange = {

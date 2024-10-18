@@ -13,14 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import frgp.utn.edu.ar.quepasa.utils.validators.StringValidator
+import frgp.utn.edu.ar.quepasa.utils.validators.Validator
 import frgp.utn.edu.ar.quepasa.utils.validators.users.PasswordValidator
 
 
 @Composable
-fun SignupPasswordField(
+fun NameField(
     modifier: Modifier,
     value: String,
-    validator: (String) -> PasswordValidator,
+    validator: (String) -> Validator<String>,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit
 ) {
@@ -39,32 +41,26 @@ fun SignupPasswordField(
             onChange(it)
         },
         isError = !isValid,
-        label = { Text("Contraseña") },
-        supportingText = { Text(error) },
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        label = { Text("Nombre") },
+        supportingText = { Text(error) }
     )
 
 }
 
 @Preview
 @Composable
-fun SignupPasswordFieldPreview() {
-    var password by remember { mutableStateOf("") }
-    SignupPasswordField(
+fun NameFieldPreview() {
+    var name by remember { mutableStateOf("") }
+    NameField(
         modifier = Modifier,
         validator = {
-            PasswordValidator(it)
-                .hasOneDigit()
-                .hasOneLowerCaseLetter()
-                .hasOneUpperCaseLetter()
-                .hasOneSpecialCharacter()
-                .lengthIsEightCharactersOrMore()
+            StringValidator(it, "name")
+                .notEmpty()
         },
-        onChange = { password = it },
+        onChange = { name = it },
         onValidityChange = {
 
         },
-        value = password
+        value = name
     )
 }

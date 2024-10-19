@@ -3,7 +3,6 @@ package frgp.utn.edu.ar.quepasa.data.models.auth
 
 import com.google.type.DateTime
 import frgp.utn.edu.ar.quepasa.data.model.User
-import frgp.utn.edu.ar.quepasa.data.models.User
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 

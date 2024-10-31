@@ -2,7 +2,6 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields
 
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import frgp.utn.edu.ar.quepasa.utils.validators.users.UsernameValidator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 @Composable
 fun UsernameField(
@@ -26,13 +28,15 @@ fun UsernameField(
         modifier = modifier,
         value = value,
         onValueChange = {
-            val status = validator(it).build()
-            isValid = status.build().isValid()
-            onValidityChange(isValid)
-            if(status.getErrors().count() > 0)
-                error = status.build().getErrors().first()
-            else error = ""
-            onChange(it)
+            CoroutineScope(IO).launch {
+                val status = validator(it).build()
+                isValid = status.build().isValid()
+                onValidityChange(isValid)
+                if(status.getErrors().isNotEmpty())
+                    error = status.build().getErrors().first()
+                else error = ""
+                onChange(it)
+            }
         },
         isError = !isValid,
         label = { Text("Nombre de usuario") },
@@ -56,9 +60,7 @@ fun UsernameFieldPreview() {
                 .doesntHaveTwoDotsOrUnderscoresInARow()
         },
         onChange = { username = it },
-        onValidityChange = {
-
-        },
+        onValidityChange = { },
         value = username
     )
 }

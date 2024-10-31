@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.utils.validators.users
 
+import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import frgp.utn.edu.ar.quepasa.utils.validators.Validator
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -7,6 +8,12 @@ import java.util.regex.Pattern
 
 class UsernameValidator(private val value: String): Validator<String>(value, "username") {
 
+    suspend fun isAvailable(repository: UserRepository): UsernameValidator {
+        if(!repository.checkUsernameAvailability(getValue())) {
+            super.invalidate("Este nombre de usuario no está disponible. ");
+        }
+        return this;
+    }
 
     fun meetsMinimumLength(): UsernameValidator {
         if (getValue().length < 4) super.invalidate("Debe tener al menos cuatro caracteres. ")

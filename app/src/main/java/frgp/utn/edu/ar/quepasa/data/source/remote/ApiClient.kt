@@ -40,7 +40,8 @@ object ApiClient {
     @Provides
     @Singleton
     fun provideApiService(retrofit: Retrofit): AuthService {
-        return retrofit.create(AuthService::class.java)
+        return retrofit
+            .create(AuthService::class.java)
     }
 
     @Provides

@@ -9,11 +9,15 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HEAD
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface UserService {
+
+    @HEAD("users/{username}")
+    suspend fun checkUserExists(@Path("username") username: String): Response<Void>
 
     @GET("users/{username}")
     suspend fun findByUsername(@Path("username") username: String): Response<User>

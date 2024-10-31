@@ -13,7 +13,7 @@ data class User(
     val phone: Set<Phone>,
     val address: String,
     val neighbourhood: Neighbourhood?,
-    // picture
+    // TODO Agregar picture
     val email: Set<Mail>,
     val role: Role,
     val active: Boolean

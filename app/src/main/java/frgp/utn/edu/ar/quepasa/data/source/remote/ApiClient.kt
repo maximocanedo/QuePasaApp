@@ -31,7 +31,7 @@ object ApiClient {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://canedo.com.ar:8080/api/")
+            .baseUrl("http://canedo.com.ar:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -42,6 +42,13 @@ object ApiClient {
     fun provideApiService(retrofit: Retrofit): AuthService {
         return retrofit
             .create(AuthService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserService(retrofit: Retrofit): UserService {
+        return retrofit
+            .create(UserService::class.java)
     }
 
     @Provides

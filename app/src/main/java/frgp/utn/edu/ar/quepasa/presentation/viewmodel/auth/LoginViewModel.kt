@@ -12,9 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SampleViewModel @Inject constructor(
-    private val auth: AuthRepository,
-    private val users: UserRepository
+class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _sampleText = MutableLiveData<String>()
@@ -22,9 +20,7 @@ class SampleViewModel @Inject constructor(
 
     fun fetchSampleText() {
         viewModelScope.launch(Dispatchers.IO) {
-            var u = users.getAuthenticatedUser()
-            val availability = u?.username ?: "Sin sesión iniciada. "
-            _sampleText.postValue("Hallo: $availability")
+            _sampleText.postValue("Pantalla de inicio de sesión. ")
         }
     }
 }

@@ -9,17 +9,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.LoginViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.SampleViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SampleActivity : AuthenticatedActivity() {
+class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Text("Estás autenticado desde una actividad diferente. ")
+            val viewModel = hiltViewModel<LoginViewModel>()
+            val sampleText by viewModel.sampleText.observeAsState("Cargando...")
+
+            LaunchedEffect(Unit) {
+                viewModel.fetchSampleText()
+            }
+
+            Text(sampleText)
         }
     }
 }

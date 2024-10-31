@@ -12,19 +12,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SampleViewModel @Inject constructor(
+class AuthenticatedActivityViewModel @Inject constructor(
     private val auth: AuthRepository,
     private val users: UserRepository
 ) : ViewModel() {
 
-    private val _sampleText = MutableLiveData<String>()
-    val sampleText: LiveData<String> = _sampleText
+    private val _authenticated = MutableLiveData<Boolean>()
+    val authenticated: LiveData<Boolean> = _authenticated
 
-    fun fetchSampleText() {
-        viewModelScope.launch(Dispatchers.IO) {
-            var u = users.getAuthenticatedUser()
-            val availability = u?.username ?: "Sin sesión iniciada. "
-            _sampleText.postValue("Hallo: $availability")
-        }
-    }
+    suspend fun isAuthenticated(): Boolean = users.getAuthenticatedUser() != null
 }

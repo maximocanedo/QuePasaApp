@@ -19,6 +19,12 @@
             android:label="Testing Activity"
             android:exported="true"
             />
+        <activity
+            android:exported="true"
+            android:name="frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity" />
+        <activity
+            android:exported="true"
+            android:name="frgp.utn.edu.ar.quepasa.presentation.activity.auth.LoginActivity" />
     </application>
 
 </manifest>

@@ -16,7 +16,8 @@ class MainActivity : AuthenticatedActivity() {
         setContent {
             TP4Theme {
                 Scaffold(
-                    topBar = { NavigationMainDrawer() }
+                    // TODO: Change to getCurrentUserOrDie() after login is implemented
+                    topBar = { NavigationMainDrawer(getCurrentUser()) }
                 ) {
 
                 }

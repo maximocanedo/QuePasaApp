@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.AuthenticatedActivityViewModel
 import kotlinx.coroutines.launch
 
@@ -31,4 +32,17 @@ abstract class AuthenticatedActivity : ComponentActivity() {
     open fun onAuthenticated() {
 
     }
+
+    fun getCurrentUser() : User? {
+        var user: User? = null
+        lifecycleScope.launch {
+            user = authViewModel.getCurrentUser()
+        }
+        return user
+    }
+
+    fun getCurrentUserOrDie() : User {
+        return getCurrentUser() ?: throw Exception("No user authenticated.")
+    }
+
 }

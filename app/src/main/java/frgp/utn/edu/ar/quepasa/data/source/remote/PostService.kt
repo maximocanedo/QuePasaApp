@@ -29,10 +29,10 @@ interface PostService {
     suspend fun getPostById(@Path("id") id: Int): Response<Post>
 
     @GET("posts/op/{id}")
-    suspend fun getPostByOp(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
+    suspend fun getPostsByOp(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
 
     @GET("posts/audience/{audience}")
-    suspend fun getPostByAudience(@Path("audience") audience: Audience, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
+    suspend fun getPostsByAudience(@Path("audience") audience: Audience, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
 
     @GET("posts/type/{id}")
     suspend fun getPostsByType(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
@@ -50,7 +50,7 @@ interface PostService {
     suspend fun getPostsByDateEnd(@Path("end") end: String, @Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
 
     @GET("posts/me")
-    suspend fun getPostByAuthUser(@Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
+    suspend fun getPostsByAuthUser(@Query("page") page: Int, @Query("size") size: Int): Response<List<Post>>
 
     @PATCH("posts/{id}")
     suspend fun updatePost(@Path("id") id: Int, @Body post: PostPatchEditRequest): Response<Post>

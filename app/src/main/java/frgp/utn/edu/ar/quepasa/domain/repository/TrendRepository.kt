@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.domain.repository
 
+import android.util.Log
 import frgp.utn.edu.ar.quepasa.data.model.Trend
 import frgp.utn.edu.ar.quepasa.data.source.remote.TrendService
 import retrofit2.Response
@@ -14,6 +15,7 @@ class TrendRepository @Inject constructor(
         if (response.isSuccessful) {
             return response.body()
         } else {
+            Log.e("TrendRepository", "Error en la respuesta: ${response.message()}")
             throw Exception("Error en la respuesta: ${response.message()}")
         }
     }
@@ -21,3 +23,5 @@ class TrendRepository @Inject constructor(
     suspend fun getTrends(barrio: Int, fechaBase: LocalDateTime): List<Trend> =
         handleResponse { trendService.getTrends(barrio, fechaBase) } ?: emptyList()
 }
+
+

@@ -15,5 +15,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) { // TODO:
     ) {
         composable("home") { MainPage(navController, user) }
         composable("userProfile") { UserProfile(navController, user) }
+        composable("trends") { TrendsScreen() }
+
     }
 }

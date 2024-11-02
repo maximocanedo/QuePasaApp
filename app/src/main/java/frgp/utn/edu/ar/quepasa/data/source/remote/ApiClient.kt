@@ -57,4 +57,10 @@ object ApiClient {
         return ApiResponseHandler()
     }
 
+    @Provides
+    @Singleton
+    fun provideTrendService(retrofit: Retrofit): TrendService {
+        return retrofit.create(TrendService::class.java)
+    }
+
 }

@@ -4,6 +4,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
+import frgp.utn.edu.ar.quepasa.data.model.PostDTO
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.source.remote.PostService
 import org.w3c.dom.Comment
@@ -79,4 +80,9 @@ class PostRepository @Inject constructor(
 
     suspend fun comment(id: Int, content: String): Comment? =
         handleResponse { postService.comment(id, content) }
+
+    suspend fun findPosts(userId: Int, userNeighbourhood: Int, page: Int, size: Int): List<PostDTO>? {
+        return handleResponse { postService.findPosts(userId, userNeighbourhood, page, size) }
+    }
+
 }

@@ -4,6 +4,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
+import frgp.utn.edu.ar.quepasa.data.model.PostDTO
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import org.w3c.dom.Comment
 import retrofit2.Response
@@ -77,9 +78,13 @@ interface PostService {
     suspend fun comment(@Path("id") id: Int, @Body content: String): Response<Comment>
     /** Termina sección de COMENTARIOS **/
 
-    // TODO: Implement when PostDTO is created
-    /*
     @GET("posts/user/{userId}/neighbourhood/{userNeighbourhood}")
-    suspend fun findPosts()
-    */
+    suspend fun findPosts(
+        @Path("userId") userId: Int,
+        @Path("userNeighbourhood") userNeighbourhood: Int,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Response<List<PostDTO>>
+
+
 }

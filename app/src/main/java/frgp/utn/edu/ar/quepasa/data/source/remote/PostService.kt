@@ -78,6 +78,7 @@ interface PostService {
     suspend fun comment(@Path("id") id: Int, @Body content: String): Response<Comment>
     /** Termina sección de COMENTARIOS **/
 
+    /** Algoritmo de post **/
     @GET("posts/user/{userId}/neighbourhood/{userNeighbourhood}")
     suspend fun findPosts(
         @Path("userId") userId: Int,

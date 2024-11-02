@@ -15,7 +15,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -29,75 +29,77 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Black1
 import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue2
+import kotlinx.coroutines.launch
 
 @Composable
-fun NavigationMainDrawer(navController: NavHostController, user: User?, topBarText: String) { // TODO: Change to User (non-nullable) after login is implemented
+fun NavigationMainDrawer(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .background(Blue2)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
-                                text = "Nombre Apellido ${user?.name}",
-                                fontSize = 20.sp,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "Usuario ${user?.username}",
-                                fontSize = 15.sp,
-                                color = Color.White
-                            )
-                        }
-                        IconButton(onClick = { navController.navigate("userProfile") }) {
-                            Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = "User Icon",
-                                tint = Color.White
-                            )
-                        }
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+    ModalDrawerSheet {
+        Column {
+            Box(
+                modifier = Modifier
+                    .background(Blue2)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = { navController.navigate("home") }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Home,
-                                    contentDescription = "Home Icon",
-                                    modifier = Modifier.size(36.dp)
-                                )
-                            }
-                            Text(
-                                text = "Inicio",
-                                fontSize = 20.sp,
-                                color = Black1,
-                                modifier = Modifier.clickable { navController.navigate("home") }
-                            )
-                        }
+                        Text(
+                            text = "Nombre Apellido ${user?.name}",
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "Usuario ${user?.username}",
+                            fontSize = 15.sp,
+                            color = Color.White
+                        )
+                    }
+                    IconButton(onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate("userProfile")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "User Icon",
+                            tint = Color.White
+                        )
                     }
                 }
             }
-        },
-        scrimColor = Color.White
-    )
-    {
-        TopMainBar(title = topBarText, scope, drawerState)
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate("home")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Home,
+                                contentDescription = "Home Icon",
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                        Text(
+                            text = "Inicio",
+                            fontSize = 20.sp,
+                            color = Black1,
+                            modifier = Modifier.clickable { navController.navigate("home") }
+                        )
+                    }
+                }
+            }
+        }
     }
 }

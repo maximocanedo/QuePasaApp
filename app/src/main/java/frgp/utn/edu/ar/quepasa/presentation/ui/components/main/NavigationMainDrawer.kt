@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

@@ -70,6 +70,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation(fileTree(mapOf(
+        "dir" to "libs/",
+        "include" to listOf("*.aar", "*.jar"),
+        "exclude" to listOf("*.exe")
+    )))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -4,40 +4,42 @@ import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
 import frgp.utn.edu.ar.quepasa.data.dto.request.SignUpRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.AuthenticationResponse
 import frgp.utn.edu.ar.quepasa.domain.repository.AuthRepository
-import frgp.utn.edu.ar.quepasa.utils.validators.users.NameValidator
-import frgp.utn.edu.ar.quepasa.utils.validators.users.PasswordValidator
-import frgp.utn.edu.ar.quepasa.utils.validators.users.UsernameValidator
+import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.users.NameValidator
+import quepasa.api.validators.users.PasswordValidator
+import quepasa.api.validators.users.UsernameValidator
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
 ) {
 
     suspend operator fun invoke(request: SignUpRequest): ApiResponse<AuthenticationResponse?> {
-        val usernameValidationResult = UsernameValidator(request.username)
-            .meetsMaximumLength()
-            .meetsMinimumLength()
-            .neitherStartsNorEndsWithDoubleDotsOrUnderscores()
-            .doesntHaveIllegalCharacters()
-            .doesntHaveTwoDotsOrUnderscoresInARow()
-            .asValidationError()
-        if(usernameValidationResult != null)
-            return ApiResponse.ValidationError(usernameValidationResult)
-        val nameValidationResult = NameValidator(request.name)
-            .validateCompoundNames()
-            .asValidationError()
-        if(nameValidationResult != null)
-            return ApiResponse.ValidationError(nameValidationResult)
-        val passwordValidationResult = PasswordValidator(request.password)
-            .hasOneDigit()
-            .hasOneLowerCaseLetter()
-            .hasOneUpperCaseLetter()
-            .hasOneSpecialCharacter()
-            .lengthIsEightCharactersOrMore()
-            .asValidationError()
-        if(passwordValidationResult != null)
-            return ApiResponse.ValidationError(passwordValidationResult)
-        return authRepository.signUp(request)
+        try {
+            val username = UsernameValidator(request.username)
+                .meetsMaximumLength()
+                .meetsMinimumLength()
+                .neitherStartsNorEndsWithDoubleDotsOrUnderscores()
+                .doesntHaveIllegalCharacters()
+                .doesntHaveTwoDotsOrUnderscoresInARow()
+                .isAvailable(userRepository)
+                .build()
+            val name = NameValidator(request.name)
+                .validateCompoundNames()
+                .build()
+            val password = PasswordValidator(request.password)
+                .hasOneDigit()
+                .hasOneLowerCaseLetter()
+                .hasOneUpperCaseLetter()
+                .hasOneSpecialCharacter()
+                .lengthIsEightCharactersOrMore()
+                .build()
+            return authRepository.signUp(request)
+        } catch (err: ValidationError) {
+            return ApiResponse.ValidationError(err)
+        }
     }
 
 }

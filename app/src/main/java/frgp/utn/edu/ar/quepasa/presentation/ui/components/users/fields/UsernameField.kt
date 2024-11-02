@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,38 +10,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import frgp.utn.edu.ar.quepasa.utils.validators.users.UsernameValidator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.users.UsernameValidator
 
 @Composable
 fun UsernameField(
     modifier: Modifier,
-    value: String,
+    value: String = "",
     validator: (String) -> UsernameValidator,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit
 ) {
+    var content: String by remember { mutableStateOf(value) }
     var isValid: Boolean by remember { mutableStateOf(true) };
     var error: String by remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = modifier,
-        value = value,
+        value = content,
         onValueChange = {
+            content = it
             CoroutineScope(IO).launch {
-                val status = validator(it).build()
-                isValid = status.build().isValid()
-                onValidityChange(isValid)
-                if(status.getErrors().isNotEmpty())
-                    error = status.build().getErrors().first()
-                else error = ""
+                var status = false
+                try {
+                    validator(it).build()
+                    error = ""
+                    status = true
+                } catch(err: ValidationError) {
+                    error = err.errors.first()
+                }
+                isValid = status
+                onValidityChange(status)
                 onChange(it)
             }
         },
         isError = !isValid,
         label = { Text("Nombre de usuario") },
-        supportingText = { Text(error) }
+        supportingText = { Text(error) },
+        keyboardOptions = KeyboardOptions(
+            autoCorrectEnabled = false
+        )
     )
 
 }

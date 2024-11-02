@@ -13,7 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import frgp.utn.edu.ar.quepasa.utils.validators.users.PasswordValidator
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.users.PasswordValidator
 
 
 @Composable
@@ -26,17 +27,24 @@ fun SignupPasswordField(
 ) {
     var isValid: Boolean by remember { mutableStateOf(true) };
     var error: String by remember { mutableStateOf("") }
+    var c: String by remember { mutableStateOf(value) }
     OutlinedTextField(
         modifier = modifier,
-        value = value,
+        value = c,
         onValueChange = {
-            val status = validator(it).build()
-            isValid = status.build().isValid()
-            onValidityChange(isValid)
-            if(status.getErrors().isNotEmpty())
-                error = status.build().getErrors().first()
-            else error = ""
-            onChange(it)
+            c = it
+            var status = false
+            var content = ""
+            try {
+                content = validator(it).build()
+                status = true
+                error = ""
+            } catch(err: ValidationError) {
+                error = err.errors.first()
+            }
+            isValid = status
+            onValidityChange(status)
+            onChange(content)
         },
         isError = !isValid,
         label = { Text("Contraseña") },
@@ -55,6 +63,8 @@ fun SignupPasswordFieldPreview() {
         modifier = Modifier,
         validator = {
             PasswordValidator(it)
+                .ifNullThen("")
+                .isNotBlank()
                 .hasOneDigit()
                 .hasOneLowerCaseLetter()
                 .hasOneUpperCaseLetter()

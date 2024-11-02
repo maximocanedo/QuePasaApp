@@ -7,8 +7,8 @@ data class Trend(
     val tag: String? = null,
     val cantidad: Int = 0
 ) : Serializable, TrendProjection {
-    override fun getTag() = tag
-    override fun getCantidad() = cantidad
+    override fun retrieveTag() = tag
+    override fun retrieveCantidad() = cantidad
 }
 
 

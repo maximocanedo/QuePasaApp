@@ -25,7 +25,7 @@ fun BaseComponent(
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-    ModalNavigationDrawer(drawerContent = { NavigationMainDrawer(navController, user) }) {
+    ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user) }) {
         Scaffold(
             topBar = { TopMainBar(title, scope, drawerState) }
         ) { paddingValues ->

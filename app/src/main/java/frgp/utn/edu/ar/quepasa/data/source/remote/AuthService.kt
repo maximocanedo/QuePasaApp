@@ -7,6 +7,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PasswordResetRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.SignUpRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.AuthenticationResponse
 import frgp.utn.edu.ar.quepasa.data.model.auth.SingleUseRequest
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -20,7 +21,7 @@ interface AuthService {
     suspend fun signup(@Body request: SignUpRequest): Response<AuthenticationResponse>
 
     @POST("login/totp")
-    suspend fun loginUsingTotp(@Body code: String): Response<AuthenticationResponse>
+    suspend fun loginUsingTotp(@Body code: RequestBody): Response<AuthenticationResponse>
 
     @POST("recover")
     suspend fun requestPasswordReset(@Body request: PasswordResetRequest): Response<SingleUseRequest>

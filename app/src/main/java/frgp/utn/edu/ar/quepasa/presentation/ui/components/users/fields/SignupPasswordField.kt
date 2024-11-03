@@ -23,16 +23,19 @@ fun SignupPasswordField(
     value: String,
     validator: (String) -> PasswordValidator,
     onChange: (String) -> Unit,
-    onValidityChange: (Boolean) -> Unit
+    onValidityChange: (Boolean) -> Unit,
+    serverError: String?,
+    clearServerError: () -> Unit
 ) {
-    var isValid: Boolean by remember { mutableStateOf(true) };
-    var error: String by remember { mutableStateOf("") }
+    var isValid: Boolean by remember { mutableStateOf(serverError == null) };
+    var error: String by remember { mutableStateOf(serverError?: "") }
     var c: String by remember { mutableStateOf(value) }
     OutlinedTextField(
         modifier = modifier,
         value = c,
         onValueChange = {
             c = it
+            clearServerError()
             var status = false
             var content = ""
             try {
@@ -48,10 +51,14 @@ fun SignupPasswordField(
         },
         isError = !isValid,
         label = { Text("Contraseña") },
-        supportingText = { Text(error) },
+        supportingText = { Text(serverError?:error) },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
+    if (value != c) {
+        c = value
+        isValid = serverError == null
+    }
 
 }
 
@@ -75,6 +82,8 @@ fun SignupPasswordFieldPreview() {
         onValidityChange = {
 
         },
-        value = password
+        value = password,
+        serverError = null,
+        clearServerError = {}
     )
 }

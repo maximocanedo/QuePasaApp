@@ -13,9 +13,12 @@ class ApiResponseHandler {
         try {
             if(response.isSuccessful) {
                 return ApiResponse.Success(response.body());
+            } else if(response.code() == 403) {
+                return ApiResponse.Error(Fail(message = "Recurso prohibido. ", status = response.code()))
             } else {
-                val error = response.errorBody()?.toString();
-                val json = JsonParser.parseString(error).asJsonObject
+                val error = response.errorBody()?.string();
+                val jsonA = JsonParser.parseString(error)
+                val json = jsonA.asJsonObject
                 if(json.has("message")) {
                     return ApiResponse.Error(Fail(message = json.get("message").asString, status = response.code()))
                 } else if(json.has("field") || json.has("errors")) {

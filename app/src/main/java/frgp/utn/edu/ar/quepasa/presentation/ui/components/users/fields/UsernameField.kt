@@ -22,16 +22,19 @@ fun UsernameField(
     value: String = "",
     validator: (String) -> UsernameValidator,
     onChange: (String) -> Unit,
-    onValidityChange: (Boolean) -> Unit
+    onValidityChange: (Boolean) -> Unit,
+    serverError: String?,
+    clearServerError: () -> Unit
 ) {
     var content: String by remember { mutableStateOf(value) }
-    var isValid: Boolean by remember { mutableStateOf(true) };
-    var error: String by remember { mutableStateOf("") }
+    var isValid: Boolean by remember { mutableStateOf(serverError == null) };
+    var error: String by remember { mutableStateOf(serverError?: "") }
     OutlinedTextField(
         modifier = modifier,
         value = content,
         onValueChange = {
             content = it
+            clearServerError()
             CoroutineScope(IO).launch {
                 var status = false
                 try {
@@ -48,11 +51,15 @@ fun UsernameField(
         },
         isError = !isValid,
         label = { Text("Nombre de usuario") },
-        supportingText = { Text(error) },
+        supportingText = { Text(serverError?:error) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = false
         )
     )
+    if (value != content) {
+        content = value
+        isValid = serverError == null
+    }
 
 }
 
@@ -72,6 +79,8 @@ fun UsernameFieldPreview() {
         },
         onChange = { username = it },
         onValidityChange = { },
-        value = username
+        value = username,
+        serverError = null,
+        clearServerError = {}
     )
 }

@@ -21,16 +21,19 @@ fun NameField(
     value: String,
     validator: (String) -> NameValidator,
     onChange: (String) -> Unit,
-    onValidityChange: (Boolean) -> Unit
+    onValidityChange: (Boolean) -> Unit,
+    serverError: String?,
+    clearServerError: () -> Unit
 ) {
-    var isValid: Boolean by remember { mutableStateOf(true) };
-    var error: String by remember { mutableStateOf("") }
+    var isValid: Boolean by remember { mutableStateOf(serverError == null) };
+    var error: String by remember { mutableStateOf(serverError?: "") }
     var c: String by remember { mutableStateOf(value) }
     OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = {
             c = it
+            clearServerError()
             var status = false
             var content = ""
             try {
@@ -44,9 +47,9 @@ fun NameField(
             onValidityChange(status)
             onChange(content)
         },
-        isError = !isValid,
+        isError = !isValid || serverError != null,
         label = { Text("Nombre") },
-        supportingText = { Text(error) }
+        supportingText = { Text(serverError?:error) }
     )
 
 }
@@ -65,6 +68,8 @@ fun NameFieldPreview() {
         onValidityChange = {
 
         },
-        value = name
+        value = name,
+        serverError = null,
+        clearServerError = {}
     )
 }

@@ -22,6 +22,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="frgp.utn.edu.ar.quepasa.presentation.activity.MainNavigationActivity"
+            android:label="Main Navigation Activity"
+            android:exported="true"/>
+        <activity
             android:name="frgp.utn.edu.ar.quepasa.presentation.activity.auth.SampleActivity"
             android:label="Testing Activity"
             android:exported="true"/>

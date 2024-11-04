@@ -1,6 +1,6 @@
 package frgp.utn.edu.ar.quepasa.data.dto.request
 
-data class PostPatchEditRequest (
+data class PostPatchEditRequest(
     val title: String?,
     val subtype: Int?,
     val description: String?,

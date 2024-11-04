@@ -57,4 +57,31 @@ object ApiClient {
         return ApiResponseHandler()
     }
 
+    @Provides
+    @Singleton
+    fun providePostService(retrofit: Retrofit): PostService {
+        return retrofit
+            .create(PostService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostTypeService(retrofit: Retrofit): PostTypeService {
+        return retrofit
+            .create(PostTypeService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostSubtypeService(retrofit: Retrofit): PostSubtypeService {
+        return retrofit
+            .create(PostSubtypeService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTrendService(retrofit: Retrofit): TrendService {
+        return retrofit.create(TrendService::class.java)
+    }
+
 }

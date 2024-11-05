@@ -254,6 +254,10 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    fun getTags(): List<String> {
+        return tags.value
+    }
+
     fun addTag(tag: String) {
         val tags = _tags.value + tag
         _tags.value = tags

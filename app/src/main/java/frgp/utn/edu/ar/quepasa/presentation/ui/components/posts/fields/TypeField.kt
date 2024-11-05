@@ -15,10 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
 
@@ -71,6 +73,13 @@ fun TypeField(modifier: Modifier, onItemSelected: (Int) -> Unit) {
     }
     else {
         Spacer(modifier = modifier)
-        Text("Cargando...", modifier = modifier)
+        Text("No se encontraron tipos", modifier = modifier)
     }
+}
+
+@Preview
+@Composable
+fun TypeFieldPreview() {
+    var type by remember { mutableIntStateOf(0) }
+    TypeField(modifier = Modifier.fillMaxWidth(), onItemSelected = { type = it })
 }

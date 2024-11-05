@@ -61,10 +61,8 @@ interface EventService {
     suspend fun downVote(@Path("eventId") eventId: Int): Response<Int>
 
     /** SECCION COMENTARIOS **/
-    @OptIn(ExperimentalUuidApi::class)
     @GET("events/{eventId}/comments")
     suspend fun getComments(@Path("eventId") eventId: UUID, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Comment>>
-    @OptIn(ExperimentalUuidApi::class)
     @POST("events/{eventId}/comments")
     suspend fun comment(@Path("eventId") eventId: UUID, @Body content: String): Response<Comment>
 }

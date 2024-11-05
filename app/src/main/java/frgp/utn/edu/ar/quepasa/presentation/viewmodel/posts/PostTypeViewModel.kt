@@ -34,14 +34,12 @@ class PostTypeViewModel @Inject constructor(
     }
 
     suspend fun getTypes(page: Int, size: Int, activeOnly: Boolean) {
-        println("Start")
         try {
             val types = repository.getTypes(page, size, activeOnly)
             _postTypes.value = types
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
-            println(_errorMessage.value)
         }
     }
 

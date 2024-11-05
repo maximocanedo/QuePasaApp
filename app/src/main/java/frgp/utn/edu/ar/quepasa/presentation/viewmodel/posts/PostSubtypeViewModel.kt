@@ -35,14 +35,12 @@ class PostSubtypeViewModel @Inject constructor(
     }
 
     suspend fun getSubtypes(page: Int, size: Int, activeOnly: Boolean) {
-        println("Start")
         try {
             val types = repository.getSubtypes(page, size, activeOnly)
             _postSubtypes.value = types
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
-            println(_errorMessage.value)
         }
     }
 

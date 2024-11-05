@@ -84,4 +84,10 @@ object ApiClient {
         return retrofit.create(TrendService::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideEventService(retrofit: Retrofit): EventService {
+        return retrofit.create(EventService::class.java)
+    }
+
 }

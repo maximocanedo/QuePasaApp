@@ -9,29 +9,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import frgp.utn.edu.ar.quepasa.utils.validators.posts.TitleValidator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.commons.StringValidator
 
 @Composable
 fun TitleField(
     modifier: Modifier,
     value: String,
-    validator: (String) -> TitleValidator,
+    validator: (String) -> StringValidator,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit
 ) {
+    var content: String by remember { mutableStateOf(value) }
     var isValid: Boolean by remember { mutableStateOf(true) }
     var error: String by remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = {
-            val status = validator(it).build()
-            isValid = status.build().isValid()
-            onValidityChange(isValid)
-            if(status.getErrors().isNotEmpty())
-                error = status.build().getErrors().first()
-            else error = ""
-            onChange(it)
+            content = it
+            CoroutineScope(IO).launch {
+                var status = false
+                try {
+                    validator(it).build()
+                    error = ""
+                    status = true
+                } catch(err: ValidationError) {
+                    error = err.errors.first()
+                }
+                isValid = status
+                onValidityChange(status)
+                onChange(it)
+            }
         },
         isError = !isValid,
         label = { Text("Título") },
@@ -46,10 +58,10 @@ fun TitleFieldPreview() {
     TitleField(
         modifier = Modifier,
         validator = {
-            TitleValidator("title")
-                .notEmpty()
-                .meetsMinimumLength()
-                .meetsMaximumLength()
+            StringValidator("title")
+                .isNotBlank()
+                .hasMinimumLength(4)
+                .hasMaximumLength(60)
         },
         onChange = { title = it },
         onValidityChange = {

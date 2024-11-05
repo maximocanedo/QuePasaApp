@@ -2,6 +2,7 @@ package frgp.utn.edu.ar.quepasa.domain.repository
 
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -24,7 +25,7 @@ class EventRepository @Inject constructor(
         }
     }
     /** GETs **/
-    suspend fun getEvents(query: String, page: Int, size: Int, active: Boolean, sort: String): Page<Event> =
+    suspend fun getEvents(query: String = "", page: Int, size: Int, active: Boolean, sort: String = "title,asc"): Page<Event> =
         handleResponse { eventService.getEvents(query, page, size, active, sort) }
     suspend fun getEventById(id: Int): Event =
         handleResponse { eventService.getEventById(id) }
@@ -56,11 +57,11 @@ class EventRepository @Inject constructor(
         handleResponse { eventService.removeNeighbourhoodFromEvent(eventId, neighbourhoodId) }
 
     /** VOTES **/
-    suspend fun getVotes(eventId: Int): Int =
+    suspend fun getVotes(eventId: Int): VoteCount =
         handleResponse { eventService.getVotes(eventId) }
-    suspend fun upVote(eventId: Int): Int =
+    suspend fun upVote(eventId: Int): VoteCount =
         handleResponse { eventService.upVote(eventId) }
-    suspend fun downVote(eventId: Int): Int =
+    suspend fun downVote(eventId: Int): VoteCount =
         handleResponse { eventService.downVote(eventId) }
 
     /** COMMENTS **/

@@ -2,6 +2,7 @@ package frgp.utn.edu.ar.quepasa.data.source.remote
 
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -16,8 +17,6 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.util.UUID
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 interface EventService {
     /** SECCION GETs **/
@@ -54,11 +53,11 @@ interface EventService {
 
     /** SECCION VOTOS **/
     @GET("events/{eventId}/votes")
-    suspend fun getVotes(@Path("eventId") eventId: Int): Response<Int>
+    suspend fun getVotes(@Path("eventId") eventId: Int): Response<VoteCount>
     @POST("events/{eventId}/votes/up")
-    suspend fun upVote(@Path("eventId") eventId: Int): Response<Int>
+    suspend fun upVote(@Path("eventId") eventId: Int): Response<VoteCount>
     @POST("events/{eventId}/votes/down")
-    suspend fun downVote(@Path("eventId") eventId: Int): Response<Int>
+    suspend fun downVote(@Path("eventId") eventId: Int): Response<VoteCount>
 
     /** SECCION COMENTARIOS **/
     @GET("events/{eventId}/comments")

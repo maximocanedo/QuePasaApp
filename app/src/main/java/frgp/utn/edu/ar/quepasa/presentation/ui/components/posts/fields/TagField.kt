@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,47 +29,47 @@ fun TagField(
     onValidityChange: (Boolean) -> Unit,
     viewModel: PostViewModel
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        var content: String by remember { mutableStateOf(value) }
-        var isValid: Boolean by remember { mutableStateOf(true) }
-        var error: String by remember { mutableStateOf("") }
-        OutlinedTextField(
-            modifier = modifier.weight(1f),
-            value = content,
-            onValueChange = {
-                content = it
-                CoroutineScope(IO).launch {
-                    var status = false
-                    try {
-                        error = ""
-                        status = true
+    Column(modifier = modifier) {
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            var content: String by remember { mutableStateOf(value) }
+            var isValid: Boolean by remember { mutableStateOf(true) }
+            var error: String by remember { mutableStateOf("") }
+            OutlinedTextField(
+                modifier = modifier.weight(1f),
+                value = content,
+                onValueChange = {
+                    content = it
+                    CoroutineScope(IO).launch {
+                        var status = false
+                        try {
+                            error = ""
+                            status = true
+                        }
+                        catch(err: Exception) {
+                            error = err.message.toString()
+                        }
+                        isValid = status
+                        onValidityChange(status)
+                        onChange(it)
                     }
-                    catch(err: Exception) {
-                        error = err.message.toString()
-                    }
-                    isValid = status
-                    onValidityChange(status)
-                    onChange(it)
-                }
-            },
-            isError = !isValid,
-            label = { Text("Etiquetas") },
-            supportingText = { Text(error) }
-        )
-
-        IconButton(onClick = {
-            if(content.isNotBlank()) {
-                viewModel.addTag(value)
-                content = ""
-                println(viewModel.tags.value)
-                println(viewModel.tagCount.value)
-            }
-        } ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Tag Add",
-                tint = Color.White
+                },
+                isError = !isValid,
+                label = { Text("Etiquetas") },
+                supportingText = { Text(error) }
             )
+
+            IconButton(onClick = {
+                if(content.isNotBlank()) {
+                    viewModel.addTag(value)
+                    content = ""
+                }
+            } ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Tag Add",
+                    tint = Color.White
+                )
+            }
         }
     }
 }

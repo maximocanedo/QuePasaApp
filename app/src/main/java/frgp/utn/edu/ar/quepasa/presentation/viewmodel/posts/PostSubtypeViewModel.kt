@@ -30,11 +30,11 @@ class PostSubtypeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getTypes(0, 10,  true)
+            getSubtypes(0, 10,  true)
         }
     }
 
-    suspend fun getTypes(page: Int, size: Int, activeOnly: Boolean) {
+    suspend fun getSubtypes(page: Int, size: Int, activeOnly: Boolean) {
         println("Start")
         try {
             val types = repository.getSubtypes(page, size, activeOnly)
@@ -46,7 +46,7 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getTypes(q: String, sort: String, page: Int, size: Int, active: Boolean) {
+    suspend fun getSubtypes(q: String, sort: String, page: Int, size: Int, active: Boolean) {
         try {
             val types = repository.getSubtypes(q, sort, page, size, active)
             _postSubtypes.value = types
@@ -56,7 +56,7 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getTypeById(id: Int) {
+    suspend fun getSubtypeById(id: Int) {
         try {
             val type = repository.getSubtypeById(id)
             _postSubtype.value = type
@@ -66,7 +66,17 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun createType(request: PostSubtypeRequest) {
+    suspend fun getSubtypesByType(id: Int, page: Int, size: Int) {
+        try {
+            val type = repository.getSubtypesByType(id, page, size)
+            _postSubtypes.value = type
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun createSubtype(request: PostSubtypeRequest) {
         try {
             val newType = repository.createSubtype(request)
             _postSubtype.value = newType
@@ -76,7 +86,7 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateType(id: Int, request: PostSubtypeRequest) {
+    suspend fun updateSubtype(id: Int, request: PostSubtypeRequest) {
         try {
             val newType = repository.updateSubtype(id, request)
             _postSubtype.value = newType
@@ -86,10 +96,10 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteType(id: Int) {
+    suspend fun deleteSubtype(id: Int) {
         try {
             repository.deleteSubtype(id)
-            getTypes(0, 10, true)
+            getSubtypes(0, 10, true)
         }
         catch(e: Exception) {
             _errorMessage.value = e.message

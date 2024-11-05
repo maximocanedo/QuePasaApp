@@ -28,8 +28,8 @@ class PostSubtypeRepository @Inject constructor(
     suspend fun getSubtypeById(id: Int): PostSubtype =
         handleResponse { postSubtypeService.getSubtypeById(id) }
 
-    suspend fun getSubtypesByType(id: Int): Page<PostSubtype> =
-        handleResponse { postSubtypeService.getSubtypesByType(id) }
+    suspend fun getSubtypesByType(id: Int, page: Int, size: Int): Page<PostSubtype> =
+        handleResponse { postSubtypeService.getSubtypesByType(id, page, size) }
 
     suspend fun createSubtype(request: PostSubtypeRequest): PostSubtype =
         handleResponse { postSubtypeService.createSubtype(request) }

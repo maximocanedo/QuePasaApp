@@ -42,7 +42,7 @@ class PostViewModel @Inject constructor(
     private val _tags = MutableStateFlow<List<String>>(emptyList())
     val tags: StateFlow<List<String>> get() = _tags
 
-    private val _tagCount = MutableStateFlow(0)
+    private var _tagCount = MutableStateFlow(0)
     val tagCount: StateFlow<Int> get() = _tagCount
 
     private val _errorMessage = MutableStateFlow<String?>(null)
@@ -252,5 +252,20 @@ class PostViewModel @Inject constructor(
         catch(e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    fun addTag(tag: String) {
+        val tags = _tags.value + tag
+        _tags.value = tags
+        _tagCount.value = _tags.value.size
+    }
+
+    fun removeTag(tag: String) {
+        var tags: List<String> = emptyList()
+        _tags.value.forEach { tagValue ->
+            if(tagValue != tag) tags = tags + tagValue
+        }
+        _tags.value = tags
+        _tagCount.value = _tags.value.size
     }
 }

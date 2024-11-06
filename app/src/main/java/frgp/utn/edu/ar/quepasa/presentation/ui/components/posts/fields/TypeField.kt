@@ -73,7 +73,7 @@ fun TypeField(modifier: Modifier, onItemSelected: (Int) -> Unit) {
     }
     else {
         Spacer(modifier = modifier)
-        Text("No se encontraron tipos", modifier = modifier)
+        Text("Sin tipos", modifier = modifier)
     }
 }
 

@@ -25,7 +25,7 @@ class NeighbourhoodViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-
+            getNeighbourhoods(true)
         }
     }
 

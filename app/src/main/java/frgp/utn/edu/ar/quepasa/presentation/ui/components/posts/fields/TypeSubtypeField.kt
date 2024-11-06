@@ -37,7 +37,10 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
     val items = postSubtypes.content.map { it.description ?: "" }
 
     if(items.isNotEmpty()) {
-        var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
+        var selectedItem by remember { mutableStateOf("") }
+        LaunchedEffect(items) {
+            selectedItem = items.firstOrNull() ?: ""
+        }
         var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = modifier) {
@@ -78,7 +81,7 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
     }
     else {
         Spacer(modifier = modifier)
-        Text("No se encontraron subtipos", modifier = modifier)
+        Text("Sin subtipos", modifier = modifier)
     }
 }
 

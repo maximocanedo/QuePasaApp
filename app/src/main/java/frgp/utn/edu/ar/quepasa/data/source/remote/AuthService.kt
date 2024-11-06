@@ -1,6 +1,7 @@
 package frgp.utn.edu.ar.quepasa.data.source.remote
 
 import android.content.Context
+import android.util.Log
 import frgp.utn.edu.ar.quepasa.data.dto.request.LoginRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.PasswordResetAttempt
 import frgp.utn.edu.ar.quepasa.data.dto.request.PasswordResetRequest
@@ -33,12 +34,15 @@ interface AuthService {
 
 fun getAuthToken(context: Context): String? {
     val sharedPreferences = context.getSharedPreferences("QuePasaToken", Context.MODE_PRIVATE)
-    return sharedPreferences.getString("identity", null)
+    val token = sharedPreferences.getString("identity", null)
+    Log.d("OBTENER TOKEN", ("(" + (token?.takeLast(4)) + ")  " + token))
+    return token
 }
 
 fun saveAuthToken(context: Context, token: String) {
     val sharedPreferences = context.getSharedPreferences("QuePasaToken", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
     editor.putString("identity", token)
+    Log.d("GUARDAR TOKEN", ("(" + (token.takeLast(4)) + ")  " + token))
     editor.apply()
 }

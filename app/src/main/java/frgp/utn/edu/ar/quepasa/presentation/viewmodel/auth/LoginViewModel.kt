@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth
 
+import android.util.Log
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -173,8 +174,14 @@ class LoginViewModel @Inject constructor(
 
     suspend fun login() {
         val req = LoginRequest(loginUsername.value, loginPassword.value)
-        val res = if(!requiresTOTPMutable.value) authRepository.login(req)
-        else authRepository.loginUsingTotp(totpCode.value)
+        val res = if(!requiresTOTPMutable.value) {
+            Log.d("LOGIN ACTIVITY", "Iniciar sesión. ")
+            authRepository.login(req)
+        }
+        else {
+            Log.d("LOGIN ACTIVITY", "Iniciar sesión con TOTP. ")
+            authRepository.loginUsingTotp(totpCode.value)
+        }
         when(res) {
             is ApiResponse.Success -> {
                 requiresTOTPMutable.value = res.data?.totpRequired ?: false

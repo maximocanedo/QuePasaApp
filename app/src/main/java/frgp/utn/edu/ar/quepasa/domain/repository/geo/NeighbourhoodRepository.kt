@@ -17,27 +17,21 @@ class NeighbourhoodRepository @Inject constructor(
         }
     }
 
-    suspend fun getNeighbourhoods(activeOnly: Boolean) {
+    suspend fun getNeighbourhoods(activeOnly: Boolean): List<Neighbourhood> =
         handleResponse { neighbourhoodService.getNeighbourhoods(activeOnly) }
-    }
 
-    suspend fun getNeighbourhoodById(id: Long) {
+    suspend fun getNeighbourhoodById(id: Long): Neighbourhood =
         handleResponse { neighbourhoodService.getNeighbourhoodById(id) }
-    }
 
-    suspend fun getNeighbourhoodsByName(name: String) {
+    suspend fun getNeighbourhoodsByName(name: String): List<Neighbourhood> =
         handleResponse { neighbourhoodService.getNeighbourhoodsByName(name) }
-    }
 
-    suspend fun createNeighbourhood(neighbourhood: Neighbourhood) {
+    suspend fun createNeighbourhood(neighbourhood: Neighbourhood): Neighbourhood =
         handleResponse { neighbourhoodService.createNeighbourhood(neighbourhood) }
-    }
 
-    suspend fun updateNeighbourhood(id: Long, neighbourhood: Neighbourhood) {
+    suspend fun updateNeighbourhood(id: Long, neighbourhood: Neighbourhood): Neighbourhood =
         handleResponse { neighbourhoodService.updateNeighbourhood(id, neighbourhood) }
-    }
 
-    suspend fun deleteNeighbourhood(id: Long) {
+    suspend fun deleteNeighbourhood(id: Long) =
         handleResponse<Void> { neighbourhoodService.deleteNeighbourhood(id) }
-    }
 }

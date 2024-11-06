@@ -1,7 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +21,7 @@ fun TitleField(
 ) {
     var isValid: Boolean by remember { mutableStateOf(true) }
     var error: String by remember { mutableStateOf("") }
-    OutlinedTextField(
+    TextField(
         modifier = modifier,
         value = value,
         onValueChange = {
@@ -34,7 +34,7 @@ fun TitleField(
             onChange(it)
         },
         isError = !isValid,
-        label = { Text("Título") },
+        placeholder = { Text("Título")},
         supportingText = { Text(error) }
     )
 }

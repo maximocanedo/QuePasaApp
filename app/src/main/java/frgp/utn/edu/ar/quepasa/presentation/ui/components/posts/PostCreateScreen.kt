@@ -43,9 +43,9 @@ import frgp.utn.edu.ar.quepasa.utils.validators.posts.TitleValidator
 fun CreatePostScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear publicación") {
-        var title by remember { mutableStateOf("Ingresar título") }
+        var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("") }
-        var description by remember { mutableStateOf("Ingresar descripción") }
+        var description by remember { mutableStateOf("") }
         var neighbourhood by remember { mutableLongStateOf(0) }
         var type by remember { mutableIntStateOf(1) }
         var subtype by remember { mutableStateOf("") }
@@ -59,7 +59,9 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     onItemSelected = {
                         type = it
                         subtype = ""
-                    })
+                    }
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 TypeSubtypeField(
                     modifier = Modifier.weight(1f),
                     type,
@@ -72,11 +74,12 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     modifier = Modifier.weight(1f),
                     onItemSelected = { audience = it }
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 NeighbourhoodField(
                     modifier = Modifier.weight(1f),
                     audience = audience,
                     onItemSelected = { neighbourhood = it }
-                    )
+                )
             }
 
             Spacer(modifier = Modifier.height(20.dp))

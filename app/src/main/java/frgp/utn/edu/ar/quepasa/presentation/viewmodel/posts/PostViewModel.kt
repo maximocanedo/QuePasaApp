@@ -259,9 +259,11 @@ class PostViewModel @Inject constructor(
     }
 
     fun addTag(tag: String) {
-        val tags = _tags.value + tag
-        _tags.value = tags
-        _tagCount.value = _tags.value.size
+        if(tagCount.value < 5) {
+            val tags = _tags.value + tag
+            _tags.value = tags
+            _tagCount.value = _tags.value.size
+        }
     }
 
     fun removeTag(tag: String) {

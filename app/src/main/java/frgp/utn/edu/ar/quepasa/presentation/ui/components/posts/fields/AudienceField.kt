@@ -11,8 +11,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,26 +20,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import frgp.utn.edu.ar.quepasa.utils.audience.audienceToEnglish
+import frgp.utn.edu.ar.quepasa.utils.audience.audiencesToSpanish
 
 @Composable
 fun AudienceField(modifier: Modifier, onItemSelected: (String) -> Unit) {
-    val audiences: List<Audience> = Audience.entries
+    val audiences: List<String> = audiencesToSpanish()
 
-    var selectedItem by remember { mutableStateOf(audiences.firstOrNull()) }
+    val maxLength = 8
+    var selectedItem by remember { mutableStateOf(audiences.firstOrNull() ?: "") }
     var expanded by remember { mutableStateOf(false) }
+    val fontSize = if (selectedItem.length > maxLength) 12.sp else 16.sp
 
     Box(modifier = modifier) {
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector =  Icons.Filled.Person,
-                contentDescription = null,
-            )
-
-            OutlinedTextField(
-                value = selectedItem.toString(),
+            TextField(
+                value = selectedItem,
                 onValueChange = {},
+                textStyle = TextStyle(fontSize = fontSize),
                 readOnly = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = null
+                    )
+                },
                 trailingIcon = {
                     Icon(
                         imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.ArrowDropDown,
@@ -57,12 +64,12 @@ fun AudienceField(modifier: Modifier, onItemSelected: (String) -> Unit) {
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                audiences.forEachIndexed { index, item ->
+                audiences.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item.toString()) },
+                        text = { Text(text = item) },
                         onClick = {
                             selectedItem = item
-                            onItemSelected(item.toString())
+                            onItemSelected(audienceToEnglish(item).name)
                             expanded = false
                         }
                     )

@@ -10,8 +10,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,10 +44,11 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
         var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = modifier) {
-            OutlinedTextField(
+            TextField(
                 value = selectedItem,
                 onValueChange = {},
                 label = { Text("Subtipo") },
+                placeholder = { Text("Subtipo")},
                 readOnly = true,
                 trailingIcon = {
                     Icon(

@@ -10,8 +10,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,10 +36,11 @@ fun TypeField(modifier: Modifier, onItemSelected: (Int) -> Unit) {
         var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = modifier) {
-            OutlinedTextField(
+            TextField(
                 value = selectedItem,
                 onValueChange = {},
                 label = { Text("Tipo") },
+                placeholder = { Text("Tipo")},
                 readOnly = true,
                 trailingIcon = {
                     Icon(

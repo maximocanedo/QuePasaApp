@@ -6,8 +6,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +34,7 @@ fun TagField(
             var content: String by remember { mutableStateOf(value) }
             var isValid: Boolean by remember { mutableStateOf(true) }
             var error: String by remember { mutableStateOf("") }
-            OutlinedTextField(
+            TextField(
                 modifier = modifier.weight(1f),
                 value = content,
                 onValueChange = {
@@ -54,7 +54,7 @@ fun TagField(
                     }
                 },
                 isError = !isValid,
-                label = { Text("Etiquetas") },
+                placeholder = { Text("Etiquetas")},
                 supportingText = { Text(error) }
             )
 

@@ -13,11 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.trends.TrendsViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun TrendsCarousel(
-    trendsViewModel: TrendsViewModel = hiltViewModel()
+    trendsViewModel: TrendsViewModel
 ) {
     val trends = trendsViewModel.trends.observeAsState(initial = emptyList())
 
@@ -40,12 +39,3 @@ fun TrendsCarousel(
         }
     }
 }
-
-
-
-
-
-
-
-
-

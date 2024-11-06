@@ -11,7 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TrendsCarousel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.trends.TrendsViewModel
-import java.time.LocalDateTime
 
 @AndroidEntryPoint
 class TrendActivity : AuthenticatedActivity() {
@@ -23,8 +22,8 @@ class TrendActivity : AuthenticatedActivity() {
 
             LaunchedEffect(Unit) {
                 trendsViewModel.loadTrends(
-                    barrio = 1, // estoy probando
-                    fechaBase = LocalDateTime.now().minusDays(30)
+                    barrio = 1,
+                    fechaBase = "2024-10-01"
                 )
             }
 

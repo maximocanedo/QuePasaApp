@@ -7,14 +7,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
+import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
 import frgp.utn.edu.ar.quepasa.domain.repository.ApiResponseHandler
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.logging.HttpLoggingInterceptor
-
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -53,6 +52,13 @@ object ApiClient {
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit
             .create(UserService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNeighbourhoodService(retrofit: Retrofit): NeighbourhoodService {
+        return retrofit
+            .create(NeighbourhoodService::class.java)
     }
 
     @Provides

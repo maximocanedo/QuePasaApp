@@ -43,7 +43,7 @@ import frgp.utn.edu.ar.quepasa.utils.validators.posts.TitleValidator
 @Composable
 fun CreatePostScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
-    BaseComponent(navController, user, "Crear publicación") {
+    BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("") }
         var description by remember { mutableStateOf("") }

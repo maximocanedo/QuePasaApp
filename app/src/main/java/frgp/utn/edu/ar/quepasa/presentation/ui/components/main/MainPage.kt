@@ -20,7 +20,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 
 @Composable
 fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
-    BaseComponent(navController, user, "¿Qué pasa?") {
+    BaseComponent(navController, user, "¿Qué pasa?", false) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

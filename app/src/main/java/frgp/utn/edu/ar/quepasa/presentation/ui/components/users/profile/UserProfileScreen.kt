@@ -29,7 +29,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.readonly
 
 @Composable
 fun UserProfileScreen(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
-    BaseComponent(navController, user, "Usuario") {
+    BaseComponent(navController, user, "Usuario", false) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

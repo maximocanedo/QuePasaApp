@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.NavigationMainDrawer
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopBackBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopMainBar
 
 @Composable
@@ -20,6 +21,7 @@ fun BaseComponent(
     navController: NavHostController,
     user: User?,
     title: String,
+    back: Boolean,
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -27,7 +29,7 @@ fun BaseComponent(
 
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user) }) {
         Scaffold(
-            topBar = { TopMainBar(title, scope, drawerState) }
+            topBar = { if(back) TopBackBar(title, navController) else TopMainBar(title, scope, drawerState) }
         ) { paddingValues ->
             Box(
                 modifier = Modifier

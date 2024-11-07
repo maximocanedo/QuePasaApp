@@ -9,11 +9,11 @@ import retrofit2.http.Query
 import java.time.LocalDateTime
 
 interface TrendService {
-    @GET("api/trends/{barrio}")
+    @GET("trends/{barrio}")
     suspend fun getTrends(
         @Path("barrio") barrio: Int,
         @Query("fechaBase") fechaBase: String
-    ): ApiResponse<List<Trend>>
+    ): Response<List<Trend>>
 }
 
 

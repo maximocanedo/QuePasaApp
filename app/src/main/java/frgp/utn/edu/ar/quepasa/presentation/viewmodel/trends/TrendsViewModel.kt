@@ -20,7 +20,11 @@ open class TrendsViewModel @Inject constructor(
     private val _trends = MutableLiveData<List<Trend>>()
     open val trends: LiveData<List<Trend>> = _trends
 
-    open fun loadTrends(barrio: Int, fechaBase: String) {
+    init {
+        loadTrends(1, "24-10-01")
+    }
+
+    fun loadTrends(barrio: Int, fechaBase: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 Log.d("TrendsViewModel", "viewmodel trend: $barrio, fecha: $fechaBase")

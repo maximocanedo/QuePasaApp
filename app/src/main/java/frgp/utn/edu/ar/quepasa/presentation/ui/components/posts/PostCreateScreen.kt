@@ -28,6 +28,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.ImageField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.NeighbourhoodField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
@@ -84,7 +85,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
 
             Spacer(modifier = Modifier.height(20.dp))
             TagField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(2.dp),
                 value = tag,
                 onChange = {
                         newTags -> tag = newTags
@@ -110,7 +111,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             TitleField(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -137,6 +138,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = {}
             )
+            ImageField(modifier = Modifier.fillMaxWidth())
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {

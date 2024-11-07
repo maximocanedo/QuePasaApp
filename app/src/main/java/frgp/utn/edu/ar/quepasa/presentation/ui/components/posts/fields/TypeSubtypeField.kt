@@ -21,7 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 
@@ -37,7 +39,9 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
     val items = postSubtypes.content.map { it.description ?: "" }
 
     if(items.isNotEmpty()) {
+        val maxLength = 14
         var selectedItem by remember { mutableStateOf("") }
+        val fontSize = if (selectedItem.length > maxLength) 14.sp else 16.sp
         LaunchedEffect(items) {
             selectedItem = items.firstOrNull() ?: ""
         }
@@ -47,6 +51,7 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
             TextField(
                 value = selectedItem,
                 onValueChange = {},
+                textStyle = TextStyle(fontSize = fontSize),
                 label = { Text("Subtipo") },
                 placeholder = { Text("Subtipo")},
                 readOnly = true,

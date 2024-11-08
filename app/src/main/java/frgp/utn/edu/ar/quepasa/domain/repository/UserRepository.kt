@@ -12,7 +12,9 @@ open class UserRepository @Inject constructor(
 ): UserVerifier {
 
     override fun existsByUsername(username: String): Boolean = runBlocking {
-        userService.checkUserExists(username).code() != 404
+        val x = userService.checkUserExists(username)
+        val y = x.code()
+        return@runBlocking y != 404
     }
 
     suspend fun getAuthenticatedUser(): User? = userService.getAuthenticatedUser().body()

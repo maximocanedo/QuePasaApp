@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import quepasa.api.validators.commons.StringValidator
 import quepasa.api.validators.users.NameValidator
 import quepasa.api.validators.users.PasswordValidator
 import quepasa.api.validators.users.UsernameValidator
@@ -101,11 +102,15 @@ class LoginViewModel @Inject constructor(
     val signupUsername = signupUsernameMutable.asStateFlow()
     private val usernameIsValidMutable = MutableStateFlow(false)
     val usernameIsValid = usernameIsValidMutable.asStateFlow()
-    fun setUsernameValidity(x: Boolean) { usernameIsValidMutable.value = x }
+    fun setUsernameValidity(x: Boolean) { usernameIsValidMutable.tryEmit(x) }
 
     private val signupPasswordMutable = MutableStateFlow("Andrew$123456789")
     fun setSignupPassword(x: String) {
         signupPasswordMutable.value = x
+        Log.d("Name", nameIsValid.value.toString())
+        Log.d("Username", usernameIsValid.value.toString())
+        Log.d("Password", passwordIsValid.value.toString())
+        Log.d("Repeatable", passwordRepeatableIsValid.value.toString())
     }
     val signupPassword = signupPasswordMutable.asStateFlow()
     private val passwordIsValidMutable = MutableStateFlow(false)
@@ -121,11 +126,11 @@ class LoginViewModel @Inject constructor(
     val passwordRepeatableIsValid = passwordRepeatableIsValidMutable.asStateFlow()
     fun setRepeatablePasswordValidity(x: Boolean) { passwordRepeatableIsValidMutable.value = x }
 
-    open fun nameValidator(name: String): NameValidator {
-        return NameValidator(name)
+    open fun nameValidator(name: String): StringValidator {
+        return StringValidator(name)
             .ifNullThen("")
             .isNotBlank()
-            .validateCompoundNames()
+            .matches("^(?![\\d\\s\\W])[\\w\\s\\W]+(?<![\\d\\s\\W])$", "El nombre no puede empezar con espacios, números o símbolos especiales. ")
     }
     open fun usernameValidator(username: String): UsernameValidator {
         return UsernameValidator(username)
@@ -151,19 +156,21 @@ class LoginViewModel @Inject constructor(
             .equals(original)
     }
 
+
     suspend fun signUp() {
-        //if(!usernameIsValid.value || !passwordIsValid.value || !passwordRepeatableIsValid.value)
-        //  return
+        val signUpValidators = listOf(nameIsValid.value, usernameIsValid.value, passwordIsValid.value, passwordRepeatableIsValid.value)
+        if(signUpValidators.contains(false)) return
         val req = SignUpRequest(signupName.value, signupUsername.value, signupPassword.value)
         val res = authRepository.signUp(req)
         when(res) {
             is ApiResponse.Success -> {
-                snackMutable.emit("¡Éxito! Requiere TOTP: ${res.data?.totpRequired}, token: ${res.data?.token}")
+                snackMutable.emit("¡Bienvenido!")
+                Log.d("SIGNUP TOKEN", res.data?.token?:"")
+                updateLoggedInState(true)
             }
             is ApiResponse.ValidationError -> {
                 setServerFeedback(res.details.errors.first())
                 setServerFeedbackField(res.details.field)
-                snackMutable.emit("ValidationError: [${res.details.field}]: ${res.details.errors.joinToString()}")
             }
             is ApiResponse.Error -> {
                 snackMutable.emit("Error: ${res.exception.message}")

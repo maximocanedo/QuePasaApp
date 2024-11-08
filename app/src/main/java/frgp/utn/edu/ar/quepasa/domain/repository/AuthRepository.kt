@@ -24,6 +24,12 @@ class AuthRepository @Inject constructor(
     suspend fun signUp(request: SignUpRequest): ApiResponse<AuthenticationResponse?> {
         val raw = authService.signup(request)
         val response = apiResponseHandler.getResponse(raw)
+        if(response is ApiResponse.Success) {
+            val token = response.data?.token ?: ""
+            if(token.isNotBlank()) {
+                saveAuthToken(context, token)
+            }
+        }
         return response
     }
 

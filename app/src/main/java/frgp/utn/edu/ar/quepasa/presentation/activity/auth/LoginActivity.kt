@@ -182,10 +182,6 @@ fun LoginTabContent(viewModel: LoginViewModel?) {
     if(viewModel == null) return;
     val username by viewModel.loginUsername.collectAsState()
     val password by viewModel.loginPassword.collectAsState()
-    val field by viewModel.serverFeedbackField.collectAsState()
-    val rt by viewModel.requiresTotp.collectAsState()
-    val totp by viewModel.totpCode.collectAsState()
-    val feedback by viewModel.serverFeedback.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -213,30 +209,6 @@ fun LoginTabContent(viewModel: LoginViewModel?) {
                 clearServerError = {}
             )
         }
-        /**
-    if (rt.value) {
-    Row {
-    OutlinedTextField(
-    value = totp.value,
-    onValueChange = viewModel::setTotpCode,
-    label = { Text("Ingrese código TOTP") },
-    isError = field.value == "totp",
-    supportingText = { if(field.value == "totp") Text(feedback.value) }
-    )
-    }
-    }*/
-        /**
-    if (rt.value) {
-    Row {
-    OutlinedTextField(
-    value = totp.value,
-    onValueChange = viewModel::setTotpCode,
-    label = { Text("Ingrese código TOTP") },
-    isError = field.value == "totp",
-    supportingText = { if(field.value == "totp") Text(feedback.value) }
-    )
-    }
-    }*/
         Spacer(modifier = Modifier.height(16.dp))
         Row(
         ) {
@@ -296,6 +268,7 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
                 clearServerError = viewModel::clearFeedback
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         Row() {
             UsernameField(
                 modifier = Modifier,
@@ -307,6 +280,7 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
                 clearServerError = viewModel::clearFeedback
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         Row() {
             SignupPasswordField(
                 modifier = Modifier,
@@ -318,6 +292,7 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
                 clearServerError = viewModel::clearFeedback
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         Row() {
             RepeatPasswordField(
                 modifier = Modifier,

@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.commons.StringValidator
 import quepasa.api.validators.users.NameValidator
 
 
@@ -19,7 +20,7 @@ import quepasa.api.validators.users.NameValidator
 fun NameField(
     modifier: Modifier,
     value: String,
-    validator: (String) -> NameValidator,
+    validator: (String) -> StringValidator,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
     serverError: String?,
@@ -61,8 +62,7 @@ fun NameFieldPreview() {
     NameField(
         modifier = Modifier,
         validator = {
-            NameValidator(it)
-                .validateCompoundNames()
+            StringValidator(it)
         },
         onChange = { name = it },
         onValidityChange = {

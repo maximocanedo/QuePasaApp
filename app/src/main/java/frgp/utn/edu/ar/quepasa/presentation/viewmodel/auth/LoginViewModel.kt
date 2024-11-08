@@ -36,13 +36,13 @@ class LoginViewModel @Inject constructor(
     fun updateLoggedInState(x: Boolean) { loggedInMutable.value = x }
     val loggedIn = loggedInMutable.asStateFlow()
 
-    private val loginUsernameMutable = MutableStateFlow("bocelli.andrea")
+    private val loginUsernameMutable = MutableStateFlow("")
     fun setLoginUsername(x: String) {
         loginUsernameMutable.value = x
     }
     val loginUsername = loginUsernameMutable.asStateFlow()
 
-    private val loginPasswordMutable = MutableStateFlow("Abc.1234\$6789")
+    private val loginPasswordMutable = MutableStateFlow("")
     fun setLoginPassword(x: String) { loginPasswordMutable.value = x }
     val loginPassword = loginPasswordMutable.asStateFlow()
 
@@ -66,7 +66,7 @@ class LoginViewModel @Inject constructor(
     }
     val totpValid = totpValidMutable.asStateFlow()
 
-    private val signupNameMutable = MutableStateFlow("Andrew")
+    private val signupNameMutable = MutableStateFlow("")
     fun setSignupName(x: String) {
         signupNameMutable.value = x
     }
@@ -95,7 +95,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private val signupUsernameMutable = MutableStateFlow("andrew.test")
+    private val signupUsernameMutable = MutableStateFlow("")
     fun setSignupUsername(x: String) {
         signupUsernameMutable.value = x
     }
@@ -104,7 +104,7 @@ class LoginViewModel @Inject constructor(
     val usernameIsValid = usernameIsValidMutable.asStateFlow()
     fun setUsernameValidity(x: Boolean) { usernameIsValidMutable.tryEmit(x) }
 
-    private val signupPasswordMutable = MutableStateFlow("Andrew$123456789")
+    private val signupPasswordMutable = MutableStateFlow("")
     fun setSignupPassword(x: String) {
         signupPasswordMutable.value = x
         Log.d("Name", nameIsValid.value.toString())
@@ -117,7 +117,7 @@ class LoginViewModel @Inject constructor(
     val passwordIsValid = passwordIsValidMutable.asStateFlow()
     fun setPasswordValidity(x: Boolean) { passwordIsValidMutable.value = x }
 
-    private val signupPasswordRepeatableMutable = MutableStateFlow("Andrew$123456789")
+    private val signupPasswordRepeatableMutable = MutableStateFlow("")
     fun setSignupRepeatablePassword(x: String) {
         signupPasswordRepeatableMutable.value = x
     }

@@ -38,6 +38,9 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubty
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import frgp.utn.edu.ar.quepasa.utils.validators.posts.DescriptionValidator
 import frgp.utn.edu.ar.quepasa.utils.validators.posts.TitleValidator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -45,11 +48,11 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
-        var audience by remember { mutableStateOf("") }
+        var audience by remember { mutableStateOf("PUBLIC") }
         var description by remember { mutableStateOf("") }
-        var neighbourhood by remember { mutableLongStateOf(0) }
+        var neighbourhood by remember { mutableLongStateOf(1) }
         var type by remember { mutableIntStateOf(1) }
-        var subtype by remember { mutableStateOf("") }
+        var subtype by remember { mutableStateOf("1") }
         var tag by remember { mutableStateOf("") }
         val tags by viewModel.tags.collectAsState()
 
@@ -142,7 +145,16 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {
-
+                    CoroutineScope(IO).launch {
+                        viewModel.createPost(
+                            audience = audience,
+                            title = title,
+                            subtype = subtype,
+                            description = description,
+                            neighbourhood = neighbourhood,
+                            tags = tags
+                        )
+                    }
                 }) {
                     Text("Publicar")
                 }

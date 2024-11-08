@@ -54,7 +54,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPosts(page: Int, size: Int, activeOnly: Boolean) {
+    private suspend fun getPosts(page: Int, size: Int, activeOnly: Boolean) {
         try {
             val posts = repository.getPosts(page, size, activeOnly)
             _posts.value = posts
@@ -164,13 +164,38 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    suspend fun createPost(request: PostCreateRequest) {
+    suspend fun createPost(
+        audience: String,
+        title: String,
+        subtype: String,
+        description: String,
+        neighbourhood: Long,
+        tags: List<String>
+    ) {
         try {
+            var tagsString = ""
+            tags.forEachIndexed { index, tag ->
+                tagsString += tag
+                if(index < tags.size - 1) tagsString += ","
+            }
+            val request = PostCreateRequest(
+                originalPoster = null,
+                audience = Audience.valueOf(audience),
+                title = title,
+                subtype = subtype.toInt(),
+                description = description,
+                neighbourhood = neighbourhood,
+                timestamp = null,
+                tags = tagsString
+            )
+            println("New post: Title ${request.title} + Audience ${request.audience} + Subtype ${request.subtype} + Desc ${request.description} + Neigh ${request.neighbourhood} + Tags ${request.tags}")
             val newType = repository.createPost(request)
             _post.value = newType
+            clearTags()
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            println(e.printStackTrace())
         }
     }
 
@@ -273,5 +298,10 @@ class PostViewModel @Inject constructor(
         }
         _tags.value = tags
         _tagCount.value = _tags.value.size
+    }
+
+    private fun clearTags() {
+        _tags.value = emptyList()
+        _tagCount.value = 0
     }
 }

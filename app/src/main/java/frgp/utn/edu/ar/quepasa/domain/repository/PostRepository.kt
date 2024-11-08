@@ -20,7 +20,7 @@ class PostRepository @Inject constructor(
         if (response.isSuccessful) {
             return response.body() ?: throw Exception("Empty body")
         } else {
-            throw Exception("Error en la respuesta: ${response.message()}")
+            throw Exception("Error en la respuesta: ${response.errorBody()}")
         }
     }
 

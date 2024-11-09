@@ -92,6 +92,7 @@ dependencies {
     /** Material Icons **/
     // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
     runtimeOnly("androidx.compose.material:material-icons-extended:1.7.5")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
 
 }

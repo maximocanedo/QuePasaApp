@@ -26,7 +26,7 @@ interface PostSubtypeService {
     suspend fun getSubtypeById(@Path("id") id: Int): Response<PostSubtype>
 
     @GET("post-subtypes/type/{id}")
-    suspend fun getSubtypesByType(@Path("id") id: Int): Response<Page<PostSubtype>>
+    suspend fun getSubtypesByType(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostSubtype>>
 
     @PATCH("post-subtypes/{id}")
     suspend fun updateSubtype(@Path("id") id: Int, @Body request: PostSubtypeRequest): Response<PostSubtype>

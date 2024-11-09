@@ -15,12 +15,12 @@ import javax.inject.Inject
 class PostRepository @Inject constructor(
     private val postService: PostService
 ) {
-    private suspend fun <T> handleResponse(call: suspend () -> Response<T>): T {
+    private suspend fun <T> handleResponse(call: suspend () -> Response<T>): T & Any {
         val response = call.invoke()
         if (response.isSuccessful) {
             return response.body() ?: throw Exception("Empty body")
         } else {
-            throw Exception("Error en la respuesta: ${response.message()}")
+            throw Exception("Error en la respuesta: ${response.errorBody()}")
         }
     }
 

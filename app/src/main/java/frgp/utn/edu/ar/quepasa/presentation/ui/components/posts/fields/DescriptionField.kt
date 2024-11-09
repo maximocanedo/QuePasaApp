@@ -1,7 +1,10 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.height
+import frgp.utn.edu.ar.quepasa.utils.validators.posts.DescriptionValidator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +17,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.StringValidator
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun DescriptionField(
@@ -26,8 +30,8 @@ fun DescriptionField(
     var content: String by remember { mutableStateOf(value) }
     var isValid: Boolean by remember { mutableStateOf(true) }
     var error: String by remember { mutableStateOf("") }
-    OutlinedTextField(
-        modifier = modifier,
+    TextField(
+        modifier = modifier.height(150.dp),
         value = value,
         onValueChange = {
             content = it
@@ -46,7 +50,7 @@ fun DescriptionField(
             }
         },
         isError = !isValid,
-        label = { Text("Descripción") },
+        placeholder = { Text("¿Qué pasa?")},
         supportingText = { Text(error) }
     )
 }

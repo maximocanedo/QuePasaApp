@@ -6,7 +6,7 @@ import java.sql.Timestamp
 data class PostCreateRequest(
     val originalPoster: String?,
     val audience: Audience?,
-    val title: String?,
+    var title: String?,
     val subtype: Int?,
     val description: String?,
     val neighbourhood: Long?,

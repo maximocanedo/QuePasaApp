@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -19,7 +20,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 
 @Composable
 fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
-    BaseComponent(navController, user, "¿Qué pasa?") {
+    BaseComponent(navController, user, "¿Qué pasa?", false) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -37,6 +38,11 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
             ) {
                 Text("Trends test")
             }
+        }
+        Column {
+            Spacer(modifier = Modifier.weight(1f))
+
+            CreateContentDropdown(navController =  navController)
         }
     }
 }

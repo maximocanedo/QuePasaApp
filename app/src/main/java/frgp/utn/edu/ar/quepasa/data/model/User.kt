@@ -4,6 +4,8 @@ import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
+import frgp.utn.edu.ar.quepasa.data.model.media.AbsPicture
+import frgp.utn.edu.ar.quepasa.data.model.media.Picture
 
 
 data class User(
@@ -13,7 +15,7 @@ data class User(
     val phone: Set<Phone>,
     val address: String,
     val neighbourhood: Neighbourhood?,
-    // TODO Agregar picture
+    val picture: Picture?,
     val email: Set<Mail>,
     val role: Role,
     val active: Boolean

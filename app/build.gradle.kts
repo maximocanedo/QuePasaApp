@@ -93,6 +93,9 @@ dependencies {
     // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
     runtimeOnly("androidx.compose.material:material-icons-extended:1.7.5")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
-
+    implementation("io.coil-kt.coil3:coil-compose:3.0.1")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.1")
+    implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.1")
+    implementation("io.coil-kt.coil3:coil-network-ktor3:3.0.1")
 
 }

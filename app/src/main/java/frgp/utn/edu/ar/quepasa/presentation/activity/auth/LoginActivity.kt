@@ -50,6 +50,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.NameField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.OtpTextField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.PasswordField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.UsernameField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.Avatar
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -76,7 +78,9 @@ class LoginActivity : ComponentActivity() {
             val snackbarHostState = remember { SnackbarHostState() }
             LaunchedEffect(1) {
                 lifecycleScope.launch {
+                    viewModel.checkLoggedInUser()
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        viewModel.checkLoggedInUser()
                         viewModel.snack.collect {
                             scope.launch {
                                 snackbarHostState.showSnackbar(it)
@@ -139,8 +143,47 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
+fun AlreadyLoggedInUser(viewModel: LoginViewModel?, modifier: Modifier, loginTab: () -> Unit) {
+    if(viewModel == null) return;
+    val user by viewModel.userLogged.collectAsState()
+    if(user == null) return
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        UserDisplayDesign(user = user!!)
+        Spacer(modifier = Modifier.height(32.dp))
+        Row {
+            Button(
+                onClick = {
+                    viewModel.updateLoggedInState(true)
+                }
+            ) {
+                Text("Continuar")
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row {
+            TextButton(
+                onClick = {
+                    loginTab()
+                    viewModel.logout()
+                }
+            ) {
+                Text("No soy yo")
+            }
+        }
+    }
+}
+
+
+@Composable
 fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
-    var tab by remember { mutableStateOf(0) }
+    if(viewModel == null) return
+    val user by viewModel.userLogged.collectAsState()
+    var tab by remember { mutableStateOf(0) } // (2) } //
+    if(user != null) tab = 2
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -148,7 +191,9 @@ fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
             .fillMaxSize()
             .background(TabRowDefaults.primaryContainerColor)
     ) {
-        if (tab == 0) LoginTabContent(viewModel, {tab = 1}) else SignUpTabContent(viewModel, { tab = 0 })
+        if (tab == 0) LoginTabContent(viewModel, {tab = 1})
+        else if (tab == 1) SignUpTabContent(viewModel, { tab = 0 })
+        else AlreadyLoggedInUser(viewModel = viewModel, modifier = Modifier, loginTab = { tab = 0 })
 
     }
 

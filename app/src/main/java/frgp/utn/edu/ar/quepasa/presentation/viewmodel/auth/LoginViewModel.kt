@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth
 
+import android.app.Application
 import android.util.Log
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
@@ -10,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
 import frgp.utn.edu.ar.quepasa.data.dto.request.LoginRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.SignUpRequest
+import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.source.remote.saveAuthToken
 import frgp.utn.edu.ar.quepasa.domain.repository.AuthRepository
 import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
@@ -29,8 +32,19 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val application: Application
 ) : ViewModel() {
+
+    private val userLoggedMutable = MutableStateFlow<User?>(null)
+    suspend fun checkLoggedInUser() {
+        userLoggedMutable.value = (userRepository.getAuthenticatedUser())
+    }
+    fun logout() {
+        userLoggedMutable.value = null
+        saveAuthToken(application.applicationContext, "")
+    }
+    val userLogged = userLoggedMutable.asStateFlow()
 
     private val loggedInMutable = MutableStateFlow(false)
     fun updateLoggedInState(x: Boolean) { loggedInMutable.value = x }

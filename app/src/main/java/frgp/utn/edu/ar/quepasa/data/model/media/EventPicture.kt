@@ -13,4 +13,4 @@ data class EventPicture(
     override var uploadedAt: Timestamp,
     override var owner: User,
     var event: Event? = null
-) : Picture()
+) : AbsPicture()

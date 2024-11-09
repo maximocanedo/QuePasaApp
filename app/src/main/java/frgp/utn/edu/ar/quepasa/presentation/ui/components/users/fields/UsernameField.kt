@@ -4,12 +4,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.editables.OutlinedField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -18,50 +21,30 @@ import quepasa.api.validators.users.UsernameValidator
 
 @Composable
 fun UsernameField(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     value: String = "",
-    validator: (String) -> UsernameValidator,
-    onChange: (String) -> Unit,
-    onValidityChange: (Boolean) -> Unit,
-    serverError: String?,
-    clearServerError: () -> Unit
+    validator: (String) -> UsernameValidator = { UsernameValidator(it) },
+    onChange: (String, Boolean) -> Unit,
+    serverError: String? = null,
+    clearServerError: () -> Unit = {}
 ) {
-    var content: String by remember { mutableStateOf(value) }
-    var isValid: Boolean by remember { mutableStateOf(serverError == null) };
-    var error: String by remember { mutableStateOf(serverError?: "") }
-    OutlinedTextField(
+
+    OutlinedField<UsernameValidator, String>(
         modifier = modifier,
-        value = content,
-        onValueChange = {
-            content = it
-            clearServerError()
-            CoroutineScope(IO).launch {
-                var status = false
-                try {
-                    validator(it).build()
-                    error = ""
-                    status = true
-                } catch(err: ValidationError) {
-                    error = err.errors.first()
-                }
-                isValid = status
-                onValidityChange(status)
-                onChange(it)
-            }
-        },
-        isError = !isValid,
-        label = { Text("Nombre de usuario") },
-        supportingText = { Text(serverError?:error) },
-        keyboardOptions = KeyboardOptions(
-            autoCorrectEnabled = false
-        )
+        validator = validator,
+        valueConverter = { it },
+        value = value,
+        textConverter = { it },
+        clearServerError = clearServerError,
+        onChange = onChange,
+        serverError = serverError,
+        label = "Nombre de usuario"
     )
-    if (value != content) {
-        content = value
-        isValid = serverError == null
-    }
 
 }
+
+
+
 
 @Preview
 @Composable
@@ -77,10 +60,9 @@ fun UsernameFieldPreview() {
                 .doesntHaveIllegalCharacters()
                 .doesntHaveTwoDotsOrUnderscoresInARow()
         },
-        onChange = { username = it },
-        onValidityChange = { },
-        value = username,
-        serverError = null,
-        clearServerError = {}
+        onChange = { value: String, valid: Boolean ->
+            username = value
+        },
+        value = username
     )
 }

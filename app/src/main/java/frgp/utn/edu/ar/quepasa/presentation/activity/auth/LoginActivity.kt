@@ -26,11 +26,11 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,11 +48,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.MainActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.NameField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.OtpTextField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.RepeatPasswordField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.SignupPasswordField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.PasswordField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.UsernameField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.LoginViewModel
-import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.SampleViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -150,27 +148,7 @@ fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
             .fillMaxSize()
             .background(TabRowDefaults.primaryContainerColor)
     ) {
-        Row(modifier = Modifier) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(256.dp)) {
-
-            }
-        }
-        TabRow(selectedTabIndex = tab) {
-            Tab(
-                selected = tab == 0,
-                onClick = { tab = 0 },
-                text = { Text("Iniciar sesión") }
-            )
-            Tab(
-                selected = tab == 1,
-                onClick = { tab = 1 },
-                text = { Text("Registrate") }
-            )
-        }
-        Spacer(modifier = Modifier.height(32.dp))
-        if (tab == 0) LoginTabContent(viewModel) else SignUpTabContent(viewModel)
+        if (tab == 0) LoginTabContent(viewModel, {tab = 1}) else SignUpTabContent(viewModel, { tab = 0 })
 
     }
 
@@ -178,7 +156,7 @@ fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
 }
 
 @Composable
-fun LoginTabContent(viewModel: LoginViewModel?) {
+fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
     if(viewModel == null) return;
     val username by viewModel.loginUsername.collectAsState()
     val password by viewModel.loginPassword.collectAsState()
@@ -188,25 +166,29 @@ fun LoginTabContent(viewModel: LoginViewModel?) {
         modifier = Modifier.fillMaxSize()
     ) {
         Row() {
+            Text(
+                text = "Iniciar sesión",
+                style = MaterialTheme.typography.displaySmall
+            )
+        }
+        Spacer(modifier = Modifier.height(48.dp))
+        Row() {
             UsernameField(
                 modifier = Modifier,
                 value = username,
                 validator = { UsernameValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginUsername,
-                onValidityChange = {},
-                serverError = null,
-                clearServerError = {}
+                serverError = null
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
         Row() {
-            SignupPasswordField(
+            PasswordField(
                 modifier = Modifier,
                 value = password,
                 validator = { PasswordValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginPassword,
-                onValidityChange = {},
                 serverError = null,
-                clearServerError = {}
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -222,24 +204,25 @@ fun LoginTabContent(viewModel: LoginViewModel?) {
                 Text("Ingresar")
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
         Row(
         ) {
-            OutlinedButton(
+            TextButton(
                 onClick = {
-                    viewModel.resetLogin()
+                    signupTab()
                 }
             ) {
-                Text("Borrar")
+                Text("Registrate")
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
     }
 }
 
 @Composable
-fun SignUpTabContent(viewModel: LoginViewModel?) {
+fun SignUpTabContent(viewModel: LoginViewModel?, loginTab: () -> Unit) {
     if(viewModel == null) return;
     val feedback by viewModel.serverFeedback.collectAsState()
     val field by viewModel.serverFeedbackField.collectAsState()
@@ -254,16 +237,22 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
     val repeatablePasswordIsValid by viewModel.passwordRepeatableIsValid.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
+        Row() {
+            Text(
+                text = "Creá una cuenta",
+                style = MaterialTheme.typography.displaySmall
+            )
+        }
+        Spacer(modifier = Modifier.height(48.dp))
         Row() {
             NameField(
                 modifier = Modifier,
                 value = name,
                 validator = viewModel::nameValidator,
                 onChange = viewModel::setSignupName,
-                onValidityChange = viewModel::setNameValidity,
                 serverError = if(field == "name") feedback else null,
                 clearServerError = viewModel::clearFeedback
             )
@@ -275,33 +264,31 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
                 value = username,
                 validator = viewModel::usernameValidator,
                 onChange = viewModel::setSignupUsername,
-                onValidityChange =  viewModel::setUsernameValidity,
                 serverError = if(field == "username") feedback else null,
                 clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Row() {
-            SignupPasswordField(
+            PasswordField(
                 modifier = Modifier,
                 value = password,
                 validator = viewModel::passwordValidator,
                 onChange = viewModel::setSignupPassword,
-                onValidityChange = viewModel::setPasswordValidity,
                 serverError = if(field == "password") feedback else null,
                 clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Row() {
-            RepeatPasswordField(
+            PasswordField(
                 modifier = Modifier,
                 value = repeatablePassword.value,
                 validator = { viewModel.passwordRepeatValidator(it, password) },
                 onChange = viewModel::setSignupRepeatablePassword,
-                onValidityChange = viewModel::setRepeatablePasswordValidity,
                 serverError = null,
-                clearServerError = viewModel::clearFeedback
+                clearServerError = viewModel::clearFeedback,
+                label = "Repita la contraseña"
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -316,6 +303,17 @@ fun SignUpTabContent(viewModel: LoginViewModel?) {
                 }
             ) {
                 Text("Registrate")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+        ) {
+            TextButton(
+                onClick = {
+                    loginTab()
+                }
+            ) {
+                Text("Iniciar sesión")
             }
         }
     }

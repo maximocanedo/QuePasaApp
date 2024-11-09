@@ -37,13 +37,13 @@ class LoginViewModel @Inject constructor(
     val loggedIn = loggedInMutable.asStateFlow()
 
     private val loginUsernameMutable = MutableStateFlow("")
-    fun setLoginUsername(x: String) {
+    fun setLoginUsername(x: String, y: Boolean? = false) {
         loginUsernameMutable.value = x
     }
     val loginUsername = loginUsernameMutable.asStateFlow()
 
     private val loginPasswordMutable = MutableStateFlow("")
-    fun setLoginPassword(x: String) { loginPasswordMutable.value = x }
+    fun setLoginPassword(x: String, y: Boolean? = false) { loginPasswordMutable.value = x }
     val loginPassword = loginPasswordMutable.asStateFlow()
 
     private val snackMutable = MutableSharedFlow<String>()
@@ -67,8 +67,9 @@ class LoginViewModel @Inject constructor(
     val totpValid = totpValidMutable.asStateFlow()
 
     private val signupNameMutable = MutableStateFlow("")
-    fun setSignupName(x: String) {
+    fun setSignupName(x: String, y: Boolean) {
         signupNameMutable.value = x
+        setNameValidity(y)
     }
     val signupName = signupNameMutable.asStateFlow()
     private val nameIsValidMutable = MutableStateFlow(false)
@@ -96,8 +97,9 @@ class LoginViewModel @Inject constructor(
     }
 
     private val signupUsernameMutable = MutableStateFlow("")
-    fun setSignupUsername(x: String) {
+    fun setSignupUsername(x: String, y: Boolean) {
         signupUsernameMutable.value = x
+        setUsernameValidity(y)
     }
     val signupUsername = signupUsernameMutable.asStateFlow()
     private val usernameIsValidMutable = MutableStateFlow(false)
@@ -105,8 +107,9 @@ class LoginViewModel @Inject constructor(
     fun setUsernameValidity(x: Boolean) { usernameIsValidMutable.tryEmit(x) }
 
     private val signupPasswordMutable = MutableStateFlow("")
-    fun setSignupPassword(x: String) {
+    fun setSignupPassword(x: String, y: Boolean) {
         signupPasswordMutable.value = x
+        setPasswordValidity(y)
         Log.d("Name", nameIsValid.value.toString())
         Log.d("Username", usernameIsValid.value.toString())
         Log.d("Password", passwordIsValid.value.toString())
@@ -118,8 +121,9 @@ class LoginViewModel @Inject constructor(
     fun setPasswordValidity(x: Boolean) { passwordIsValidMutable.value = x }
 
     private val signupPasswordRepeatableMutable = MutableStateFlow("")
-    fun setSignupRepeatablePassword(x: String) {
+    fun setSignupRepeatablePassword(x: String, y: Boolean) {
         signupPasswordRepeatableMutable.value = x
+        setRepeatablePasswordValidity(y)
     }
     val signupPasswordRepeatable = signupPasswordRepeatableMutable.asStateFlow()
     private val passwordRepeatableIsValidMutable = MutableStateFlow(false)

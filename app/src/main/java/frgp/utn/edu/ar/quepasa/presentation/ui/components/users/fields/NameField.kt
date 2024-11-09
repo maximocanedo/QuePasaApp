@@ -1,9 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields
 
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,49 +9,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.editables.OutlinedField
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.StringValidator
-import quepasa.api.validators.users.NameValidator
+import quepasa.api.validators.users.UsernameValidator
 
 
 @Composable
 fun NameField(
-    modifier: Modifier,
-    value: String,
+    modifier: Modifier = Modifier,
+    value: String = "",
     validator: (String) -> StringValidator,
-    onChange: (String) -> Unit,
-    onValidityChange: (Boolean) -> Unit,
-    serverError: String?,
-    clearServerError: () -> Unit
+    onChange: (String, Boolean) -> Unit,
+    serverError: String? = null,
+    clearServerError: () -> Unit = {}
 ) {
-    var isValid: Boolean by remember { mutableStateOf(serverError == null) };
-    var error: String by remember { mutableStateOf(serverError?: "") }
-    var c: String by remember { mutableStateOf(value) }
-    OutlinedTextField(
+    OutlinedField<StringValidator, String>(
         modifier = modifier,
+        validator = validator,
+        valueConverter = { it },
         value = value,
-        onValueChange = {
-            c = it
-            clearServerError()
-            var status = false
-            var content = ""
-            try {
-                content = validator(it).build()
-                status = true
-                error = ""
-            } catch(err: ValidationError) {
-                error = err.errors.first()
-            }
-            isValid = status
-            onValidityChange(status)
-            onChange(content)
-        },
-        isError = !isValid || serverError != null,
-        label = { Text("Nombre") },
-        supportingText = { Text(serverError?:error) }
+        textConverter = { it },
+        clearServerError = clearServerError,
+        onChange = onChange,
+        serverError = serverError,
+        label = "Nombre"
     )
-
 }
+
 
 @Preview
 @Composable
@@ -61,15 +44,8 @@ fun NameFieldPreview() {
     var name by remember { mutableStateOf("") }
     NameField(
         modifier = Modifier,
-        validator = {
-            StringValidator(it)
-        },
-        onChange = { name = it },
-        onValidityChange = {
-
-        },
-        value = name,
-        serverError = null,
-        clearServerError = {}
+        validator = { StringValidator(it) },
+        onChange = { value, valid -> name = value },
+        value = name
     )
 }

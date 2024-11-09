@@ -89,5 +89,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    /** Material Icons **/
+    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
+    runtimeOnly("androidx.compose.material:material-icons-extended:1.7.5")
+
 
 }

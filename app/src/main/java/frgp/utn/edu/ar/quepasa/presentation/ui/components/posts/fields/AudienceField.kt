@@ -23,14 +23,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.utils.audience.audienceToEnglish
+import frgp.utn.edu.ar.quepasa.utils.audience.audienceToSpanish
 import frgp.utn.edu.ar.quepasa.utils.audience.audiencesToSpanish
 
 @Composable
-fun AudienceField(modifier: Modifier, onItemSelected: (String) -> Unit) {
+fun AudienceField(
+    modifier: Modifier,
+    audience: String,
+    onItemSelected: (String) -> Unit) {
     val audiences: List<String> = audiencesToSpanish()
 
     val maxLength = 8
-    var selectedItem by remember { mutableStateOf(audiences.firstOrNull() ?: "") }
+    var selectedItem by remember { mutableStateOf("") }
+    if(audience.isNotBlank()) {
+        selectedItem = audiences.find { item -> audienceToSpanish(audience) == item }.toString()
+    }
+    else {
+        audiences.firstOrNull() ?: ""
+    }
     var expanded by remember { mutableStateOf(false) }
     val fontSize = if (selectedItem.length > maxLength) 12.sp else 16.sp
 

@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 
 @Composable
-fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> Unit) {
+fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (Int) -> Unit) {
     val viewModel: PostSubtypeViewModel = hiltViewModel()
 
     LaunchedEffect(type) {
@@ -77,7 +77,7 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
                         text = { Text(text = item) },
                         onClick = {
                             selectedItem = item
-                            onItemSelected(item)
+                            onItemSelected(item.toInt())
                             expanded = false
                         }
                     )
@@ -94,7 +94,7 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (String) -> 
 @Preview
 @Composable
 fun TypeSubtypeFieldPreview() {
-    var subtype by remember { mutableStateOf("") }
+    var subtype by remember { mutableIntStateOf(0) }
     val type by remember { mutableIntStateOf(0) }
     TypeSubtypeField(modifier = Modifier.fillMaxWidth(), type, onItemSelected = { subtype = it })
 }

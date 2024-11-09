@@ -41,66 +41,68 @@ fun NeighbourhoodField(
     val items = neighbourhoods.map { it.name }
     val itemsId = neighbourhoods.map { it.id }
 
-    val maxLength = 8
-    var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
-    var expanded by remember { mutableStateOf(false) }
-    var enabled by remember { mutableStateOf(false) }
-    val fontSize = if (selectedItem.length > maxLength) 10.sp else 16.sp
+    if(items.isNotEmpty()) {
+        val maxLength = 8
+        var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
+        var expanded by remember { mutableStateOf(false) }
+        var enabled by remember { mutableStateOf(false) }
+        val fontSize = if (selectedItem.length > maxLength) 10.sp else 16.sp
 
-    LaunchedEffect(audience) {
-        if(audience.isNotBlank()) {
-            enabled = Audience.valueOf(audience) == Audience.NEIGHBORHOOD
+        LaunchedEffect(audience) {
+            enabled = audience == Audience.NEIGHBORHOOD.name
         }
-    }
-    LaunchedEffect(enabled) {
-        selectedItem = if(enabled) items.firstOrNull() ?: "" else ""
-    }
+        LaunchedEffect(enabled) {
+            selectedItem = if (enabled) items.firstOrNull() ?: "" else ""
+        }
 
-    println("$items $selectedItem")
+        Box(modifier = modifier) {
+            Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+                TextField(
+                    value = selectedItem,
+                    onValueChange = {},
+                    textStyle = TextStyle(fontSize = fontSize),
+                    readOnly = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Place,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        var arrowIcon: ImageVector =
+                            if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.ArrowDropDown
+                        if (!enabled) arrowIcon = Icons.Filled.Clear
+                        Icon(
+                            imageVector = arrowIcon,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { expanded = !expanded }
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded }
+                )
 
-    Box(modifier = modifier) {
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-            TextField(
-                value = selectedItem,
-                onValueChange = {},
-                textStyle = TextStyle(fontSize = fontSize),
-                readOnly = true,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Place,
-                        contentDescription = null
-                    )
-                },
-                trailingIcon = {
-                    var arrowIcon: ImageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.ArrowDropDown
-                    if(!enabled) arrowIcon = Icons.Filled.Clear
-                    Icon(
-                        imageVector = arrowIcon,
-                        contentDescription = null,
-                        modifier = Modifier.clickable { expanded = !expanded }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = !expanded }
-            )
-
-            DropdownMenu(
-                expanded = expanded && enabled,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items.forEachIndexed { index, item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                            selectedItem = item
-                            onItemSelected(itemsId[index])
-                            expanded = false
-                        }
-                    )
+                DropdownMenu(
+                    expanded = expanded && enabled,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item) },
+                            onClick = {
+                                selectedItem = item
+                                onItemSelected(itemsId[index])
+                                expanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
+    }
+    else {
+        Text("Sin barrios", modifier = modifier)
     }
 }

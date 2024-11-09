@@ -14,6 +14,10 @@ fun audiencesToSpanish(): List<String> {
     return audienceTranslations.values.toList()
 }
 
+fun audienceToSpanish(audience: String): String {
+    return audienceTranslations.entries.find { it.key == Audience.valueOf(audience) }?.value ?: throw IllegalArgumentException("Non existing audience")
+}
+
 fun audienceToEnglish(audience: String): Audience {
     return audienceTranslations.entries.find { it.value == audience }?.key ?: throw IllegalArgumentException("Non existing audience")
 }

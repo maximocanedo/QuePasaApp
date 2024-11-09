@@ -29,7 +29,7 @@ class NeighbourhoodViewModel @Inject constructor(
         }
     }
 
-    suspend fun getNeighbourhoods(activeOnly: Boolean) {
+    private suspend fun getNeighbourhoods(activeOnly: Boolean) {
         try {
             val neighbourhoods = repository.getNeighbourhoods(activeOnly)
             _neighbourhoods.value = neighbourhoods

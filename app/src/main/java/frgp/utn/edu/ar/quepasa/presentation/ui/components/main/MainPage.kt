@@ -38,6 +38,13 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
             ) {
                 Text("Trends test")
             }
+
+            Button(
+                onClick = { navController.navigate("postEdit") },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("PostEditScreen test")
+            }
         }
         Column {
             Spacer(modifier = Modifier.weight(1f))

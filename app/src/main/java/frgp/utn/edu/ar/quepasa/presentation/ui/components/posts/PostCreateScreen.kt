@@ -51,7 +51,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
         var description by remember { mutableStateOf("") }
         var neighbourhood by remember { mutableLongStateOf(1) }
         var type by remember { mutableIntStateOf(1) }
-        var subtype by remember { mutableStateOf("1") }
+        var subtype by remember { mutableStateOf(1) }
         var tag by remember { mutableStateOf("") }
         val tags by viewModel.tags.collectAsState()
 
@@ -61,7 +61,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     modifier = Modifier.weight(1f),
                     onItemSelected = {
                         type = it
-                        subtype = ""
+                        subtype = 0
                     }
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -75,6 +75,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 AudienceField(
                     modifier = Modifier.weight(1f),
+                    audience = audience,
                     onItemSelected = { audience = it }
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -121,8 +122,8 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                 validator = {
                     StringValidator(title)
                         .isNotBlank()
-                        .hasMaximumLength(100)
-                        .hasMinimumLength(1)
+                        .hasMaximumLength(30)
+                        .hasMinimumLength(4)
                 },
                 onChange = { newTitle -> title = newTitle },
                 onValidityChange = {}
@@ -134,8 +135,8 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                 validator = {
                     StringValidator(title)
                         .isNotBlank()
-                        .hasMaximumLength(100)
-                        .hasMinimumLength(1)
+                        .hasMaximumLength(256)
+                        .hasMinimumLength(4)
                 },
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = {}

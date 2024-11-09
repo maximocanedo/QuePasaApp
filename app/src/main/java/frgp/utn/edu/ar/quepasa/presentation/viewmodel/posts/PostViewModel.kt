@@ -78,6 +78,8 @@ class PostViewModel @Inject constructor(
         try {
             val post = repository.getPostById(id)
             _post.value = post
+            _tags.value = _post.value!!.tags?.split(",") ?: emptyList()
+            _tagCount.value = _tags.value.size
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -167,7 +169,7 @@ class PostViewModel @Inject constructor(
     suspend fun createPost(
         audience: String,
         title: String,
-        subtype: String,
+        subtype: Int,
         description: String,
         neighbourhood: Long,
         tags: List<String>
@@ -182,7 +184,7 @@ class PostViewModel @Inject constructor(
                 originalPoster = null,
                 audience = Audience.valueOf(audience),
                 title = title,
-                subtype = subtype.toInt(),
+                subtype = subtype,
                 description = description,
                 neighbourhood = neighbourhood,
                 timestamp = null,

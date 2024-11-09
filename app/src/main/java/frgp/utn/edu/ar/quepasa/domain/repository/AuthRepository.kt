@@ -12,7 +12,9 @@ import frgp.utn.edu.ar.quepasa.data.model.auth.SingleUseRequest
 import frgp.utn.edu.ar.quepasa.data.source.remote.AuthService
 import frgp.utn.edu.ar.quepasa.data.source.remote.saveAuthToken
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
@@ -45,8 +47,8 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun loginUsingTotp(code: String): ApiResponse<AuthenticationResponse?> {
-        val mediaType = MediaType.parse("text/plain")
-        val requestBody = RequestBody.create(mediaType, code)
+        val mediaType = "text/plain".toMediaTypeOrNull()
+        val requestBody = code.toRequestBody(mediaType)
         val x = apiResponseHandler.getResponse(authService.loginUsingTotp(requestBody))
         if(x is ApiResponse.Success) {
             val token = x.data?.token ?: ""

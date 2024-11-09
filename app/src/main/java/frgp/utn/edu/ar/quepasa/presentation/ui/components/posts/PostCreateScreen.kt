@@ -36,11 +36,10 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleFiel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
-import frgp.utn.edu.ar.quepasa.utils.validators.posts.DescriptionValidator
-import frgp.utn.edu.ar.quepasa.utils.validators.posts.TitleValidator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -120,10 +119,10 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     .fillMaxWidth(),
                 value = title,
                 validator = {
-                    TitleValidator(title)
-                        .notEmpty()
-                        .meetsMinimumLength()
-                        .meetsMaximumLength()
+                    StringValidator(title)
+                        .isNotBlank()
+                        .hasMaximumLength(100)
+                        .hasMinimumLength(1)
                 },
                 onChange = { newTitle -> title = newTitle },
                 onValidityChange = {}
@@ -133,10 +132,10 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     .fillMaxWidth(),
                 value = description,
                 validator = {
-                    DescriptionValidator(description)
-                        .notEmpty()
-                        .meetsMinimumLength()
-                        .meetsMaximumLength()
+                    StringValidator(title)
+                        .isNotBlank()
+                        .hasMaximumLength(100)
+                        .hasMinimumLength(1)
                 },
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = {}

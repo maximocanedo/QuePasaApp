@@ -3,6 +3,7 @@ package frgp.utn.edu.ar.quepasa.data
 import android.content.Context
 import frgp.utn.edu.ar.quepasa.data.source.remote.getAuthToken
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import okhttp3.internal.http.HttpMethod
 
@@ -30,12 +31,12 @@ class AuthInterceptor(private val context: Context) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = getAuthToken(context) ?: defaultToken
         val request = chain.request().newBuilder();
-        val rawPath = chain.request().url().uri().rawPath
+        val rawPath = chain.request().url.toUri().rawPath
         val isExcluded = getAuthenticationExcludedEndpoints().any { endpoint ->
             val pattern = endpoint.uri.replace("*", ".*")
             val regex = Regex(pattern)
             val urlMatches = regex.matches(rawPath)
-            val methodMatches = chain.request().method().equals(endpoint.method.name)
+            val methodMatches = chain.request().method.equals(endpoint.method.name)
                     || endpoint.method == Method.ALL
             urlMatches && methodMatches
         }

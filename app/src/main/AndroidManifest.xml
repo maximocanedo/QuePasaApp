@@ -26,10 +26,6 @@
             android:label="Main Navigation Activity"
             android:exported="true"/>
         <activity
-            android:name="frgp.utn.edu.ar.quepasa.presentation.activity.auth.SampleActivity"
-            android:label="Testing Activity"
-            android:exported="true"/>
-        <activity
             android:exported="true"
             android:name="frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity" />
         <activity

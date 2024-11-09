@@ -1,8 +1,8 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.foundation.layout.height
 import frgp.utn.edu.ar.quepasa.utils.validators.posts.DescriptionValidator
-
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -12,29 +12,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.commons.StringValidator
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DescriptionField(
     modifier: Modifier,
     value: String,
-    validator: (String) -> DescriptionValidator,
+    validator: (String) -> StringValidator,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit
 ) {
+    var content: String by remember { mutableStateOf(value) }
     var isValid: Boolean by remember { mutableStateOf(true) }
     var error: String by remember { mutableStateOf("") }
     TextField(
         modifier = modifier.height(150.dp),
         value = value,
         onValueChange = {
-            val status = validator(it).build()
-            isValid = status.build().isValid()
-            onValidityChange(isValid)
-            error = if(status.getErrors().isNotEmpty())
-                status.build().getErrors().first()
-            else ""
-            onChange(it)
+            content = it
+            CoroutineScope(IO).launch {
+                var status = false
+                try {
+                    validator(it).build()
+                    error = ""
+                    status = true
+                } catch(err: ValidationError) {
+                    error = err.errors.first()
+                }
+                isValid = status
+                onValidityChange(status)
+                onChange(it)
+            }
         },
         isError = !isValid,
         placeholder = { Text("¿Qué pasa?")},
@@ -49,10 +62,10 @@ fun DescriptionFieldPreview() {
     DescriptionField(
         modifier = Modifier,
         validator = {
-            DescriptionValidator("description")
-                .notEmpty()
-                .meetsMinimumLength()
-                .meetsMaximumLength()
+            StringValidator("description")
+                .isNotBlank()
+                .hasMinimumLength(3)
+                .hasMaximumLength(256)
         },
         onChange = { description = it },
         onValidityChange = {

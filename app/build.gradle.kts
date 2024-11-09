@@ -70,6 +70,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation(fileTree(mapOf(
+        "dir" to "libs/",
+        "include" to listOf("*.aar", "*.jar"),
+        "exclude" to listOf("*.exe")
+    )))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -84,6 +89,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    /** Material Icons **/
+    // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
+    runtimeOnly("androidx.compose.material:material-icons-extended:1.7.5")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
 

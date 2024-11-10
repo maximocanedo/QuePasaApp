@@ -17,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.MinimalDialog
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import java.time.LocalDateTime
 
@@ -48,7 +48,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
         }
         when {
             openNeighbourhoodDialog.value -> {
-                MinimalDialog(
+                NeighbourhoodDialog(
                     onDismissRequest = { openNeighbourhoodDialog.value = false },
                     neighbourhoods = neighbourhoods,
                     onNeighbourhoodsChange = { neighbourhoods = it }

@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,13 +42,16 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PostCreateScreen(navController: NavHostController, user: User?) {
+    val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
@@ -64,7 +69,6 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                     modifier = Modifier.weight(1f),
                     onItemSelected = {
                         type = it
-                        subtype = 0
                     }
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -97,7 +101,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                     StringValidator(tag)
                         .isNotBlank()
                         .hasMaximumLength(15)
-                        .hasMinimumLength(4)
+                        .hasMinimumLength(3)
                 },
                 onChange = {
                         newTags -> tag = newTags
@@ -155,7 +159,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {
                     CoroutineScope(IO).launch {
-                        viewModel.createPost(
+                        val result = viewModel.createPost(
                             audience = audience,
                             title = title,
                             subtype = subtype,
@@ -163,6 +167,16 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                             neighbourhood = neighbourhood,
                             tags = tags
                         )
+
+                        withContext(Dispatchers.Main) {
+                            if (result) {
+                                navController.navigate("home")
+                                Toast.makeText(context, "Publicación creada", Toast.LENGTH_SHORT).show()
+                            }
+                            else {
+                                Toast.makeText(context, "Publicación no creada (error)", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }) {
                     Text("Publicar")

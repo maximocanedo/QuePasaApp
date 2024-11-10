@@ -173,7 +173,7 @@ class PostViewModel @Inject constructor(
         description: String,
         neighbourhood: Long,
         tags: List<String>
-    ) {
+    ): Boolean {
         try {
             var tagsString = ""
             tags.forEachIndexed { index, tag ->
@@ -194,10 +194,12 @@ class PostViewModel @Inject constructor(
             val newType = repository.createPost(request)
             _post.value = newType
             clearTags()
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
-            println(e.printStackTrace())
+            e.printStackTrace()
+            return false
         }
     }
 

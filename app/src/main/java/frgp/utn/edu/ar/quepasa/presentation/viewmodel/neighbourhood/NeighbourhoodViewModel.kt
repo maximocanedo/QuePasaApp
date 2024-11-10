@@ -37,9 +37,9 @@ class NeighbourhoodViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getNeighbourhoods(activeOnly: Boolean) {
+    private suspend fun getNeighbourhoods(activeOnly: Boolean, page: Int = 0, size: Int = 10) {
         try {
-            val neighbourhoods = repository.getNeighbourhoods(activeOnly)
+            val neighbourhoods = repository.getNeighbourhoods(activeOnly, page, size)
             _neighbourhoods.value = neighbourhoods
         }
         catch(e: Exception) {
@@ -57,9 +57,9 @@ class NeighbourhoodViewModel @Inject constructor(
         }
     }
 
-    suspend fun getNeighbourhoodsByName(name: String) {
+    suspend fun getNeighbourhoodsByName(name: String, page: Int = 0, size: Int = 10) {
         try {
-            val neighbourhoods = repository.getNeighbourhoodsByName(name)
+            val neighbourhoods = repository.getNeighbourhoodsByName(name, page, size)
             _neighbourhoods.value = neighbourhoods
         }
         catch(e: Exception) {

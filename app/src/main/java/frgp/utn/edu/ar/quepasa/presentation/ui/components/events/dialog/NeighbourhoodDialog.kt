@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -41,10 +44,11 @@ fun NeighbourhoodDialog(
     val searchedNeighbourhood = remember { mutableStateOf("") }
     val viewModel: NeighbourhoodViewModel = hiltViewModel()
     val displayNeighbourhoods by viewModel.neighbourhoods.collectAsState()
+    var neighbourhoodSize by remember { mutableIntStateOf(3) }
 
     LaunchedEffect(Unit) {
         viewModel.viewModelScope.launch {
-            viewModel.getNeighbourhoodsByName(searchedNeighbourhood.value)
+            viewModel.getNeighbourhoodsByName(searchedNeighbourhood.value, size = neighbourhoodSize)
         }
     }
 
@@ -63,8 +67,12 @@ fun NeighbourhoodDialog(
                 onValueChange = {
                     searchedNeighbourhood.value = it
                     viewModel.viewModelScope.launch {
-                        viewModel.getNeighbourhoodsByName(searchedNeighbourhood.value)
+                        viewModel.getNeighbourhoodsByName(
+                            searchedNeighbourhood.value,
+                            size = neighbourhoodSize
+                        )
                     }
+                    neighbourhoodSize = 3
                 },
                 label = { Text("Barrio") },
                 modifier = Modifier
@@ -74,8 +82,9 @@ fun NeighbourhoodDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp),
-                userScrollEnabled = true
+                    .height(220.dp)
+                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+                userScrollEnabled = true,
             ) {
                 items(displayNeighbourhoods.content) { neighbourhood ->
                     Row(
@@ -107,6 +116,20 @@ fun NeighbourhoodDialog(
                         }
                     }
                 }
+            }
+            Button(
+                onClick = {
+                    neighbourhoodSize += 3
+                    viewModel.viewModelScope.launch {
+                        viewModel.getNeighbourhoodsByName(
+                            searchedNeighbourhood.value,
+                            size = neighbourhoodSize
+                        )
+                    }
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Cargar más")
             }
         }
     }

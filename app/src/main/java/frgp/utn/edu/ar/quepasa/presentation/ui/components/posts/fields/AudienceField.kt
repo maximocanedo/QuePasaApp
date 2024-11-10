@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.utils.audience.audienceToEnglish
 import frgp.utn.edu.ar.quepasa.utils.audience.audienceToSpanish
@@ -87,4 +88,15 @@ fun AudienceField(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun AudienceFieldPreview() {
+    var audience by remember { mutableStateOf("") }
+    AudienceField(
+        modifier = Modifier,
+        audience = audience,
+        onItemSelected = { audience = it }
+    )
 }

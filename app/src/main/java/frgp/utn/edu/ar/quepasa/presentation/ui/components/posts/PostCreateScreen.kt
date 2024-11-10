@@ -21,10 +21,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
@@ -43,7 +46,7 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CreatePostScreen(navController: NavHostController, user: User?) {
+fun PostCreateScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
@@ -51,7 +54,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
         var description by remember { mutableStateOf("") }
         var neighbourhood by remember { mutableLongStateOf(1) }
         var type by remember { mutableIntStateOf(1) }
-        var subtype by remember { mutableStateOf(1) }
+        var subtype by remember { mutableIntStateOf(1) }
         var tag by remember { mutableStateOf("") }
         val tags by viewModel.tags.collectAsState()
 
@@ -90,6 +93,12 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
             TagField(
                 modifier = Modifier.padding(2.dp),
                 value = tag,
+                validator = {
+                    StringValidator(tag)
+                        .isNotBlank()
+                        .hasMaximumLength(15)
+                        .hasMinimumLength(4)
+                },
                 onChange = {
                         newTags -> tag = newTags
                 },
@@ -133,7 +142,7 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
                     .fillMaxWidth(),
                 value = description,
                 validator = {
-                    StringValidator(title)
+                    StringValidator(description)
                         .isNotBlank()
                         .hasMaximumLength(256)
                         .hasMinimumLength(4)
@@ -161,4 +170,12 @@ fun CreatePostScreen(navController: NavHostController, user: User?) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PostCreateScreenPreview() {
+    val navController = rememberNavController()
+    val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
+    PostCreateScreen(navController = navController, user = user)
 }

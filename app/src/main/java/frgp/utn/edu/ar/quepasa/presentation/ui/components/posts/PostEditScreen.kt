@@ -22,10 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
@@ -99,6 +102,12 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     TagField(
                         modifier = Modifier.padding(2.dp),
                         value = tag,
+                        validator = {
+                            StringValidator(title)
+                                .isNotBlank()
+                                .hasMaximumLength(15)
+                                .hasMinimumLength(4)
+                        },
                         onChange = { newTags ->
                             tag = newTags
                         },
@@ -171,4 +180,12 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
             //navController.navigate("home")
         }
     }
+}
+
+@Preview
+@Composable
+fun PostEditScreenPreview() {
+    val navController = rememberNavController()
+    val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
+    PostEditScreen(navController = navController, user = user)
 }

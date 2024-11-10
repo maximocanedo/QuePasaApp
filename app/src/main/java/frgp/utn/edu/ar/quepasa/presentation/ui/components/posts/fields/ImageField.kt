@@ -7,6 +7,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import frgp.utn.edu.ar.quepasa.R
 
 @Composable
@@ -23,4 +24,10 @@ fun ImageField(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun ImageFieldPreview() {
+    ImageField(modifier = Modifier)
 }

@@ -2,6 +2,7 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.events
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
@@ -16,6 +17,7 @@ import org.w3c.dom.Comment
 import java.util.UUID
 import javax.inject.Inject
 
+@HiltViewModel
 class EventViewModel @Inject constructor(
     private val repository: EventRepository
 ) : ViewModel() {

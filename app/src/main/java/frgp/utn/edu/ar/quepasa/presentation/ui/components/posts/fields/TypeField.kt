@@ -2,7 +2,6 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -73,8 +72,13 @@ fun TypeField(modifier: Modifier, onItemSelected: (Int) -> Unit) {
         }
     }
     else {
-        Spacer(modifier = modifier)
-        Text("Sin tipos", modifier = modifier)
+        TextField(
+            value = "",
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth(),
+        )
     }
 }
 

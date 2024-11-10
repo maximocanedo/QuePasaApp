@@ -105,7 +105,13 @@ fun NeighbourhoodField(
         }
     }
     else {
-        Text("Sin barrios", modifier = modifier)
+        TextField(
+            value = "",
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth(),
+        )
     }
 }
 

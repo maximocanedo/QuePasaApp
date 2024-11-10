@@ -40,8 +40,8 @@ fun NeighbourhoodField(
 ) {
     val viewModel: NeighbourhoodViewModel = hiltViewModel()
     val neighbourhoods by viewModel.neighbourhoods.collectAsState()
-    val items = neighbourhoods.map { it.name }
-    val itemsId = neighbourhoods.map { it.id }
+    val items = neighbourhoods.content.map { it.name }
+    val itemsId = neighbourhoods.content.map { it.id }
 
     if(items.isNotEmpty()) {
         val maxLength = 8

@@ -1,6 +1,7 @@
 package frgp.utn.edu.ar.quepasa.data.source.remote.geo
 
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
+import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -15,13 +16,21 @@ interface NeighbourhoodService {
     suspend fun createNeighbourhood(@Body neighbourhood: Neighbourhood): Response<Neighbourhood>
 
     @GET("neighbourhoods")
-    suspend fun getNeighbourhoods(@Query("activeOnly") activeOnly: Boolean): Response<List<Neighbourhood>>
+    suspend fun getNeighbourhoods(
+        @Query("activeOnly") activeOnly: Boolean,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<Page<Neighbourhood>>
 
     @GET("neighbourhoods/{id}")
     suspend fun getNeighbourhoodById(@Path("id") id: Long): Response<Neighbourhood>
 
     @GET("neighbourhoods/search")
-    suspend fun getNeighbourhoodsByName(@Query("name") name: String): Response<List<Neighbourhood>>
+    suspend fun getNeighbourhoodsByName(
+        @Query("name") name: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<Page<Neighbourhood>>
 
     @PUT("neighbourhoods/{id}")
     suspend fun updateNeighbourhood(@Path("id") id: Long, @Body updatedNeighbourhood: Neighbourhood): Response<Neighbourhood>

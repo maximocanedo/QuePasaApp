@@ -77,7 +77,7 @@ fun NeighbourhoodDialog(
                     .padding(start = 16.dp, end = 16.dp),
                 userScrollEnabled = true
             ) {
-                items(displayNeighbourhoods) { neighbourhood ->
+                items(displayNeighbourhoods.content) { neighbourhood ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,

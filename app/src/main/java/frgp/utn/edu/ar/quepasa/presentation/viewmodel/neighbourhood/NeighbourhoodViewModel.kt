@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.domain.repository.geo.NeighbourhoodRepository
+import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,8 +15,15 @@ import javax.inject.Inject
 class NeighbourhoodViewModel @Inject constructor(
     private val repository: NeighbourhoodRepository
 ): ViewModel() {
-    private val _neighbourhoods = MutableStateFlow<List<Neighbourhood>>(emptyList())
-    val neighbourhoods: StateFlow<List<Neighbourhood>> get() = _neighbourhoods
+    private val _neighbourhoods = MutableStateFlow<Page<Neighbourhood>>(
+        Page(
+            content = emptyList(),
+            totalElements = 0,
+            totalPages = 0,
+            pageNumber = 0
+        )
+    )
+    val neighbourhoods: StateFlow<Page<Neighbourhood>> get() = _neighbourhoods
 
     private val _neighbourhood = MutableStateFlow<Neighbourhood?>(null)
     val neighbourhood: StateFlow<Neighbourhood?> get() = _neighbourhood

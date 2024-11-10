@@ -7,14 +7,24 @@ import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.MaterialTheme
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.trends.TrendsViewModel
 
 @Composable
 fun TrendsScreen() {
     val trendsViewModel: TrendsViewModel = hiltViewModel()
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Tendencias", modifier = Modifier.padding(bottom = 8.dp))
+    Column(modifier = Modifier.padding(12.dp)) {
+        Text(
+            "Tendencias",
+            modifier = Modifier.padding(bottom = 6.dp),
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 16.sp,  // Fuente más pequeña para el título
+            fontWeight = FontWeight.SemiBold
+        )
         TrendsCarousel(trendsViewModel = trendsViewModel)
     }
 }
+

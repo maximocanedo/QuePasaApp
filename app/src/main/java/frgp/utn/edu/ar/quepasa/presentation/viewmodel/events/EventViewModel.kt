@@ -12,8 +12,10 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
+import quepasa.api.validators.commons.StringValidator
 import java.util.UUID
 import javax.inject.Inject
 
@@ -38,6 +40,20 @@ class EventViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: MutableStateFlow<String?> get() = _errorMessage
+
+    /** Valid **/
+    private val titleIsValidMutable = MutableStateFlow(false)
+    val titleIsValid = titleIsValidMutable.asStateFlow()
+    fun setTitleIsValid(x: Boolean) {
+        titleIsValidMutable.value = x
+    }
+
+    private val descriptionIsValidMutable = MutableStateFlow(false)
+    val descriptionIsValid = descriptionIsValidMutable.asStateFlow()
+    fun setDescriptionIsValid(x: Boolean) {
+        descriptionIsValidMutable.value = x
+    }
+
 
     init {
         viewModelScope.launch {
@@ -211,5 +227,19 @@ class EventViewModel @Inject constructor(
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    fun titleValidator(title: String): StringValidator {
+        return StringValidator(title)
+            .isNotBlank()
+            .hasMaximumLength(60)
+            .hasMinimumLength(4)
+    }
+
+    fun descriptionValidator(description: String): StringValidator {
+        return StringValidator(description)
+            .isNotBlank()
+            .hasMaximumLength(256)
+            .hasMinimumLength(4)
     }
 }

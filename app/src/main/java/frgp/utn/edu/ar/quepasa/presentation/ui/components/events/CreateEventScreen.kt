@@ -18,13 +18,15 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DescriptionField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import java.time.LocalDateTime
 
 @Composable
 fun CreateEventScreen(navController: NavHostController, user: User?) {
     val viewModel: EventViewModel = hiltViewModel()
-    BaseComponent(navController, user, "Creacion de Evento", true) {
+    BaseComponent(navController, user, "Crear de Evento", true) {
         var title: String by remember { mutableStateOf("") }
         var description: String by remember { mutableStateOf("") }
         var address: String by remember { mutableStateOf("") }
@@ -35,10 +37,43 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
         var neighbourhoods: Set<Long> by remember { mutableStateOf(HashSet()) }
 
         val openNeighbourhoodDialog = remember { mutableStateOf(false) }
+
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TitleField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = title,
+                    validator = viewModel::titleValidator,
+                    onChange = { value, valid ->
+                        run {
+                            title = value
+                            viewModel.setTitleIsValid(valid)
+                        }
+                    }
+                )
+            }
+            Row {
+                DescriptionField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = description,
+                    validator = viewModel::descriptionValidator,
+                    onChange = { value, valid ->
+                        run {
+                            description = value
+                            viewModel.setDescriptionIsValid(valid)
+                        }
+                    }
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Button(onClick = {
                     openNeighbourhoodDialog.value = true
                 }) {
@@ -46,6 +81,9 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                 }
             }
         }
+
+
+
         when {
             openNeighbourhoodDialog.value -> {
                 NeighbourhoodDialog(

@@ -1,8 +1,13 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -42,6 +47,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,9 +58,21 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostCreateScreen(navController: NavHostController, user: User?, pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>) {
+fun PostCreateScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
+    val imageViewModel = ImageViewModel()
+
+    val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+        if(uris.isNotEmpty()) {
+            imageViewModel.addImages(uris)
+            Log.d("ImageSelector", "Number of items selected: ${uris.size}")
+        }
+        else {
+            Log.d("ImageSelector", "No media selected")
+        }
+    }
+
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("PUBLIC") }
@@ -199,11 +217,23 @@ fun PostCreateScreen(navController: NavHostController, user: User?, pickMultiple
     }
 }
 
+@Composable
+fun LaunchImageSelector() {
+    val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+        if(uris.isNotEmpty()) {
+            //imageViewModel.addImages(uris)
+            Log.d("PhotoPicker", "Number of items selected: ${uris.size}")
+        }
+        else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PostCreateScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
-    PostCreateScreen(navController = navController, user = user, pickMultipleMediaLauncher)
+    PostCreateScreen(navController = navController, user = user)
 }

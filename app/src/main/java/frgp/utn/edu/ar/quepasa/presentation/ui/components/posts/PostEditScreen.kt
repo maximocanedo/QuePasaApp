@@ -1,7 +1,10 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -41,6 +44,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -49,11 +53,23 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostEditScreen(navController: NavHostController, user: User?, pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>) {
+fun PostEditScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
+    val imageViewModel = ImageViewModel()
+
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(1)
+        }
+
+        val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+            if(uris.isNotEmpty()) {
+                imageViewModel.addImages(uris)
+                Log.d("ImageSelector", "Number of items selected: ${uris.size}")
+            }
+            else {
+                Log.d("ImageSelector", "No media selected")
+            }
         }
 
         val post by viewModel.post.collectAsState()
@@ -193,5 +209,5 @@ fun PostEditScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
     lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
-    PostEditScreen(navController = navController, user = user, pickMultipleMediaLauncher = pickMultipleMediaLauncher)
+    PostEditScreen(navController = navController, user = user)
 }

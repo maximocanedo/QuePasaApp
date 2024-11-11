@@ -18,9 +18,12 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DateField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DescriptionField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
+import quepasa.api.validators.events.EventDateValidator
 import java.time.LocalDateTime
 
 @Composable
@@ -71,6 +74,50 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     }
                 )
             }
+            Row {
+                AddressField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = address,
+                    validator = viewModel::addressValidator,
+                    onChange = { value, valid ->
+                        run {
+                            address = value
+                            viewModel.setAddressIsValid(valid)
+                        }
+                    }
+                )
+            }
+            Row {
+                DateField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = start,
+                    validator = viewModel::startDateValidator,
+                    onChange = { value, valid ->
+                        run {
+                            start = value
+                            viewModel.setStartDateIsValid(valid)
+                        }
+                    },
+                    label = "Fecha de inicio"
+                )
+            }
+            Row {
+                DateField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = end,
+                    validator = {
+                        EventDateValidator(it)
+                            .isNotNull().isNotPast().isAfterStartDate(start)
+                    },
+                    onChange = { value, valid ->
+                        run {
+                            end = value
+                            viewModel.setEndDateIsValid(valid)
+                        }
+                    },
+                    label = "Fecha de fin"
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -80,6 +127,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     Text("Agregar Barrios")
                 }
             }
+
         }
 
 

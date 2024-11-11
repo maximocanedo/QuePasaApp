@@ -1,23 +1,19 @@
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Post
+import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
+import frgp.utn.edu.ar.quepasa.data.model.PostType
 import frgp.utn.edu.ar.quepasa.data.model.enums.SubnationalDivisionDenomination
-import frgp.utn.edu.ar.quepasa.data.model.geo.Country
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.card.components.CardButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
@@ -194,6 +190,8 @@ fun PreviewPostCard() {
             role = frgp.utn.edu.ar.quepasa.data.model.enums.Role.USER,
             active = true
         ),
+        title = "Título ejemplo",
+        subtype = PostSubtype(1, PostType(1, "PostType ejemplo"), "PostSubtype ejemplo"),
         description = "Este es un ejemplo estoy usando preview como me recomendo Maximo, ahora la pc suena mas fuerte jajjaj. mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto ",
         timestamp = Timestamp(System.currentTimeMillis()),
         neighbourhood = frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood(

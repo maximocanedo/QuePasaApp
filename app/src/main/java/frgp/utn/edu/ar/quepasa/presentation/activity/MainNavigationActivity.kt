@@ -10,6 +10,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.theme.TP4Theme
 class MainNavigationActivity : AuthenticatedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             val navController = rememberNavController()
             TP4Theme {

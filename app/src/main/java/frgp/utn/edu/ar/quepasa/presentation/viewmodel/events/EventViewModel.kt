@@ -12,8 +12,14 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
+import quepasa.api.validators.events.EventAddressValidator
+import quepasa.api.validators.events.EventDateValidator
+import quepasa.api.validators.events.EventDescriptionValidator
+import quepasa.api.validators.events.EventTitleValidator
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -38,6 +44,37 @@ class EventViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: MutableStateFlow<String?> get() = _errorMessage
+
+    /** Valid **/
+    private val titleIsValidMutable = MutableStateFlow(false)
+    val titleIsValid = titleIsValidMutable.asStateFlow()
+    fun setTitleIsValid(x: Boolean) {
+        titleIsValidMutable.value = x
+    }
+
+    private val descriptionIsValidMutable = MutableStateFlow(false)
+    val descriptionIsValid = descriptionIsValidMutable.asStateFlow()
+    fun setDescriptionIsValid(x: Boolean) {
+        descriptionIsValidMutable.value = x
+    }
+
+    private val addressIsValidMutable = MutableStateFlow(false)
+    val addressIsValid = addressIsValidMutable.asStateFlow()
+    fun setAddressIsValid(x: Boolean) {
+        addressIsValidMutable.value = x
+    }
+
+    private val startDateIsValidMutable = MutableStateFlow(false)
+    val startDateIsValid = startDateIsValidMutable.asStateFlow()
+    fun setStartDateIsValid(x: Boolean) {
+        startDateIsValidMutable.value = x
+    }
+
+    private val endDateIsValidMutable = MutableStateFlow(false)
+    val endDateIsValid = endDateIsValidMutable.asStateFlow()
+    fun setEndDateIsValid(x: Boolean) {
+        endDateIsValidMutable.value = x
+    }
 
     init {
         viewModelScope.launch {
@@ -211,5 +248,21 @@ class EventViewModel @Inject constructor(
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    fun titleValidator(title: String): EventTitleValidator {
+        return EventTitleValidator(title).isNotBlank().meetsLimits()
+    }
+
+    fun descriptionValidator(description: String): EventDescriptionValidator {
+        return EventDescriptionValidator(description).isNotBlank().meetsLimits()
+    }
+
+    fun addressValidator(address: String): EventAddressValidator {
+        return EventAddressValidator(address).isNotBlank()
+    }
+
+    fun startDateValidator(date: LocalDateTime): EventDateValidator {
+        return EventDateValidator(date).isNotNull().isNotPast()
     }
 }

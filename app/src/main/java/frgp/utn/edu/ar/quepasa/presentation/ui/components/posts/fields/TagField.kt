@@ -32,6 +32,7 @@ fun TagField(
     validator: (String) -> StringValidator,
     onChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
+    onAdded: () -> Unit,
     viewModel: PostViewModel
 ) {
     Column(modifier = modifier) {
@@ -65,9 +66,10 @@ fun TagField(
             )
 
             IconButton(onClick = {
-                if(content.isNotBlank()) {
+                if(isValid && content.isNotBlank()) {
                     viewModel.addTag(value)
                     content = ""
+                    onAdded()
                 }
             } ) {
                 Icon(
@@ -98,6 +100,7 @@ fun TagFieldPreview() {
             newTags -> tag = newTags
         },
         onValidityChange = {},
+        onAdded = { tag = "" },
         viewModel = viewModel
     )
 }

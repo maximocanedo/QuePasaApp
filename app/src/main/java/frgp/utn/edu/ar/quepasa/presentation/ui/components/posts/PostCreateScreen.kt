@@ -1,6 +1,9 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -40,6 +43,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +58,8 @@ import quepasa.api.validators.commons.StringValidator
 fun PostCreateScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
+    val imageViewModel = ImageViewModel()
+
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("PUBLIC") }
@@ -67,6 +74,8 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 TypeField(
                     modifier = Modifier.weight(1f),
+                    subtype = subtype,
+                    loadBySubtype = false,
                     onItemSelected = {
                         type = it
                     }
@@ -106,7 +115,8 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 onChange = {
                         newTags -> tag = newTags
                 },
-                onValidityChange = {},
+                onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
+                onAdded = { tag = "" },
                 viewModel
             )
 
@@ -139,7 +149,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                         .hasMinimumLength(4)
                 },
                 onChange = { newTitle -> title = newTitle },
-                onValidityChange = {}
+                onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
             )
             DescriptionField(
                 modifier = Modifier
@@ -152,29 +162,38 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                         .hasMinimumLength(4)
                 },
                 onChange = { newDesc -> description = newDesc },
-                onValidityChange = {}
+                onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
             )
-            ImageField(modifier = Modifier.fillMaxWidth())
+            ImagesPreview(modifier = Modifier, viewModel = imageViewModel)
+            ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {
                     CoroutineScope(IO).launch {
-                        val result = viewModel.createPost(
-                            audience = audience,
-                            title = title,
-                            subtype = subtype,
-                            description = description,
-                            neighbourhood = neighbourhood,
-                            tags = tags
-                        )
+                        val validation = viewModel.checkValidationFields()
+                        println("Validation $validation")
+                        if (validation) {
+                            val result = viewModel.createPost(
+                                audience = audience,
+                                title = title,
+                                subtype = subtype,
+                                description = description,
+                                neighbourhood = neighbourhood,
+                                tags = tags
+                            )
 
-                        withContext(Dispatchers.Main) {
-                            if (result) {
-                                navController.navigate("home")
-                                Toast.makeText(context, "Publicación creada", Toast.LENGTH_SHORT).show()
+                            withContext(Dispatchers.Main) {
+                                if (result) {
+                                    navController.navigate("home")
+                                    Toast.makeText(context, "Publicación creada", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Publicación no creada (error)", Toast.LENGTH_SHORT).show()
+                                }
                             }
-                            else {
-                                Toast.makeText(context, "Publicación no creada (error)", Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Tiene campos sin completar", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -182,6 +201,19 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                     Text("Publicar")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LaunchImageSelector() {
+    val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+        if(uris.isNotEmpty()) {
+            //imageViewModel.addImages(uris)
+            Log.d("PhotoPicker", "Number of items selected: ${uris.size}")
+        }
+        else {
+            Log.d("PhotoPicker", "No media selected")
         }
     }
 }

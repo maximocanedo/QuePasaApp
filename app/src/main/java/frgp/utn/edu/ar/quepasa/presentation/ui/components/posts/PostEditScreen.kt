@@ -62,8 +62,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                 var audience by remember { mutableStateOf(safePost.audience.name) }
                 var description by remember { mutableStateOf(safePost.description) }
                 var neighbourhood by remember { mutableLongStateOf(safePost.neighbourhood!!.id) }
-                var type by remember { mutableIntStateOf(safePost.subtype!!.type!!.id!!) }
-                var subtype by remember { mutableStateOf(safePost.subtype!!.id) }
+                var type by remember { mutableIntStateOf(safePost.subtype.type.id) }
+                var subtype by remember { mutableIntStateOf(safePost.subtype.id) }
                 var tag by remember { mutableStateOf("") }
                 val tags by viewModel.tags.collectAsState()
 
@@ -71,6 +71,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TypeField(
                             modifier = Modifier.weight(1f),
+                            subtype = subtype,
+                            loadBySubtype = true,
                             onItemSelected = {
                                 type = it
                                 subtype = 0
@@ -111,7 +113,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         onChange = { newTags ->
                             tag = newTags
                         },
-                        onValidityChange = {},
+                        onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
+                        onAdded = { tag = "" },
                         viewModel
                     )
 
@@ -136,7 +139,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     TitleField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = title!!,
+                        value = title,
                         validator = {
                             StringValidator(title)
                                 .isNotBlank()
@@ -144,12 +147,12 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                                 .hasMinimumLength(1)
                         },
                         onChange = { newTitle -> title = newTitle },
-                        onValidityChange = {}
+                        onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
                     )
                     DescriptionField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = description!!,
+                        value = description,
                         validator = {
                             StringValidator(title)
                                 .isNotBlank()
@@ -157,7 +160,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                                 .hasMinimumLength(4)
                         },
                         onChange = { newDesc -> description = newDesc },
-                        onValidityChange = {}
+                        onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
                     ImageField(modifier = Modifier.fillMaxWidth())
 

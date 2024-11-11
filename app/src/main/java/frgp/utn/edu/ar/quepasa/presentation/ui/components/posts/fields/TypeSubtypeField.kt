@@ -35,7 +35,8 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (Int) -> Uni
     }
 
     val postSubtypes by viewModel.postSubtypes.collectAsState()
-    val items = postSubtypes.content.map { it.description ?: "" }
+    val items = postSubtypes.content.map { it.description }
+    val itemsId = postSubtypes.content.map { it.id }
 
     if(items.isNotEmpty()) {
         val maxLength = 14
@@ -71,12 +72,12 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (Int) -> Uni
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items.forEach { item ->
+                items.forEachIndexed() { index, item ->
                     DropdownMenuItem(
                         text = { Text(text = item) },
                         onClick = {
                             selectedItem = item
-                            onItemSelected(item.toInt())
+                            onItemSelected(itemsId[index])
                             expanded = false
                         }
                     )

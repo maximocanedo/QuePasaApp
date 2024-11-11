@@ -11,6 +11,7 @@ import frgp.utn.edu.ar.quepasa.data.model.PostDTO
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.domain.repository.PostRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -45,8 +46,11 @@ class PostViewModel @Inject constructor(
     private var _tagCount = MutableStateFlow(0)
     val tagCount: StateFlow<Int> get() = _tagCount
 
+    private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }
+
+    private val _fieldTagValidation = MutableSharedFlow<Boolean>()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> get() = _errorMessage
 
     init {
         viewModelScope.launch {
@@ -307,5 +311,20 @@ class PostViewModel @Inject constructor(
     private fun clearTags() {
         _tags.value = emptyList()
         _tagCount.value = 0
+    }
+
+    fun toggleValidationField(index: Int, state: Boolean) {
+        require(index in _fieldsValidation.indices) { "Index out of bounds" }
+        _fieldsValidation[index].value = state
+    }
+
+    fun checkValidationFields(): Boolean {
+        return _fieldsValidation.all { it.value }
+    }
+
+    fun toggleTagValidationField(state: Boolean) {
+        viewModelScope.launch {
+            _fieldTagValidation.emit(state)
+        }
     }
 }

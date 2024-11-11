@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.DateDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.TimeDialog
+import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventDateValidator
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -35,11 +36,11 @@ fun DateField(
     modifier: Modifier = Modifier,
     value: LocalDateTime,
     validator: (LocalDateTime) -> EventDateValidator = { EventDateValidator(it) },
-    clearServerError: () -> Unit = {},
-    onChange: (LocalDateTime, Boolean) -> Unit,
-    serverError: String? = null,
+    onChange: (LocalDateTime) -> Unit,
     label: String
 ) {
+    var isValid by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf<LocalDateTime?>(value) }
     var showDateModal by remember { mutableStateOf(false) }
     var showTimeModal by remember { mutableStateOf(false) }
@@ -54,7 +55,8 @@ fun DateField(
                 value = selectedDate?.let { selectedDate!!.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) }
                     ?: "",
                 onValueChange = {
-
+                    selectedDate =
+                        LocalDateTime.parse(it, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 },
                 label = { Text(label) },
                 placeholder = { Text("MM/DD/YYYY HH:MM") },
@@ -72,6 +74,12 @@ fun DateField(
                             }
                         }
                     },
+                isError = !isValid,
+                supportingText = {
+                    if (!isValid) {
+                        Text(errorMessage)
+                    }
+                }
             )
         }
     }
@@ -82,7 +90,7 @@ fun DateField(
             onConfirm = { localDateTime ->
                 selectedDate = localDateTime
                 if (localDateTime != null) {
-                    onChange(localDateTime, validator(localDateTime).isValid)
+                    onChange(localDateTime)
                 }
                 showDateModal = false
                 showTimeModal = true
@@ -95,9 +103,18 @@ fun DateField(
             onConfirm = { time: TimePickerState ->
                 selectedDate = selectedDate?.withHour(time.hour)?.withMinute(time.minute)
                 if (selectedDate != null) {
-                    onChange(selectedDate!!, validator(selectedDate!!).isValid)
+                    onChange(selectedDate!!)
                 }
                 showTimeModal = false
+                // Validate the date
+                try {
+                    validator(selectedDate!!).build()
+                    isValid = true
+                    errorMessage = ""
+                } catch (e: ValidationError) {
+                    isValid = false
+                    errorMessage = e.errors.first() ?: ""
+                }
             }
         )
     }

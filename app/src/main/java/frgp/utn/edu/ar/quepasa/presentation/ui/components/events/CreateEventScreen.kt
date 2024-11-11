@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +23,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.Neighbou
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DateField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DescriptionField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventAudienceField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import quepasa.api.validators.events.EventDateValidator
@@ -44,11 +48,11 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row {
                 TitleField(
                     modifier = Modifier.fillMaxWidth(),
                     value = title,
@@ -92,12 +96,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     modifier = Modifier.fillMaxWidth(),
                     value = start,
                     validator = viewModel::startDateValidator,
-                    onChange = { value, valid ->
-                        run {
-                            start = value
-                            viewModel.setStartDateIsValid(valid)
-                        }
-                    },
+                    onChange = { start = it },
                     label = "Fecha de inicio"
                 )
             }
@@ -109,13 +108,26 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         EventDateValidator(it)
                             .isNotNull().isNotPast().isAfterStartDate(start)
                     },
-                    onChange = { value, valid ->
-                        run {
-                            end = value
-                            viewModel.setEndDateIsValid(valid)
-                        }
-                    },
+                    onChange = { end = it },
                     label = "Fecha de fin"
+                )
+            }
+            Row {
+                EventAudienceField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    audience = audience,
+                    onItemSelected = { audience = it }
+                )
+            }
+            Row {
+                EventCategoryField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    category = category,
+                    onItemSelected = { category = it }
                 )
             }
             Row(
@@ -129,8 +141,6 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
             }
 
         }
-
-
 
         when {
             openNeighbourhoodDialog.value -> {

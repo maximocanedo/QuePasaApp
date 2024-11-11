@@ -39,7 +39,8 @@ import kotlinx.coroutines.launch
 fun NeighbourhoodDialog(
     onDismissRequest: () -> Unit,
     neighbourhoods: Set<Long>,
-    onNeighbourhoodsChange: (Set<Long>) -> Unit
+    neighbourhoodsNames: List<String>,
+    onNeighbourhoodsChange: (Set<Long>, List<String>) -> Unit
 ) {
     val searchedNeighbourhood = remember { mutableStateOf("") }
     val viewModel: NeighbourhoodViewModel = hiltViewModel()
@@ -100,9 +101,15 @@ fun NeighbourhoodDialog(
                         IconButton(
                             onClick = {
                                 if (neighbourhoods.contains(neighbourhood.id)) {
-                                    onNeighbourhoodsChange(neighbourhoods.minus(neighbourhood.id))
+                                    onNeighbourhoodsChange(
+                                        neighbourhoods.minus(neighbourhood.id),
+                                        neighbourhoodsNames.minus(neighbourhood.name)
+                                    )
                                 } else {
-                                    onNeighbourhoodsChange(neighbourhoods.plus(neighbourhood.id))
+                                    onNeighbourhoodsChange(
+                                        neighbourhoods.plus(neighbourhood.id),
+                                        neighbourhoodsNames.plus(neighbourhood.name)
+                                    )
                                 }
                             },
                             modifier = Modifier

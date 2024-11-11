@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,7 +35,7 @@ fun DateField(
     modifier: Modifier = Modifier,
     value: LocalDateTime,
     validator: (LocalDateTime) -> EventDateValidator = { EventDateValidator(it) },
-    onChange: (LocalDateTime) -> Unit,
+    onChange: (LocalDateTime, Boolean) -> Unit,
     label: String
 ) {
     var isValid by remember { mutableStateOf(true) }
@@ -46,8 +45,7 @@ fun DateField(
     var showTimeModal by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
@@ -64,7 +62,6 @@ fun DateField(
                     Icon(Icons.Default.DateRange, contentDescription = "Select date")
                 },
                 modifier = modifier
-                    .fillMaxWidth()
                     .pointerInput(selectedDate) {
                         awaitEachGesture {
                             awaitFirstDown(pass = PointerEventPass.Initial)
@@ -89,8 +86,17 @@ fun DateField(
             onDismiss = { showDateModal = false },
             onConfirm = { localDateTime ->
                 selectedDate = localDateTime
+                // Validate date
+                try {
+                    validator(selectedDate!!).build()
+                    isValid = true
+                    errorMessage = ""
+                } catch (e: ValidationError) {
+                    isValid = false
+                    errorMessage = e.errors.first() ?: ""
+                }
                 if (localDateTime != null) {
-                    onChange(localDateTime)
+                    onChange(localDateTime, isValid)
                 }
                 showDateModal = false
                 showTimeModal = true
@@ -102,11 +108,7 @@ fun DateField(
             onDismiss = { showTimeModal = false },
             onConfirm = { time: TimePickerState ->
                 selectedDate = selectedDate?.withHour(time.hour)?.withMinute(time.minute)
-                if (selectedDate != null) {
-                    onChange(selectedDate!!)
-                }
-                showTimeModal = false
-                // Validate the date
+                // Validate date
                 try {
                     validator(selectedDate!!).build()
                     isValid = true
@@ -115,6 +117,10 @@ fun DateField(
                     isValid = false
                     errorMessage = e.errors.first() ?: ""
                 }
+                if (selectedDate != null) {
+                    onChange(selectedDate!!, isValid)
+                }
+                showTimeModal = false
             }
         )
     }

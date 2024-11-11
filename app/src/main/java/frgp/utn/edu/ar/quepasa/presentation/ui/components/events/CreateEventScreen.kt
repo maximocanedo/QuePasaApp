@@ -11,16 +11,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
+import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
@@ -33,26 +37,23 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.ImageFiel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import quepasa.api.validators.events.EventDateValidator
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun CreateEventScreen(navController: NavHostController, user: User?) {
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     BaseComponent(navController, user, "Crear de Evento", true) {
-        var title: String by remember { mutableStateOf("") }
-        var description: String by remember { mutableStateOf("") }
-        var address: String by remember { mutableStateOf("") }
-        var start: LocalDateTime by remember { mutableStateOf(LocalDateTime.now()) }
-        var end: LocalDateTime by remember { mutableStateOf(LocalDateTime.now()) }
-        var category: String by remember { mutableStateOf("EDUCATIVE") }
-        var audience: String by remember { mutableStateOf("PUBLIC") }
-        var neighbourhoods: Set<Long> by remember { mutableStateOf(HashSet()) }
-        var neighbourhoodsNames: List<String> by remember { mutableStateOf(ArrayList()) }
+        val title by viewModel.title.collectAsState()
+        val description by viewModel.description.collectAsState()
+        val address by viewModel.address.collectAsState()
+        val start by viewModel.start.collectAsState()
+        val end by viewModel.end.collectAsState()
+        val category by viewModel.category.collectAsState()
+        val audience by viewModel.audience.collectAsState()
+        val neighbourhoods by viewModel.neighbourhoods.collectAsState()
+        val neighbourhoodsNames by viewModel.neighbourhoodsNames.collectAsState()
 
         val openNeighbourhoodDialog = remember { mutableStateOf(false) }
 
@@ -70,7 +71,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     validator = viewModel::titleValidator,
                     onChange = { value, valid ->
                         run {
-                            title = value
+                            viewModel.setTitle(value)
                             viewModel.setTitleIsValid(valid)
                         }
                     }
@@ -83,7 +84,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     validator = viewModel::descriptionValidator,
                     onChange = { value, valid ->
                         run {
-                            description = value
+                            viewModel.setDescription(value)
                             viewModel.setDescriptionIsValid(valid)
                         }
                     }
@@ -96,7 +97,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     validator = viewModel::addressValidator,
                     onChange = { value, valid ->
                         run {
-                            address = value
+                            viewModel.setAddress(value)
                             viewModel.setAddressIsValid(valid)
                         }
                     }
@@ -112,11 +113,20 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     DateField(
                         modifier = Modifier.fillMaxWidth(),
                         value = start,
-                        validator = viewModel::startDateValidator,
+                        validator = {
+                            viewModel.startValidator(it)
+                            viewModel.endValidator(end)
+                        },
                         onChange = { value, valid ->
                             run {
-                                start = value
+                                viewModel.setStart(value)
                                 viewModel.setStartDateIsValid(valid)
+                                try {
+                                    viewModel.endValidator(end).build()
+                                    viewModel.setEndDateIsValid(true)
+                                } catch (e: Exception) {
+                                    viewModel.setEndDateIsValid(false)
+                                }
                             }
                         },
                         label = "Fecha de inicio"
@@ -129,12 +139,11 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         modifier = Modifier.widthIn(120.dp, 240.dp),
                         value = end,
                         validator = {
-                            EventDateValidator(it)
-                                .isNotNull().isNotPast().isAfterStartDate(start)
+                            viewModel.endValidator(it)
                         },
                         onChange = { value, valid ->
                             run {
-                                end = value
+                                viewModel.setEnd(value)
                                 viewModel.setEndDateIsValid(valid)
                             }
                         },
@@ -153,7 +162,9 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         modifier = Modifier
                             .padding(bottom = 8.dp),
                         audience = audience,
-                        onItemSelected = { audience = it }
+                        onItemSelected = {
+                            viewModel.setAudience(it)
+                        }
                     )
                 }
                 Column(
@@ -163,7 +174,9 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         modifier = Modifier
                             .padding(bottom = 8.dp),
                         category = category,
-                        onItemSelected = { category = it }
+                        onItemSelected = {
+                            viewModel.setCategory(it)
+                        }
                     )
                 }
             }
@@ -181,7 +194,14 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Barrios") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = !viewModel.neighbourhoodIsValid.collectAsState().value,
+                        supportingText = {
+                            if (!viewModel.neighbourhoodIsValid.collectAsState().value) {
+                                Text("Debe seleccionar al menos un barrio")
+                            }
+                        },
+
                     )
                 }
                 Column(
@@ -204,25 +224,26 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
             Row {
                 Button(
                     onClick = {
-                        CoroutineScope(IO).launch {
-                            /*
-                            val validation = viewModel.
-                            println("Validation $validation")
-                            if (validation) {
-                                val result = viewModel.createEvent(
+                        viewModel.viewModelScope.launch {
+                            if (viewModel.isEventValid()) {
+                                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                                val startDate = start.format(formatter)
+                                val endDate = end.format(formatter)
+                                val request = EventCreateRequest(
                                     title = title,
                                     description = description,
                                     address = address,
-                                    start = start,
-                                    end = end,
-                                    category = category,
-                                    audience = audience,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    category = EventCategory.valueOf(category),
+                                    audience = Audience.valueOf(audience),
                                     neighbourhoods = neighbourhoods
                                 )
+                                viewModel.createEvent(request)
                             }
-                             */
                         }
-                    }
+                    },
+                    enabled = viewModel.isEventValid(),
                 ) {
                     Text("Crear Evento")
                 }
@@ -236,8 +257,13 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     neighbourhoods = neighbourhoods,
                     neighbourhoodsNames = neighbourhoodsNames,
                     onNeighbourhoodsChange = { newNeighbourhoods, newNeighbourhoodsNames ->
-                        neighbourhoods = newNeighbourhoods
-                        neighbourhoodsNames = newNeighbourhoodsNames
+                        viewModel.setNeighbourhoods(newNeighbourhoods)
+                        viewModel.setNeighbourhoodsNames(newNeighbourhoodsNames)
+                        viewModel.setNeighbourhoodIsValid(
+                            viewModel.neighbourhoodValidator(
+                                newNeighbourhoods
+                            )
+                        )
                     }
                 )
             }

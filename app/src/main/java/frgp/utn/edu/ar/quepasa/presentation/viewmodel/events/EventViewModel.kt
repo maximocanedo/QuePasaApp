@@ -27,6 +27,71 @@ import javax.inject.Inject
 class EventViewModel @Inject constructor(
     private val repository: EventRepository
 ) : ViewModel() {
+    // Data fields Variables
+    private val titleMutable = MutableStateFlow("")
+    fun setTitle(x: String) {
+        titleMutable.value = x
+    }
+
+    val title = titleMutable.asStateFlow()
+
+    private val descriptionMutable = MutableStateFlow("")
+    fun setDescription(x: String) {
+        descriptionMutable.value = x
+    }
+
+    val description = descriptionMutable.asStateFlow()
+
+    private val addressMutable = MutableStateFlow("")
+    fun setAddress(x: String) {
+        addressMutable.value = x
+    }
+
+    val address = addressMutable.asStateFlow()
+
+    private val startMutable = MutableStateFlow(LocalDateTime.now())
+    fun setStart(x: LocalDateTime) {
+        startMutable.value = x
+    }
+
+    val start = startMutable.asStateFlow()
+
+    private val endMutable = MutableStateFlow(LocalDateTime.now())
+    fun setEnd(x: LocalDateTime) {
+        endMutable.value = x
+    }
+
+    val end = endMutable.asStateFlow()
+
+    private val neighbourhoodsMutable = MutableStateFlow(emptySet<Long>())
+    fun setNeighbourhoods(x: Set<Long>) {
+        neighbourhoodsMutable.value = x
+    }
+
+    val neighbourhoods = neighbourhoodsMutable.asStateFlow()
+
+    private val neighbourhoodsNamesMutable = MutableStateFlow(emptyList<String>())
+    fun setNeighbourhoodsNames(x: List<String>) {
+        neighbourhoodsNamesMutable.value = x
+    }
+
+    val neighbourhoodsNames = neighbourhoodsNamesMutable.asStateFlow()
+
+    private val categoryMutable = MutableStateFlow("EDUCATIVE")
+    fun setCategory(x: String) {
+        categoryMutable.value = x
+    }
+
+    val category = categoryMutable.asStateFlow()
+
+    private val audienceMutable = MutableStateFlow("PUBLIC")
+    fun setAudience(x: String) {
+        audienceMutable.value = x
+    }
+
+    val audience = audienceMutable.asStateFlow()
+
+    // Variables
     private val _events = MutableStateFlow<Page<Event>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val events: MutableStateFlow<Page<Event>> get() = _events
 
@@ -74,6 +139,12 @@ class EventViewModel @Inject constructor(
     val endDateIsValid = endDateIsValidMutable.asStateFlow()
     fun setEndDateIsValid(x: Boolean) {
         endDateIsValidMutable.value = x
+    }
+
+    private val neighbourhoodIsValidMutable = MutableStateFlow(false)
+    val neighbourhoodIsValid = neighbourhoodIsValidMutable.asStateFlow()
+    fun setNeighbourhoodIsValid(x: Boolean) {
+        neighbourhoodIsValidMutable.value = x
     }
 
     init {
@@ -261,8 +332,35 @@ class EventViewModel @Inject constructor(
     fun addressValidator(address: String): EventAddressValidator {
         return EventAddressValidator(address).isNotBlank()
     }
+    fun startValidator(start: LocalDateTime): EventDateValidator {
+        return EventDateValidator(start).isNotPast().isBefore(end.value)
+    }
 
-    fun startDateValidator(date: LocalDateTime): EventDateValidator {
-        return EventDateValidator(date).isNotNull().isNotPast()
+    fun endValidator(end: LocalDateTime): EventDateValidator {
+        return EventDateValidator(end).isNotPast().isAfterStartDate(start.value)
+    }
+
+    fun neighbourhoodValidator(neighbourhoods: Set<Long>): Boolean {
+        return neighbourhoods.isNotEmpty()
+    }
+
+    fun isEventValid(): Boolean {
+        return titleIsValid.value
+                && descriptionIsValid.value
+                && addressIsValid.value
+                && startDateIsValid.value
+                && endDateIsValid.value
+                && neighbourhoodIsValid.value
+    }
+
+    fun resetEvent() {
+        titleMutable.value = ""
+        descriptionMutable.value = ""
+        addressMutable.value = ""
+        startMutable.value = LocalDateTime.now()
+        endMutable.value = LocalDateTime.now()
+        neighbourhoodsMutable.value = emptySet()
+        categoryMutable.value = "EDUCATIVE"
+        audienceMutable.value = "PUBLIC"
     }
 }

@@ -1,6 +1,8 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -50,7 +52,7 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostCreateScreen(navController: NavHostController, user: User?) {
+fun PostCreateScreen(navController: NavHostController, user: User?, pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear publicación", true) {
@@ -157,7 +159,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
             )
-            ImageField(modifier = Modifier.fillMaxWidth())
+            ImageField(modifier = Modifier.fillMaxWidth(), pickMultipleMedia = pickMultipleMediaLauncher)
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {
@@ -202,5 +204,6 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
 fun PostCreateScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    PostCreateScreen(navController = navController, user = user)
+    lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
+    PostCreateScreen(navController = navController, user = user, pickMultipleMediaLauncher)
 }

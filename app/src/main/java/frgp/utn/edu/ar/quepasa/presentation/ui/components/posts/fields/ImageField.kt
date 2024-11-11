@@ -1,5 +1,8 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
@@ -13,11 +16,12 @@ import frgp.utn.edu.ar.quepasa.R
 @Composable
 fun ImageField(
     modifier: Modifier,
+    pickMultipleMedia: ActivityResultLauncher<PickVisualMediaRequest>?
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
         IconButton(onClick = {
-            // TODO: Not implemented yet
-        } ) {
+            pickMultipleMedia?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+            } ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_image_24),
                 contentDescription = "Image Add",
@@ -29,5 +33,6 @@ fun ImageField(
 @Preview
 @Composable
 fun ImageFieldPreview() {
-    ImageField(modifier = Modifier)
+    val pickMultipleMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null
+    ImageField(modifier = Modifier, pickMultipleMedia)
 }

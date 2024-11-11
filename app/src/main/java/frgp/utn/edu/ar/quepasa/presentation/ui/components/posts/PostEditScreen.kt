@@ -1,5 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -47,7 +49,7 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostEditScreen(navController: NavHostController, user: User?) {
+fun PostEditScreen(navController: NavHostController, user: User?, pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>) {
     val viewModel: PostViewModel = hiltViewModel()
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
@@ -162,7 +164,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         onChange = { newDesc -> description = newDesc },
                         onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
-                    ImageField(modifier = Modifier.fillMaxWidth())
+                    ImageField(modifier = Modifier.fillMaxWidth(), pickMultipleMedia = pickMultipleMediaLauncher)
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -190,5 +192,6 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 fun PostEditScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    PostEditScreen(navController = navController, user = user)
+    lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
+    PostEditScreen(navController = navController, user = user, pickMultipleMediaLauncher = pickMultipleMediaLauncher)
 }

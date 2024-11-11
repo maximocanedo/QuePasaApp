@@ -1,9 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -201,19 +198,6 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                     Text("Publicar")
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun LaunchImageSelector() {
-    val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-        if(uris.isNotEmpty()) {
-            //imageViewModel.addImages(uris)
-            Log.d("PhotoPicker", "Number of items selected: ${uris.size}")
-        }
-        else {
-            Log.d("PhotoPicker", "No media selected")
         }
     }
 }

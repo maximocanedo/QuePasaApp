@@ -16,4 +16,12 @@ class ImageViewModel : ViewModel() {
     fun clearImages() {
         _selectedUris.value = emptyList()
     }
+
+    fun clearImage(uri: Uri) {
+        var uriList = emptyList<Uri>()
+        _selectedUris.value.forEach { selUri ->
+            if(selUri.path != uri.path) uriList = uriList + selUri
+        }
+        _selectedUris.value = uriList
+    }
 }

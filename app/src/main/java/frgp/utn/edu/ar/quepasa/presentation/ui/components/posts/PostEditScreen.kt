@@ -62,16 +62,6 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
             viewModel.getPostById(1)
         }
 
-        val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-            if(uris.isNotEmpty()) {
-                imageViewModel.addImages(uris)
-                Log.d("ImageSelector", "Number of items selected: ${uris.size}")
-            }
-            else {
-                Log.d("ImageSelector", "No media selected")
-            }
-        }
-
         val post by viewModel.post.collectAsState()
 
         if(post != null) {
@@ -180,7 +170,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         onChange = { newDesc -> description = newDesc },
                         onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
-                    ImageField(modifier = Modifier.fillMaxWidth(), pickMultipleMedia = pickMultipleMediaLauncher)
+                    ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),

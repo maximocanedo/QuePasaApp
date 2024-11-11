@@ -43,6 +43,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -58,16 +59,6 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
-
-    val pickMultipleMediaLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-        if(uris.isNotEmpty()) {
-            imageViewModel.addImages(uris)
-            Log.d("ImageSelector", "Number of items selected: ${uris.size}")
-        }
-        else {
-            Log.d("ImageSelector", "No media selected")
-        }
-    }
 
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
@@ -173,7 +164,8 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
             )
-            ImageField(modifier = Modifier.fillMaxWidth(), pickMultipleMedia = pickMultipleMediaLauncher)
+            ImagesPreview(modifier = Modifier, viewModel = imageViewModel)
+            ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {

@@ -1,7 +1,5 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost

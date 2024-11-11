@@ -14,8 +14,8 @@ import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialog(
-    onDateSelected: (LocalDateTime?) -> Unit,
+fun DateDialog(
+    onConfirm: (LocalDateTime?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
@@ -28,15 +28,15 @@ fun DatePickerDialog(
                     datePickerState.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
                 val zoneId = ZoneId.from(ZoneOffset.UTC)
                 val date = instant?.atZone(zoneId)?.toLocalDateTime()
-                onDateSelected(date)
+                onConfirm(date)
                 onDismiss()
             }) {
-                Text("OK")
+                Text("Confirmar")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Cancelar")
             }
         }
     ) {

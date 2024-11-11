@@ -8,18 +8,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.editables.OutlinedField
-import quepasa.api.validators.commons.StringValidator
+import quepasa.api.validators.events.EventDescriptionValidator
 
 @Composable
 fun DescriptionField(
     modifier: Modifier,
     value: String = "",
-    validator: (String) -> StringValidator,
+    validator: (String) -> EventDescriptionValidator = { EventDescriptionValidator(it) },
     onChange: (String, Boolean) -> Unit,
     serverError: String? = null,
     clearServerError: () -> Unit = {}
 ) {
-    OutlinedField<StringValidator, String>(
+    OutlinedField<EventDescriptionValidator, String>(
         modifier = modifier,
         validator = validator,
         valueConverter = { it },
@@ -36,9 +36,13 @@ fun DescriptionField(
 @Composable
 fun DescriptionFieldPreview() {
     var description by remember { mutableStateOf("") }
-    TitleField(
+    DescriptionField(
         modifier = Modifier,
-        validator = { StringValidator(it) },
+        validator = {
+            EventDescriptionValidator(it)
+                .isNotBlank()
+                .meetsLimits()
+        },
         onChange = { value, valid -> description = value },
         value = description
     )

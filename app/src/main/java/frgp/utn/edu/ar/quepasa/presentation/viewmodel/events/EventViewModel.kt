@@ -15,7 +15,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
-import quepasa.api.validators.commons.StringValidator
+import quepasa.api.validators.events.EventAddressValidator
+import quepasa.api.validators.events.EventDateValidator
+import quepasa.api.validators.events.EventDescriptionValidator
+import quepasa.api.validators.events.EventTitleValidator
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -54,6 +58,23 @@ class EventViewModel @Inject constructor(
         descriptionIsValidMutable.value = x
     }
 
+    private val addressIsValidMutable = MutableStateFlow(false)
+    val addressIsValid = addressIsValidMutable.asStateFlow()
+    fun setAddressIsValid(x: Boolean) {
+        addressIsValidMutable.value = x
+    }
+
+    private val startDateIsValidMutable = MutableStateFlow(false)
+    val startDateIsValid = startDateIsValidMutable.asStateFlow()
+    fun setStartDateIsValid(x: Boolean) {
+        startDateIsValidMutable.value = x
+    }
+
+    private val endDateIsValidMutable = MutableStateFlow(false)
+    val endDateIsValid = endDateIsValidMutable.asStateFlow()
+    fun setEndDateIsValid(x: Boolean) {
+        endDateIsValidMutable.value = x
+    }
 
     init {
         viewModelScope.launch {
@@ -229,17 +250,19 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    fun titleValidator(title: String): StringValidator {
-        return StringValidator(title)
-            .isNotBlank()
-            .hasMaximumLength(60)
-            .hasMinimumLength(4)
+    fun titleValidator(title: String): EventTitleValidator {
+        return EventTitleValidator(title).isNotBlank().meetsLimits()
     }
 
-    fun descriptionValidator(description: String): StringValidator {
-        return StringValidator(description)
-            .isNotBlank()
-            .hasMaximumLength(256)
-            .hasMinimumLength(4)
+    fun descriptionValidator(description: String): EventDescriptionValidator {
+        return EventDescriptionValidator(description).isNotBlank().meetsLimits()
+    }
+
+    fun addressValidator(address: String): EventAddressValidator {
+        return EventAddressValidator(address).isNotBlank()
+    }
+
+    fun startDateValidator(date: LocalDateTime): EventDateValidator {
+        return EventDateValidator(date).isNotNull().isNotPast()
     }
 }

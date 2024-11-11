@@ -8,18 +8,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.editables.OutlinedField
-import quepasa.api.validators.events.EventTitleValidator
+import quepasa.api.validators.events.EventAddressValidator
 
 @Composable
-fun TitleField(
+fun AddressField(
     modifier: Modifier,
     value: String = "",
-    validator: (String) -> EventTitleValidator = { EventTitleValidator(it) },
+    validator: (String) -> EventAddressValidator = { EventAddressValidator(it) },
     onChange: (String, Boolean) -> Unit,
     serverError: String? = null,
     clearServerError: () -> Unit = {}
 ) {
-    OutlinedField<EventTitleValidator, String>(
+    OutlinedField<EventAddressValidator, String>(
         modifier = modifier,
         validator = validator,
         valueConverter = { it },
@@ -28,22 +28,22 @@ fun TitleField(
         clearServerError = clearServerError,
         onChange = onChange,
         serverError = serverError,
-        label = "Título"
+        label = "Dirección"
     )
 }
 
 @Preview
 @Composable
-fun TitleFieldPreview() {
-    var title by remember { mutableStateOf("") }
-    TitleField(
+fun AddressFieldPreview() {
+    var address by remember { mutableStateOf("") }
+    AddressField(
         modifier = Modifier,
         validator = {
-            EventTitleValidator(it)
+            EventAddressValidator(it)
                 .isNotBlank()
                 .meetsLimits()
         },
-        onChange = { value, valid -> title = value },
-        value = title
+        onChange = { value, valid -> address = value },
+        value = address
     )
 }

@@ -36,7 +36,7 @@ fun ReadMoreText(text: String, modifier: Modifier, style: TextStyle, minLines: I
         )
         if (showReadMoreButtonState) {
             Text(
-                text = if (expandedState) "Read Less" else "Read More",
+                text = if (expandedState) "Leer menos" else "Leer más",
                 color = Color.Gray,
                 modifier = Modifier.clickable {
                     expandedState = !expandedState

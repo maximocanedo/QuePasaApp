@@ -25,4 +25,8 @@ class ImageViewModel : ViewModel() {
         }
         _selectedUris.value = uriList
     }
+
+    fun areUrisEmpty(): Boolean {
+        return _selectedUris.value.isEmpty()
+    }
 }

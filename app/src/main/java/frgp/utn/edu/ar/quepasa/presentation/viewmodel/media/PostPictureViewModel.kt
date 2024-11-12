@@ -1,7 +1,9 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.media
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.Post
@@ -47,12 +49,13 @@ class PostPictureViewModel @Inject constructor(
         }
     }
 
-    suspend fun upload(context: Context, uri: Uri, description: String) {
+    suspend fun upload(context: Context, uri: Uri, post: Int) {
         try {
             val file: File? = getFileFromUri(context, uri)
-
-            if(file != null) {
-
+            val description: String = getDescriptionFromUri(context, uri) ?: "No description"
+            if (file != null) {
+                println("File ${file.name}, path ${file.path}")
+                repository.upload(file, post, description)
             }
         }
         catch(e: Exception) {
@@ -77,7 +80,7 @@ class PostPictureViewModel @Inject constructor(
         return _post.value
     }
 
-    fun getFileFromUri(context: Context, uri: Uri): File? {
+    private fun getFileFromUri(context: Context, uri: Uri): File? {
         val contentResolver = context.contentResolver
 
         if (uri.scheme == "file") {
@@ -102,11 +105,26 @@ class PostPictureViewModel @Inject constructor(
     private fun getFileNameFromUri(context: Context, uri: Uri): String? {
         val cursor = context.contentResolver.query(uri, null, null, null, null)
         cursor?.use {
-            val columnIndex = cursor.getColumnIndex(android.provider.MediaStore.Images.Media.DISPLAY_NAME)
+            val columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
             if (cursor.moveToFirst()) {
                 return cursor.getString(columnIndex)
             }
         }
         return null
+    }
+
+    fun getDescriptionFromUri(context: Context, uri: Uri): String? {
+        val contentResolver: ContentResolver = context.contentResolver
+        var description: String? = null
+
+        val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
+        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val nameIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                description = cursor.getString(nameIndex)
+            }
+        }
+
+        return description
     }
 }

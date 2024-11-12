@@ -42,6 +42,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +57,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
+    val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
     BaseComponent(navController, user, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
@@ -168,7 +170,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 Button(onClick = {
                     CoroutineScope(IO).launch {
                         val validation = viewModel.checkValidationFields()
-                        println("Validation $validation")
+
                         if (validation) {
                             val result = viewModel.createPost(
                                 audience = audience,
@@ -181,9 +183,17 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
 
                             withContext(Dispatchers.Main) {
                                 if (result) {
+                                    if(!imageViewModel.areUrisEmpty()) {
+                                        viewModel.post.value?.let {
+                                            imageViewModel.selectedUris.value.forEach { uri ->
+                                                pictureViewModel.upload(context, uri, it.id)
+                                            }
+                                        }
+                                    }
                                     navController.navigate("home")
                                     Toast.makeText(context, "Publicación creada", Toast.LENGTH_SHORT).show()
-                                } else {
+                                }
+                                else {
                                     Toast.makeText(context, "Publicación no creada (error)", Toast.LENGTH_SHORT).show()
                                 }
                             }

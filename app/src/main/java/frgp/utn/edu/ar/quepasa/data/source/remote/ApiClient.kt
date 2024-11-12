@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
+import frgp.utn.edu.ar.quepasa.data.source.remote.media.PostPictureService
 import frgp.utn.edu.ar.quepasa.domain.repository.ApiResponseHandler
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -90,6 +91,13 @@ object ApiClient {
     fun providePostSubtypeService(retrofit: Retrofit): PostSubtypeService {
         return retrofit
             .create(PostSubtypeService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostPictureService(retrofit: Retrofit): PostPictureService {
+        return retrofit
+            .create(PostPictureService::class.java)
     }
 
     @Provides

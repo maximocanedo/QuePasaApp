@@ -185,7 +185,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEventById(id: Int) {
+    suspend fun getEventById(id: UUID) {
         try {
             val event = repository.getEventById(id)
             _event.value = event
@@ -243,7 +243,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun rsvpEvent(eventId: Int) {
+    suspend fun rsvpEvent(eventId: UUID) {
         try {
             val event = repository.rvspEvent(eventId)
             _event.value = event
@@ -252,7 +252,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun addNeighbourhoodToEvent(eventId: Int, neighbourhoodId: Int) {
+    suspend fun addNeighbourhoodToEvent(eventId: UUID, neighbourhoodId: Int) {
         try {
             val event = repository.addNeighbourhoodToEvent(eventId, neighbourhoodId)
             _event.value = event
@@ -262,7 +262,7 @@ class EventViewModel @Inject constructor(
     }
 
     /** PATCH **/
-    suspend fun updateEvent(eventId: Int, event: EventPatchRequest) {
+    suspend fun updateEvent(eventId: UUID, event: EventPatchRequest) {
         try {
             val updatedEvent = repository.updateEvent(eventId, event)
             _event.value = updatedEvent
@@ -272,7 +272,7 @@ class EventViewModel @Inject constructor(
     }
 
     /** DELETE **/
-    suspend fun deleteEvent(eventId: Int) {
+    suspend fun deleteEvent(eventId: UUID) {
         try {
             val deletedEvent = repository.deleteEvent(eventId)
             _event.value = deletedEvent
@@ -281,7 +281,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun removeNeighbourhoodFromEvent(eventId: Int, neighbourhoodId: Int) {
+    suspend fun removeNeighbourhoodFromEvent(eventId: UUID, neighbourhoodId: Int) {
         try {
             val event = repository.removeNeighbourhoodFromEvent(eventId, neighbourhoodId)
             _event.value = event
@@ -291,7 +291,7 @@ class EventViewModel @Inject constructor(
     }
 
     /** VOTES **/
-    suspend fun getVotes(eventId: Int) {
+    suspend fun getVotes(eventId: UUID) {
         try {
             val newVotes = repository.getVotes(eventId)
             _votes.value = newVotes
@@ -300,7 +300,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun upVote(eventId: Int) {
+    suspend fun upVote(eventId: UUID) {
         try {
             val votes = repository.upVote(eventId)
             _votes.value = votes
@@ -309,7 +309,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun downVote(eventId: Int) {
+    suspend fun downVote(eventId: UUID) {
         try {
             val votes = repository.downVote(eventId)
             _votes.value = votes

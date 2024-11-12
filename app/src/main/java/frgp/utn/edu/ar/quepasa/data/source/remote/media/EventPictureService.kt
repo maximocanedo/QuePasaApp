@@ -4,7 +4,6 @@ import frgp.utn.edu.ar.quepasa.data.model.media.EventPicture
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -26,9 +25,6 @@ interface EventPictureService {
 
     @GET("event-pictures/{id}")
     suspend fun getPictureById(@Path("id") id: UUID): Response<EventPicture>
-
-    @GET("event-pictures/{id}/view")
-    suspend fun viewPicture(@Path("id") id: UUID): Response<ResponseBody>
 
     @GET("event-pictures/event/{id}")
     suspend fun getPicturesByEvent(

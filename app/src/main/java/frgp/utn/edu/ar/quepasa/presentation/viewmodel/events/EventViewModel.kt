@@ -231,12 +231,15 @@ class EventViewModel @Inject constructor(
     }
 
     /** POST **/
-    suspend fun createEvent(event: EventCreateRequest) {
+    suspend fun createEvent(event: EventCreateRequest): Boolean {
         try {
             val newEvent = repository.createEvent(event)
             _event.value = newEvent
+            resetEvent()
+            return true
         } catch (e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 

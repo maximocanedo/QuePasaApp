@@ -7,7 +7,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.File
 import java.util.UUID
@@ -27,10 +26,6 @@ class EventPictureRepository @Inject constructor(
 
     suspend fun getPictureById(id: UUID): EventPicture =
         handleResponse { pictureService.getPictureById(id) }
-
-    suspend fun viewPicture(id: UUID): ResponseBody =
-        handleResponse { pictureService.viewPicture(id) }
-
 
     suspend fun getPicturesByEvent(id: UUID, page: Int, size: Int): Page<EventPicture> =
         handleResponse { pictureService.getPicturesByEvent(id, page, size) }

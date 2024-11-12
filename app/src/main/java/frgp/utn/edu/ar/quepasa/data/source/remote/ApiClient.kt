@@ -8,14 +8,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
+import frgp.utn.edu.ar.quepasa.data.source.remote.media.EventPictureService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.PostPictureService
 import frgp.utn.edu.ar.quepasa.domain.repository.ApiResponseHandler
 import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import javax.inject.Singleton
-import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -112,4 +113,9 @@ object ApiClient {
         return retrofit.create(EventService::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideEventPictureService(retrofit: Retrofit): EventPictureService {
+        return retrofit.create(EventPictureService::class.java)
+    }
 }

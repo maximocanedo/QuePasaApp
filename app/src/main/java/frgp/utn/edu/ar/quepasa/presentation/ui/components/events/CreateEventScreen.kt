@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,18 +34,21 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DateFiel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DescriptionField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventAudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventImageField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.ImageField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews.EventImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun CreateEventScreen(navController: NavHostController, user: User?) {
+    val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
+    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     BaseComponent(navController, user, "Crear de Evento", true) {
         val title by viewModel.title.collectAsState()
         val description by viewModel.description.collectAsState()
@@ -202,8 +207,15 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                 }
             }
             Row {
-                ImagesPreview(modifier = Modifier, viewModel = imageViewModel)
-                ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
+                EventImagesPreview(
+                    modifier = Modifier,
+                    imageViewModel.selectedUris,
+                    imageViewModel::clearImage
+                )
+                EventImageField(
+                    modifier = Modifier.fillMaxWidth(),
+                    imageViewModel::addImages
+                )
             }
             Row {
                 Button(
@@ -213,7 +225,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                                 val startDate = start.format(formatter)
                                 val endDate = end.format(formatter)
-                                val request = EventCreateRequest(
+                                val eventRequest = EventCreateRequest(
                                     title = title,
                                     description = description,
                                     address = address,
@@ -223,7 +235,24 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                     audience = Audience.valueOf(audience),
                                     neighbourhoods = neighbourhoods
                                 )
-                                viewModel.createEvent(request)
+                                val request: Boolean = viewModel.createEvent(eventRequest)
+                                if (request) {
+                                    if (!imageViewModel.areUrisEmpty()) {
+                                        viewModel.event.value?.let {
+                                            it.id?.let {
+                                                imageViewModel.selectedUris.value.forEach { uri ->
+                                                    eventPictureViewModel.upload(context, uri, it)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    navController.navigate("home")
+                                    Toast.makeText(
+                                        context,
+                                        "Evento Creado!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     },

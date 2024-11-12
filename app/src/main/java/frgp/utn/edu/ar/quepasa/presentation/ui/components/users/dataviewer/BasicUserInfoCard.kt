@@ -22,13 +22,12 @@ import java.sql.Timestamp
 import java.util.UUID
 
 @Composable
-fun BasicUserInfoCard(user: User) {
+fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        modifier = Modifier
-            .width(240.dp)
+        modifier = modifier
             .wrapContentHeight()
     ) {
         Text(

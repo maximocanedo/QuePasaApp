@@ -10,6 +10,7 @@ class ImageViewModel : ViewModel() {
     val selectedUris = _selectedUris.asStateFlow()
 
     fun addImages(uris: List<Uri>) {
+        println(uris[0].path)
         _selectedUris.value += uris
     }
 

@@ -2,6 +2,7 @@ package frgp.utn.edu.ar.quepasa.domain.repository.geo
 
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
+import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -17,14 +18,22 @@ class NeighbourhoodRepository @Inject constructor(
         }
     }
 
-    suspend fun getNeighbourhoods(activeOnly: Boolean): List<Neighbourhood> =
-        handleResponse { neighbourhoodService.getNeighbourhoods(activeOnly) }
+    suspend fun getNeighbourhoods(
+        activeOnly: Boolean,
+        page: Int = 0,
+        size: Int = 10
+    ): Page<Neighbourhood> =
+        handleResponse { neighbourhoodService.getNeighbourhoods(activeOnly, page, size) }
 
     suspend fun getNeighbourhoodById(id: Long): Neighbourhood =
         handleResponse { neighbourhoodService.getNeighbourhoodById(id) }
 
-    suspend fun getNeighbourhoodsByName(name: String): List<Neighbourhood> =
-        handleResponse { neighbourhoodService.getNeighbourhoodsByName(name) }
+    suspend fun getNeighbourhoodsByName(
+        name: String,
+        page: Int = 0,
+        size: Int = 10
+    ): Page<Neighbourhood> =
+        handleResponse { neighbourhoodService.getNeighbourhoodsByName(name, page, size) }
 
     suspend fun createNeighbourhood(neighbourhood: Neighbourhood): Neighbourhood =
         handleResponse { neighbourhoodService.createNeighbourhood(neighbourhood) }

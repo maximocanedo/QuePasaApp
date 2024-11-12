@@ -11,5 +11,5 @@ data class EventCreateRequest(
     val endDate: String?,
     val category: EventCategory?,
     val audience: Audience?,
-    val pictureId: String?
+    val neighbourhoods: Set<Long>
 )

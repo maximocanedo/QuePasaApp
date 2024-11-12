@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 
 @Composable
 fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
@@ -32,12 +33,8 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
                 Text(text = "Bienvenido, ${user?.name ?: "Usuario"}")
             }
 
-            Button(
-                onClick = { navController.navigate("trends") },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("Trends test")
-            }
+            PostScreen()
+
 
             Button(
                 onClick = { navController.navigate("postEdit") },

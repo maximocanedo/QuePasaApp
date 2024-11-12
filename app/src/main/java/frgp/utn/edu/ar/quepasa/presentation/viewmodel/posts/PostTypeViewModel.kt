@@ -63,6 +63,16 @@ class PostTypeViewModel @Inject constructor(
         }
     }
 
+    suspend fun getTypesBySubtype(id: Int, page: Int, size: Int) {
+        try {
+            val types = repository.getTypesBySubtype(id, page, size)
+            _postTypes.value = types
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
     suspend fun createType(description: String) {
         try {
             val newType = repository.createType(description)

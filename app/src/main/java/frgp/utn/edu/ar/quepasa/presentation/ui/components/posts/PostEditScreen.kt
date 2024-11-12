@@ -1,5 +1,10 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -22,10 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
@@ -36,6 +44,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -46,6 +55,8 @@ import quepasa.api.validators.commons.StringValidator
 @Composable
 fun PostEditScreen(navController: NavHostController, user: User?) {
     val viewModel: PostViewModel = hiltViewModel()
+    val imageViewModel = ImageViewModel()
+
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(1)
@@ -59,8 +70,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                 var audience by remember { mutableStateOf(safePost.audience.name) }
                 var description by remember { mutableStateOf(safePost.description) }
                 var neighbourhood by remember { mutableLongStateOf(safePost.neighbourhood!!.id) }
-                var type by remember { mutableIntStateOf(safePost.subtype!!.type!!.id!!) }
-                var subtype by remember { mutableStateOf(safePost.subtype!!.id) }
+                var type by remember { mutableIntStateOf(safePost.subtype.type.id) }
+                var subtype by remember { mutableIntStateOf(safePost.subtype.id) }
                 var tag by remember { mutableStateOf("") }
                 val tags by viewModel.tags.collectAsState()
 
@@ -68,6 +79,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TypeField(
                             modifier = Modifier.weight(1f),
+                            subtype = subtype,
+                            loadBySubtype = true,
                             onItemSelected = {
                                 type = it
                                 subtype = 0
@@ -99,10 +112,17 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     TagField(
                         modifier = Modifier.padding(2.dp),
                         value = tag,
+                        validator = {
+                            StringValidator(title)
+                                .isNotBlank()
+                                .hasMaximumLength(15)
+                                .hasMinimumLength(4)
+                        },
                         onChange = { newTags ->
                             tag = newTags
                         },
-                        onValidityChange = {},
+                        onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
+                        onAdded = { tag = "" },
                         viewModel
                     )
 
@@ -127,7 +147,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     TitleField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = title!!,
+                        value = title,
                         validator = {
                             StringValidator(title)
                                 .isNotBlank()
@@ -135,12 +155,12 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                                 .hasMinimumLength(1)
                         },
                         onChange = { newTitle -> title = newTitle },
-                        onValidityChange = {}
+                        onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
                     )
                     DescriptionField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        value = description!!,
+                        value = description,
                         validator = {
                             StringValidator(title)
                                 .isNotBlank()
@@ -148,9 +168,9 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                                 .hasMinimumLength(4)
                         },
                         onChange = { newDesc -> description = newDesc },
-                        onValidityChange = {}
+                        onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
-                    ImageField(modifier = Modifier.fillMaxWidth())
+                    ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -171,4 +191,13 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
             //navController.navigate("home")
         }
     }
+}
+
+@Preview
+@Composable
+fun PostEditScreenPreview() {
+    val navController = rememberNavController()
+    val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
+    lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
+    PostEditScreen(navController = navController, user = user)
 }

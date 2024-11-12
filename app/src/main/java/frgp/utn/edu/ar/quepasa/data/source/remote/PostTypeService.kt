@@ -24,6 +24,9 @@ interface PostTypeService {
     @GET("post-types/{id}")
     suspend fun getTypeById(@Path("id") id: Int): Response<PostType>
 
+    @GET("post-types/subtype/{id}")
+    suspend fun getTypesBySubtype(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostType>>
+
     @PATCH("post-types/{id}")
     suspend fun updateType(@Path("id") id: Int, @Body description: String): Response<PostType>
 

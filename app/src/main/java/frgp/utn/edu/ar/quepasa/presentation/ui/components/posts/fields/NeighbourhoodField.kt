@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
@@ -38,8 +40,8 @@ fun NeighbourhoodField(
 ) {
     val viewModel: NeighbourhoodViewModel = hiltViewModel()
     val neighbourhoods by viewModel.neighbourhoods.collectAsState()
-    val items = neighbourhoods.map { it.name }
-    val itemsId = neighbourhoods.map { it.id }
+    val items = neighbourhoods.content.map { it.name }
+    val itemsId = neighbourhoods.content.map { it.id }
 
     if(items.isNotEmpty()) {
         val maxLength = 8
@@ -103,6 +105,24 @@ fun NeighbourhoodField(
         }
     }
     else {
-        Text("Sin barrios", modifier = modifier)
+        TextField(
+            value = "",
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth(),
+        )
     }
+}
+
+@Preview
+@Composable
+fun NeighbourhoodFieldPreview() {
+    val audience by remember { mutableStateOf("") }
+    var neighbourhood by remember { mutableLongStateOf(1) }
+    NeighbourhoodField(
+        modifier = Modifier,
+        audience = audience,
+        onItemSelected = { neighbourhood = it }
+    )
 }

@@ -2,14 +2,16 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,14 +27,22 @@ import frgp.utn.edu.ar.quepasa.data.model.media.Picture
 import java.sql.Timestamp
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MailsCard(mails: Set<Mail>) {
+fun MailsCard(
+    mails: Set<Mail>,
+    modifier: Modifier = Modifier,
+    // Mail Dialog events:
+    onMailRegistration: suspend (String) -> Unit,
+    onMailDeleteRequest: suspend (Mail) -> Unit,
+    onMailValidationRequest: suspend (Mail, String) -> Boolean
+) {
+    val addMailDialogState = rememberModalBottomSheetState(true)
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
-        modifier = Modifier
-            .width(240.dp)
+        modifier = modifier
             .wrapContentHeight()
     ) {
         Text(
@@ -53,11 +63,18 @@ fun MailsCard(mails: Set<Mail>) {
             if(showDialog) MailDialog(
                 mail = (it),
                 onDismissRequest = { showDialog = false },
-                onDeleteRequest = {},
-                onValidateRequest = { mail, code -> true }
+                onDeleteRequest = onMailDeleteRequest,
+                onValidateRequest = onMailValidationRequest
             )
         }
+        OutlinedButton(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Registrar nueva dirección de correo")
+        }
     }
+    AddMailDialog(onRequest = onMailRegistration, onDismiss = { addMailDialogState.hide() }, addMailDialogState)
 }
 
 @Preview
@@ -81,20 +98,25 @@ fun MailsCardPreview() {
         email = emptySet(),
         phone = emptySet()
     )
-    MailsCard(mails = setOf(
-        Mail(
-            mail= "parravicini@gmail.com",
-            user = user,
-            requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
-            verified = true,
-            verifiedAt = Timestamp(System.currentTimeMillis())
+    MailsCard(
+        mails = setOf(
+            Mail(
+                mail= "parravicini@gmail.com",
+                user = user,
+                requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
+                verified = true,
+                verifiedAt = Timestamp(System.currentTimeMillis())
+            ),
+            Mail(
+                mail= "abc@gmail.com",
+                user = user,
+                requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
+                verified = false,
+                verifiedAt = Timestamp(System.currentTimeMillis())
+            )
         ),
-        Mail(
-            mail= "abc@gmail.com",
-            user = user,
-            requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
-            verified = false,
-            verifiedAt = Timestamp(System.currentTimeMillis())
-        )
-    ))
+        onMailValidationRequest = { mail, code -> true },
+        onMailDeleteRequest = { mail -> },
+        onMailRegistration = { mailAddress -> }
+    )
 }

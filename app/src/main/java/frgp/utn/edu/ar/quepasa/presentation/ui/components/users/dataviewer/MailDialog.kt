@@ -54,13 +54,13 @@ fun convertTimestampToFormattedString(timestamp: Timestamp): String {
 fun MailDialog(
     mail: Mail,
     onDismissRequest: () -> Unit,
-    onDeleteRequest: (Mail) -> Unit,
+    onDeleteRequest: suspend (Mail) -> Unit,
     onValidateRequest: suspend (Mail, String) -> Boolean
 ) {
     var vrs by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     var errorOtp by remember { mutableStateOf(false) }
-    if(mail.verified) {
+    if(mail.verified && mail.verifiedAt != null) {
         vrs = "Verificado el " + convertTimestampToFormattedString(mail.verifiedAt)
     } else vrs = "Agregado el " + convertTimestampToFormattedString(mail.requestedAt)
     ModalBottomSheet(sheetState = rememberModalBottomSheetState(true), onDismissRequest = { onDismissRequest() }) {
@@ -102,7 +102,7 @@ fun MailDialog(
                 .fillMaxWidth()
         ) {
             TextButton(
-                onClick = { onDeleteRequest(mail) },
+                onClick = { CoroutineScope(IO).launch { onDeleteRequest(mail) } },
                 modifier = Modifier.padding(horizontal = 2.dp)
             ) {
                 Text("Eliminar")

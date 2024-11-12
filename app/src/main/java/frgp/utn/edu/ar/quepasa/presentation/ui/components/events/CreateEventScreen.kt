@@ -38,7 +38,6 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesP
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import kotlinx.coroutines.launch
-import quepasa.api.exceptions.ValidationError
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -71,10 +70,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = title,
                     validator = viewModel::titleValidator,
                     onChange = { value, valid ->
-                        run {
                             viewModel.setTitle(value)
                             viewModel.setTitleIsValid(valid)
-                        }
                     }
                 )
             }
@@ -84,10 +81,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = description,
                     validator = viewModel::descriptionValidator,
                     onChange = { value, valid ->
-                        run {
                             viewModel.setDescription(value)
                             viewModel.setDescriptionIsValid(valid)
-                        }
                     }
                 )
             }
@@ -97,10 +92,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = address,
                     validator = viewModel::addressValidator,
                     onChange = { value, valid ->
-                        run {
                             viewModel.setAddress(value)
                             viewModel.setAddressIsValid(valid)
-                        }
                     }
                 )
             }
@@ -114,22 +107,11 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     DateField(
                         modifier = Modifier.fillMaxWidth(),
                         value = start,
-                        validator = {
-                            viewModel.startValidator(it)
-                            viewModel.endValidator(end)
-                        },
+                        validator = { viewModel.startValidator(it) },
                         onChange = { value, valid ->
-                            run {
                                 viewModel.setStart(value)
                                 viewModel.setStartDateIsValid(valid)
-                                try {
-                                    viewModel.endValidator(end).build()
-                                    viewModel.setEndDateIsValid(true)
-                                } catch (e: ValidationError) {
-                                    viewModel.setEndDateIsValid(false)
-                                    viewModel.setEndDateErrorMessage(e.errors.first() ?: "")
-                                }
-                            }
+                            viewModel.endDateValidation()
                         },
                         label = "Fecha de inicio",
                         isError = !viewModel.startDateIsValid.collectAsState().value,
@@ -142,21 +124,11 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     DateField(
                         modifier = Modifier.widthIn(120.dp, 240.dp),
                         value = end,
-                        validator = {
-                            viewModel.endValidator(it)
-                        },
+                        validator = { viewModel.endValidator(it) },
                         onChange = { value, valid ->
-                            run {
                                 viewModel.setEnd(value)
                                 viewModel.setEndDateIsValid(valid)
-                                try {
-                                    viewModel.startValidator(start).build()
-                                    viewModel.setStartDateIsValid(true)
-                                } catch (e: ValidationError) {
-                                    viewModel.setStartDateIsValid(false)
-                                    viewModel.setStartDateErrorMessage(e.errors.first() ?: "")
-                                }
-                            }
+                            viewModel.startDateValidation()
                         },
                         label = "Fecha de fin",
                         isError = !viewModel.endDateIsValid.collectAsState().value,
@@ -200,7 +172,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(0.70f)
+                    modifier = Modifier.weight(0.7f)
                 ) {
                     OutlinedTextField(
                         value = neighbourhoodsNames.joinToString(", "),
@@ -214,11 +186,10 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                 Text("Debe seleccionar al menos un barrio")
                             }
                         },
-
                     )
                 }
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.weight(0.3f)
                 ) {
                     Button(
                         onClick = {

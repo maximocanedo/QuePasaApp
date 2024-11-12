@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
+import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventAddressValidator
 import quepasa.api.validators.events.EventDateValidator
 import quepasa.api.validators.events.EventDescriptionValidator
@@ -350,6 +351,28 @@ class EventViewModel @Inject constructor(
 
     fun endValidator(end: LocalDateTime): EventDateValidator {
         return EventDateValidator(end).isNotPast().isAfterStartDate(start.value)
+    }
+
+    fun startDateValidation() {
+        try {
+            startValidator(startMutable.value).build()
+            setStartDateIsValid(true)
+            setStartDateErrorMessage("")
+        } catch (e: ValidationError) {
+            setStartDateIsValid(false)
+            setStartDateErrorMessage(e.errors.first() ?: "")
+        }
+    }
+
+    fun endDateValidation() {
+        try {
+            endValidator(endMutable.value).build()
+            setEndDateIsValid(true)
+            setEndDateErrorMessage("")
+        } catch (e: ValidationError) {
+            setEndDateIsValid(false)
+            setEndDateErrorMessage(e.errors.first() ?: "")
+        }
     }
 
     fun neighbourhoodValidator(neighbourhoods: Set<Long>): Boolean {

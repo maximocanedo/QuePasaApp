@@ -17,13 +17,7 @@ fun TrendsScreen() {
     val trendsViewModel: TrendsViewModel = hiltViewModel()
 
     Column(modifier = Modifier.padding(12.dp)) {
-        Text(
-            "Tendencias",
-            modifier = Modifier.padding(bottom = 6.dp),
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 16.sp,  // Fuente más pequeña para el título
-            fontWeight = FontWeight.SemiBold
-        )
+        
         TrendsCarousel(trendsViewModel = trendsViewModel)
     }
 }

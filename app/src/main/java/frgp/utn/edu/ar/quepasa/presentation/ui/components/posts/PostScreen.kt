@@ -29,20 +29,10 @@ fun PostScreen(
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = "Tendencias",
-            modifier = Modifier.padding(16.dp),
-            color = Color.Gray,
-            fontSize = 20.sp
-        )
+        
         TrendsScreen()
 
-        Text(
-            text = "Publicaciones",
-            modifier = Modifier.padding(16.dp),
-            color = Color.Gray,
-            fontSize = 20.sp
-        )
+
         postsState.value.content.forEach { post ->
             PostCard(
                 post = post,

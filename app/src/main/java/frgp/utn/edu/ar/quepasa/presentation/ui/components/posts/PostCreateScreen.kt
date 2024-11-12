@@ -61,7 +61,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("PUBLIC") }
         var description by remember { mutableStateOf("") }
-        var neighbourhood by remember { mutableLongStateOf(1) }
+        var neighbourhood by remember { mutableLongStateOf(user?.neighbourhood?.id ?: 1) }
         var type by remember { mutableIntStateOf(1) }
         var subtype by remember { mutableIntStateOf(1) }
         var tag by remember { mutableStateOf("") }

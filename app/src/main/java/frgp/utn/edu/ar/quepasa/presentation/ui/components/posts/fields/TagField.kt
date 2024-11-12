@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -16,12 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.StringValidator
 
@@ -35,6 +39,7 @@ fun TagField(
     onAdded: () -> Unit,
     viewModel: PostViewModel
 ) {
+    val context = LocalContext.current
     Column(modifier = modifier) {
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
             var content: String by remember { mutableStateOf(value) }
@@ -70,6 +75,13 @@ fun TagField(
                     viewModel.addTag(value)
                     content = ""
                     onAdded()
+                }
+                else {
+                    CoroutineScope(IO).launch {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Ingrese una etiqueta válida", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             } ) {
                 Icon(

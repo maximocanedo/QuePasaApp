@@ -38,6 +38,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesP
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import kotlinx.coroutines.launch
+import quepasa.api.exceptions.ValidationError
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -124,12 +125,15 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                 try {
                                     viewModel.endValidator(end).build()
                                     viewModel.setEndDateIsValid(true)
-                                } catch (e: Exception) {
+                                } catch (e: ValidationError) {
                                     viewModel.setEndDateIsValid(false)
+                                    viewModel.setEndDateErrorMessage(e.errors.first() ?: "")
                                 }
                             }
                         },
-                        label = "Fecha de inicio"
+                        label = "Fecha de inicio",
+                        isError = !viewModel.startDateIsValid.collectAsState().value,
+                        errorMessage = viewModel.startDateErrorMessage,
                     )
                 }
                 Column(
@@ -145,9 +149,18 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                             run {
                                 viewModel.setEnd(value)
                                 viewModel.setEndDateIsValid(valid)
+                                try {
+                                    viewModel.startValidator(start).build()
+                                    viewModel.setStartDateIsValid(true)
+                                } catch (e: ValidationError) {
+                                    viewModel.setStartDateIsValid(false)
+                                    viewModel.setStartDateErrorMessage(e.errors.first() ?: "")
+                                }
                             }
                         },
-                        label = "Fecha de fin"
+                        label = "Fecha de fin",
+                        isError = !viewModel.endDateIsValid.collectAsState().value,
+                        errorMessage = viewModel.endDateErrorMessage,
                     )
                 }
             }

@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.DateDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.TimeDialog
+import kotlinx.coroutines.flow.MutableStateFlow
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventDateValidator
 import java.time.LocalDateTime
@@ -36,10 +38,11 @@ fun DateField(
     value: LocalDateTime,
     validator: (LocalDateTime) -> EventDateValidator = { EventDateValidator(it) },
     onChange: (LocalDateTime, Boolean) -> Unit,
-    label: String
+    label: String,
+    isError: Boolean,
+    errorMessage: MutableStateFlow<String?>,
 ) {
     var isValid by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf<LocalDateTime?>(value) }
     var showDateModal by remember { mutableStateOf(false) }
     var showTimeModal by remember { mutableStateOf(false) }
@@ -71,10 +74,10 @@ fun DateField(
                             }
                         }
                     },
-                isError = !isValid,
+                isError = isError,
                 supportingText = {
-                    if (!isValid) {
-                        Text(errorMessage)
+                    if (isError) {
+                        Text(errorMessage.collectAsState().value ?: "")
                     }
                 }
             )
@@ -90,10 +93,10 @@ fun DateField(
                 try {
                     validator(selectedDate!!).build()
                     isValid = true
-                    errorMessage = ""
+                    errorMessage.value = ""
                 } catch (e: ValidationError) {
                     isValid = false
-                    errorMessage = e.errors.first() ?: ""
+                    errorMessage.value = e.errors.first() ?: ""
                 }
                 if (localDateTime != null) {
                     onChange(localDateTime, isValid)
@@ -112,10 +115,10 @@ fun DateField(
                 try {
                     validator(selectedDate!!).build()
                     isValid = true
-                    errorMessage = ""
+                    errorMessage.value = ""
                 } catch (e: ValidationError) {
                     isValid = false
-                    errorMessage = e.errors.first() ?: ""
+                    errorMessage.value = e.errors.first() ?: ""
                 }
                 if (selectedDate != null) {
                     onChange(selectedDate!!, isValid)

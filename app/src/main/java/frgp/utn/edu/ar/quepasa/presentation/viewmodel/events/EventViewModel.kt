@@ -110,6 +110,18 @@ class EventViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: MutableStateFlow<String?> get() = _errorMessage
 
+    private val _startDateErrorMessage = MutableStateFlow<String?>(null)
+    val startDateErrorMessage: MutableStateFlow<String?> get() = _startDateErrorMessage
+    fun setStartDateErrorMessage(x: String) {
+        _startDateErrorMessage.value = x
+    }
+
+    private val _endDateErrorMessage = MutableStateFlow<String?>(null)
+    val endDateErrorMessage: MutableStateFlow<String?> get() = _endDateErrorMessage
+    fun setEndDateErrorMessage(x: String) {
+        _endDateErrorMessage.value = x
+    }
+
     /** Valid **/
     private val titleIsValidMutable = MutableStateFlow(false)
     val titleIsValid = titleIsValidMutable.asStateFlow()

@@ -113,7 +113,7 @@ class PostPictureViewModel @Inject constructor(
         return null
     }
 
-    fun getDescriptionFromUri(context: Context, uri: Uri): String? {
+    private fun getDescriptionFromUri(context: Context, uri: Uri): String? {
         val contentResolver: ContentResolver = context.contentResolver
         var description: String? = null
 

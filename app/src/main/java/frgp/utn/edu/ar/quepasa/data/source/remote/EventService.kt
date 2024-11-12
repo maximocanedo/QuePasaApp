@@ -23,9 +23,13 @@ interface EventService {
     @GET("events")
     suspend fun getEvents(@Query("q") q: String, @Query("page") page: Int, @Query("size") size: Int, @Query("active") active: Boolean, @Query("sort") sort: String): Response<Page<Event>>
     @GET("events/{id}")
-    suspend fun getEventById(@Query("id") id: UUID): Response<Event>
+    suspend fun getEventById(@Path("id") id: UUID): Response<Event>
     @GET("events/{username}")
-    suspend fun getEventsByUser(@Query("username") username: String, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
+    suspend fun getEventsByUser(
+        @Path("username") username: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<Page<Event>>
     @GET("events/me")
     suspend fun getEventsByAuthUser(@Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
     @GET("events/audience/{audience}")

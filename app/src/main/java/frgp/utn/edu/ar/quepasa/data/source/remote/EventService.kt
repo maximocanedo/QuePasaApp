@@ -23,7 +23,7 @@ interface EventService {
     @GET("events")
     suspend fun getEvents(@Query("q") q: String, @Query("page") page: Int, @Query("size") size: Int, @Query("active") active: Boolean, @Query("sort") sort: String): Response<Page<Event>>
     @GET("events/{id}")
-    suspend fun getEventById(@Query("id") id: Int): Response<Event>
+    suspend fun getEventById(@Query("id") id: UUID): Response<Event>
     @GET("events/{username}")
     suspend fun getEventsByUser(@Query("username") username: String, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
     @GET("events/me")
@@ -37,27 +37,33 @@ interface EventService {
     @POST("events")
     suspend fun createEvent(@Body event: EventCreateRequest): Response<Event>
     @POST("events/{eventId}/rsvp")
-    suspend fun rsvpEvent(@Path("eventId") eventId: Int): Response<Event>
+    suspend fun rsvpEvent(@Path("eventId") eventId: UUID): Response<Event>
     @POST("events/{eventId}/neighbourhood/{neighbourhoodId}")
-    suspend fun addNeighbourhoodToEvent(@Path("eventId") eventId: Int, @Path("neighbourhoodId") neighbourhoodId: Int): Response<Event>
+    suspend fun addNeighbourhoodToEvent(
+        @Path("eventId") eventId: UUID,
+        @Path("neighbourhoodId") neighbourhoodId: Int
+    ): Response<Event>
 
     /** SECCION PATCHs **/
     @PATCH("events/{id}")
-    suspend fun updateEvent(@Path("id") id: Int, @Body event: EventPatchRequest): Response<Event>
+    suspend fun updateEvent(@Path("id") id: UUID, @Body event: EventPatchRequest): Response<Event>
 
     /** SECCION DELETEs **/
     @DELETE("events/{id}")
-    suspend fun deleteEvent(@Path("id") id: Int): Response<Event>
+    suspend fun deleteEvent(@Path("id") id: UUID): Response<Event>
     @DELETE("events/{eventId}/neighbourhood/{neighbourhoodId}")
-    suspend fun removeNeighbourhoodFromEvent(@Path("eventId") eventId: Int, @Path("neighbourhoodId") neighbourhoodId: Int): Response<Event>
+    suspend fun removeNeighbourhoodFromEvent(
+        @Path("eventId") eventId: UUID,
+        @Path("neighbourhoodId") neighbourhoodId: Int
+    ): Response<Event>
 
     /** SECCION VOTOS **/
     @GET("events/{eventId}/votes")
-    suspend fun getVotes(@Path("eventId") eventId: Int): Response<VoteCount>
+    suspend fun getVotes(@Path("eventId") eventId: UUID): Response<VoteCount>
     @POST("events/{eventId}/votes/up")
-    suspend fun upVote(@Path("eventId") eventId: Int): Response<VoteCount>
+    suspend fun upVote(@Path("eventId") eventId: UUID): Response<VoteCount>
     @POST("events/{eventId}/votes/down")
-    suspend fun downVote(@Path("eventId") eventId: Int): Response<VoteCount>
+    suspend fun downVote(@Path("eventId") eventId: UUID): Response<VoteCount>
 
     /** SECCION COMENTARIOS **/
     @GET("events/{eventId}/comments")

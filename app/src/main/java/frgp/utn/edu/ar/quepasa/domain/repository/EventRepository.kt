@@ -27,7 +27,7 @@ class EventRepository @Inject constructor(
     /** GETs **/
     suspend fun getEvents(query: String = "", page: Int, size: Int, active: Boolean, sort: String = "title,asc"): Page<Event> =
         handleResponse { eventService.getEvents(query, page, size, active, sort) }
-    suspend fun getEventById(id: Int): Event =
+    suspend fun getEventById(id: UUID): Event =
         handleResponse { eventService.getEventById(id) }
     suspend fun getEventsByUser(username: String, page: Int, size: Int): Page<Event> =
         handleResponse { eventService.getEventsByUser(username, page, size) }
@@ -41,27 +41,31 @@ class EventRepository @Inject constructor(
     /** POSTs **/
     suspend fun createEvent(event: EventCreateRequest): Event =
         handleResponse { eventService.createEvent(event) }
-    suspend fun rvspEvent(eventId: Int): Event =
+    suspend fun rvspEvent(eventId: UUID): Event =
         handleResponse { eventService.rsvpEvent(eventId) }
-    suspend fun addNeighbourhoodToEvent(eventId: Int, neighbourhoodId: Int): Event =
+
+    suspend fun addNeighbourhoodToEvent(eventId: UUID, neighbourhoodId: Int): Event =
         handleResponse { eventService.addNeighbourhoodToEvent(eventId, neighbourhoodId) }
 
     /** PATCHs **/
-    suspend fun updateEvent(id: Int, event: EventPatchRequest): Event =
+    suspend fun updateEvent(id: UUID, event: EventPatchRequest): Event =
         handleResponse { eventService.updateEvent(id, event) }
 
     /** DELETEs **/
-    suspend fun deleteEvent(id: Int): Event =
+    suspend fun deleteEvent(id: UUID): Event =
         handleResponse { eventService.deleteEvent(id) }
-    suspend fun removeNeighbourhoodFromEvent(eventId: Int, neighbourhoodId: Int): Event =
+
+    suspend fun removeNeighbourhoodFromEvent(eventId: UUID, neighbourhoodId: Int): Event =
         handleResponse { eventService.removeNeighbourhoodFromEvent(eventId, neighbourhoodId) }
 
     /** VOTES **/
-    suspend fun getVotes(eventId: Int): VoteCount =
+    suspend fun getVotes(eventId: UUID): VoteCount =
         handleResponse { eventService.getVotes(eventId) }
-    suspend fun upVote(eventId: Int): VoteCount =
+
+    suspend fun upVote(eventId: UUID): VoteCount =
         handleResponse { eventService.upVote(eventId) }
-    suspend fun downVote(eventId: Int): VoteCount =
+
+    suspend fun downVote(eventId: UUID): VoteCount =
         handleResponse { eventService.downVote(eventId) }
 
     /** COMMENTS **/

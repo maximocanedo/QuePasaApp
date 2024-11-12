@@ -25,7 +25,7 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(1.dp)
                 .border(BorderStroke(2.dp, Color.LightGray))
                 .background(Color.White)
         ) {

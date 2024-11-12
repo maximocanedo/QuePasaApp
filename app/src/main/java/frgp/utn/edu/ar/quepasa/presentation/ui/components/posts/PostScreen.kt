@@ -2,6 +2,8 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
 import PostCard
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,10 +29,12 @@ fun PostScreen(
 ) {
     val postViewModel: PostViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
+    TrendsScreen()
+    Column(modifier = Modifier
+        .verticalScroll(rememberScrollState())
+        .padding(1.dp),) {
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        
-        TrendsScreen()
+
 
 
         postsState.value.content.forEach { post ->

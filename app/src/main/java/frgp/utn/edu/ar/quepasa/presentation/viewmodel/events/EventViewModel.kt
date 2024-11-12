@@ -7,6 +7,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
+import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
@@ -98,6 +99,9 @@ class EventViewModel @Inject constructor(
 
     private val _event = MutableStateFlow<Event?>(null)
     val event: MutableStateFlow<Event?> get() = _event
+
+    private val _eventRvsp = MutableStateFlow<EventRvsp?>(null)
+    val eventRvsp: MutableStateFlow<EventRvsp?> get() = _eventRvsp
 
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: MutableStateFlow<VoteCount?> get() = _votes
@@ -246,7 +250,7 @@ class EventViewModel @Inject constructor(
     suspend fun rsvpEvent(eventId: UUID) {
         try {
             val event = repository.rvspEvent(eventId)
-            _event.value = event
+            _eventRvsp.value = event
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }

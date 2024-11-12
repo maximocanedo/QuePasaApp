@@ -4,6 +4,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
+import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.data.source.remote.EventService
@@ -41,7 +42,7 @@ class EventRepository @Inject constructor(
     /** POSTs **/
     suspend fun createEvent(event: EventCreateRequest): Event =
         handleResponse { eventService.createEvent(event) }
-    suspend fun rvspEvent(eventId: UUID): Event =
+    suspend fun rvspEvent(eventId: UUID): EventRvsp =
         handleResponse { eventService.rsvpEvent(eventId) }
 
     suspend fun addNeighbourhoodToEvent(eventId: UUID, neighbourhoodId: Int): Event =

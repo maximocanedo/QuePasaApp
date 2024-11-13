@@ -119,6 +119,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         NeighbourhoodField(
                             modifier = Modifier.weight(1f),
                             audience = audience,
+                            neighbourhood = neighbourhood,
+                            loadBySelected = true,
                             onItemSelected = { neighbourhood = it }
                         )
                     }

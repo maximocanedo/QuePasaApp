@@ -105,6 +105,8 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 NeighbourhoodField(
                     modifier = Modifier.weight(1f),
                     audience = audience,
+                    neighbourhood = neighbourhood,
+                    loadBySelected = false,
                     onItemSelected = { neighbourhood = it }
                 )
             }

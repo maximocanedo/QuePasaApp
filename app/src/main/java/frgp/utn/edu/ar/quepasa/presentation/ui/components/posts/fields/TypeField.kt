@@ -48,6 +48,8 @@ fun TypeField(
     val itemsId = postTypes.content.map { it.id }
 
     if(items.isNotEmpty()) {
+        selectedItem = selectedItem.ifBlank { items.firstOrNull() ?: "" }
+
         Box(modifier = modifier) {
             TextField(
                 value = selectedItem,

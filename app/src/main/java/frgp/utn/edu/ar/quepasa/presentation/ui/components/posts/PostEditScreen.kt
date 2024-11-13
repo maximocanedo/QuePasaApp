@@ -56,7 +56,7 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostEditScreen(navController: NavHostController, user: User?) {
+fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     val typeViewModel: PostTypeViewModel = hiltViewModel()
@@ -66,10 +66,10 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
-            viewModel.getPostById(152)
+            viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)
             viewModel.toggleValidationField(1, true)
-            pictureViewModel.getPicturesByPost(152, 0, 10)
+            pictureViewModel.getPicturesByPost(postId, 0, 10)
             imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
         }
 
@@ -251,5 +251,5 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 fun PostEditScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    PostEditScreen(navController = navController, user = user)
+    PostEditScreen(navController = navController, user = user,1)
 }

@@ -10,7 +10,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +24,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
@@ -36,6 +40,7 @@ class ProfileScreen: AuthenticatedActivity() {
         setContent {
             AuthenticationProvider {
                 val viewModel: ProfileScreenViewModel = hiltViewModel()
+                val username: String? = intent.getStringExtra("username")
                 viewModel.updateUser()
                 val user: User? by viewModel.user.collectAsState()
                 if(user == null) return@AuthenticationProvider
@@ -57,6 +62,12 @@ fun ProfileScreenContent(
     onMailValidationRequest: suspend (Mail, String) -> Boolean,
     onMailDeleteRequest: suspend (Mail) -> Unit
 ) {
+    val me by LocalAuth.current.collectAsState()
+    val itsMe by remember {
+        derivedStateOf {
+            me.ok && me.username == (user.username)
+        }
+    }
     val navController = rememberNavController()
     BaseComponent(navController, user, title = "Perfil", back = false) {
         Column(
@@ -68,7 +79,7 @@ fun ProfileScreenContent(
         ) {
             UserDisplayDesign(user, Modifier.fillMaxWidth())
             BasicUserInfoCard(user, Modifier.fillMaxWidth())
-            MailsCard(
+            if(itsMe) MailsCard(
                 user.email, Modifier.fillMaxWidth(),
                 onMailRegistration, onMailDeleteRequest, onMailValidationRequest
             )

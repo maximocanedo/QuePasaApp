@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.AuthenticatedActivityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,12 +42,9 @@ abstract class AuthenticatedActivity : ComponentActivity() {
 
     }
 
+    @Deprecated("Usar AuthenticationContext. ")
     suspend fun getCurrentUser() : User? {
         return authViewModel.getCurrentUser()
-    }
-
-    suspend fun getCurrentUserOrDie() : User {
-        return getCurrentUser() ?: throw Exception("No user authenticated.")
     }
 
 }

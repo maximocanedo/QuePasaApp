@@ -3,6 +3,7 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.neighbourhood
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.domain.repository.geo.NeighbourhoodRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
@@ -65,6 +66,34 @@ class NeighbourhoodViewModel @Inject constructor(
         catch(e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    suspend fun getNeighbourhoodsBySelectedFirst(idNeigh: Long) {
+        try {
+            val neighbourhoods = repository.getNeighbourhoods(true, 0, 10)
+            val neighbourhoodsSelFirst: MutableList<Neighbourhood> = mutableListOf()
+
+            neighbourhoods.content.firstOrNull { it.id == idNeigh }?.let { selectedNeighbourhood ->
+                neighbourhoodsSelFirst.add(selectedNeighbourhood)
+            }
+
+            neighbourhoods.content.filter { it.id != idNeigh }.forEach { neighbourhood ->
+                neighbourhoodsSelFirst.add(neighbourhood)
+            }
+
+            _neighbourhoods.value.content = neighbourhoodsSelFirst
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    fun getNeighbourhoodFirstId(): Long {
+        return _neighbourhoods.value.content[0].id
+    }
+
+    fun getNeighbourhoodFirstName(): String {
+        return _neighbourhoods.value.content[0].name
     }
 
     suspend fun createNeighbourhood(request: Neighbourhood) {

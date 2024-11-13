@@ -19,6 +19,9 @@ class PostSubtypeViewModel @Inject constructor(
     private val _postSubtypes = MutableStateFlow<Page<PostSubtype>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val postSubtypes: StateFlow<Page<PostSubtype>> get() = _postSubtypes
 
+    private var _postSubtypesSel = MutableStateFlow<Page<PostSubtype>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
+    val postSubtypesSel: StateFlow<Page<PostSubtype>>  get() = _postSubtypesSel
+
     private val _postSubtype = MutableStateFlow<PostSubtype?>(null)
     val postSubtype: StateFlow<PostSubtype?> get() = _postSubtype
 
@@ -30,14 +33,15 @@ class PostSubtypeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getSubtypes(0, 10,  true)
+            getSubtypes(0, 10, true)
         }
     }
 
-    suspend fun getSubtypes(page: Int, size: Int, activeOnly: Boolean) {
+    private suspend fun getSubtypes(page: Int, size: Int, activeOnly: Boolean) {
         try {
-            val types = repository.getSubtypes(page, size, activeOnly)
-            _postSubtypes.value = types
+            val subtypes = repository.getSubtypes(page, size, activeOnly)
+            _postSubtypes.value = subtypes
+            _postSubtypesSel.value = subtypes
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -46,8 +50,8 @@ class PostSubtypeViewModel @Inject constructor(
 
     suspend fun getSubtypes(q: String, sort: String, page: Int, size: Int, active: Boolean) {
         try {
-            val types = repository.getSubtypes(q, sort, page, size, active)
-            _postSubtypes.value = types
+            val subtypes = repository.getSubtypes(q, sort, page, size, active)
+            _postSubtypes.value = subtypes
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -56,8 +60,8 @@ class PostSubtypeViewModel @Inject constructor(
 
     suspend fun getSubtypeById(id: Int) {
         try {
-            val type = repository.getSubtypeById(id)
-            _postSubtype.value = type
+            val subtype = repository.getSubtypeById(id)
+            _postSubtype.value = subtype
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -66,18 +70,61 @@ class PostSubtypeViewModel @Inject constructor(
 
     suspend fun getSubtypesByType(id: Int, page: Int, size: Int) {
         try {
-            val type = repository.getSubtypesByType(id, page, size)
-            _postSubtypes.value = type
+            val subtypes = repository.getSubtypesByType(id, page, size)
+            _postSubtypesSel.value = subtypes
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
         }
     }
 
+    suspend fun getSubtypesBySelectedFirst(idType: Int, idSubtype: Int) {
+        try {
+            val subtypes = repository.getSubtypesByType(idType, 0, 10)
+            val subtypesSelFirst: MutableList<PostSubtype> = mutableListOf()
+
+            subtypes.content.firstOrNull { it.id == idSubtype }?.let { selectedSubtype ->
+                subtypesSelFirst.add(selectedSubtype)
+            }
+
+            subtypes.content.filter { it.id != idSubtype }.forEach { subtype ->
+                subtypesSelFirst.add(subtype)
+            }
+
+            _postSubtypesSel.value.content = subtypesSelFirst
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    fun getSubtypeByType(id: Int): Int {
+        try {
+            _postSubtypes.value.content.forEach { subtype ->
+                if(subtype.type.id == id) {
+                    return subtype.id
+                }
+            }
+            return 1
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+            return 1
+        }
+    }
+
+    fun getSubtypeFirstId(): Int {
+        return _postSubtypesSel.value.content[0].id
+    }
+
+    fun getSubtypeFirstDescription(): String {
+        return _postSubtypesSel.value.content[0].description
+    }
+
     suspend fun createSubtype(request: PostSubtypeRequest) {
         try {
-            val newType = repository.createSubtype(request)
-            _postSubtype.value = newType
+            val newSubtype = repository.createSubtype(request)
+            _postSubtype.value = newSubtype
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -86,8 +133,8 @@ class PostSubtypeViewModel @Inject constructor(
 
     suspend fun updateSubtype(id: Int, request: PostSubtypeRequest) {
         try {
-            val newType = repository.updateSubtype(id, request)
-            _postSubtype.value = newType
+            val newSubtype = repository.updateSubtype(id, request)
+            _postSubtype.value = newSubtype
         }
         catch(e: Exception) {
             _errorMessage.value = e.message

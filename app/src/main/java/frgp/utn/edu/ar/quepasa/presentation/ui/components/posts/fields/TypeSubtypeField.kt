@@ -27,25 +27,37 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 
 @Composable
-fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (Int) -> Unit) {
-    val viewModel: PostSubtypeViewModel = hiltViewModel()
+fun TypeSubtypeField(
+    modifier: Modifier,
+    viewModel: PostSubtypeViewModel,
+    type: Int,
+    subtype: Int,
+    loadBySelected: Boolean,
+    onItemSelected: (Int) -> Unit) {
+    var selectedItem by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if(loadBySelected) {
+            viewModel.getSubtypesBySelectedFirst(type, subtype)
+            selectedItem = viewModel.getSubtypeFirstDescription()
+            onItemSelected(viewModel.getSubtypeFirstId())
+        }
+    }
 
     LaunchedEffect(type) {
         viewModel.getSubtypesByType(type, 0, 10)
+        selectedItem = viewModel.getSubtypeFirstDescription()
+        onItemSelected(viewModel.getSubtypeFirstId())
     }
 
-    val postSubtypes by viewModel.postSubtypes.collectAsState()
+    val postSubtypes by viewModel.postSubtypesSel.collectAsState()
     val items = postSubtypes.content.map { it.description }
     val itemsId = postSubtypes.content.map { it.id }
 
     if(items.isNotEmpty()) {
         val maxLength = 14
-        var selectedItem by remember { mutableStateOf("") }
         val fontSize = if (selectedItem.length > maxLength) 14.sp else 16.sp
-        LaunchedEffect(items) {
-            selectedItem = items.firstOrNull() ?: ""
-        }
-        var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = modifier) {
             TextField(
@@ -99,7 +111,8 @@ fun TypeSubtypeField(modifier: Modifier, type: Int, onItemSelected: (Int) -> Uni
 @Preview
 @Composable
 fun TypeSubtypeFieldPreview() {
-    var subtype by remember { mutableIntStateOf(0) }
-    val type by remember { mutableIntStateOf(0) }
-    TypeSubtypeField(modifier = Modifier.fillMaxWidth(), type, onItemSelected = { subtype = it })
+    val viewModel: PostSubtypeViewModel = hiltViewModel()
+    var subtype by remember { mutableIntStateOf(1) }
+    val type by remember { mutableIntStateOf(1) }
+    TypeSubtypeField(modifier = Modifier.fillMaxWidth(), viewModel, type, subtype, true, onItemSelected = { subtype = it })
 }

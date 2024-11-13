@@ -43,6 +43,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubty
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostCreateImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +58,8 @@ import quepasa.api.validators.commons.StringValidator
 fun PostCreateScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
+    val typeViewModel: PostTypeViewModel = hiltViewModel()
+    val subtypeViewModel: PostSubtypeViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
@@ -73,6 +77,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 TypeField(
                     modifier = Modifier.weight(1f),
+                    typeViewModel,
                     subtype = subtype,
                     loadBySubtype = false,
                     onItemSelected = {
@@ -82,7 +87,10 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 Spacer(modifier = Modifier.width(4.dp))
                 TypeSubtypeField(
                     modifier = Modifier.weight(1f),
-                    type,
+                    viewModel = subtypeViewModel,
+                    type = type,
+                    subtype = subtype,
+                    loadBySelected = false,
                     onItemSelected = { subtype = it }
                 )
             }
@@ -97,6 +105,8 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 NeighbourhoodField(
                     modifier = Modifier.weight(1f),
                     audience = audience,
+                    neighbourhood = neighbourhood,
+                    loadBySelected = false,
                     onItemSelected = { neighbourhood = it }
                 )
             }

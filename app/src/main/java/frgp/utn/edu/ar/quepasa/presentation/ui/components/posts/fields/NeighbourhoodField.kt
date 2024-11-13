@@ -36,18 +36,32 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.neighbourhood.Neighbourhoo
 fun NeighbourhoodField(
     modifier: Modifier,
     audience: String,
+    neighbourhood: Long,
+    loadBySelected: Boolean,
     onItemSelected: (Long) -> Unit
 ) {
     val viewModel: NeighbourhoodViewModel = hiltViewModel()
+
+    var selectedItem by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if(loadBySelected) {
+            viewModel.getNeighbourhoodsBySelectedFirst(neighbourhood)
+            selectedItem = viewModel.getNeighbourhoodFirstName()
+            onItemSelected(viewModel.getNeighbourhoodFirstId())
+        }
+    }
+
     val neighbourhoods by viewModel.neighbourhoods.collectAsState()
     val items = neighbourhoods.content.map { it.name }
     val itemsId = neighbourhoods.content.map { it.id }
 
     if(items.isNotEmpty()) {
+        selectedItem = selectedItem.ifBlank { items.firstOrNull() ?: "" }
+
         val maxLength = 8
-        var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
-        var expanded by remember { mutableStateOf(false) }
-        var enabled by remember { mutableStateOf(false) }
         val fontSize = if (selectedItem.length > maxLength) 10.sp else 16.sp
 
         LaunchedEffect(audience) {
@@ -123,6 +137,8 @@ fun NeighbourhoodFieldPreview() {
     NeighbourhoodField(
         modifier = Modifier,
         audience = audience,
+        neighbourhood = neighbourhood,
+        loadBySelected = false,
         onItemSelected = { neighbourhood = it }
     )
 }

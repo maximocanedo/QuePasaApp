@@ -22,10 +22,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import frgp.utn.edu.ar.quepasa.R
+import frgp.utn.edu.ar.quepasa.data.model.User
 
 @Composable
 fun PostScreen(
-
+    user : User?
 ) {
     val postViewModel: PostViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
@@ -40,6 +41,7 @@ fun PostScreen(
         postsState.value.content.forEach { post ->
             PostCard(
                 post = post,
+                user= user,
                 onLikeClick = {
                     CoroutineScope(Dispatchers.IO).launch {
                         postViewModel.upVote(post.id!!)

@@ -33,7 +33,7 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
                 Text(text = "Bienvenido, ${user?.name ?: "Usuario"}")
             }
 
-            PostScreen()
+            PostScreen(user)
 
 
             Button(

@@ -1,3 +1,4 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,12 +14,24 @@ import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 import frgp.utn.edu.ar.quepasa.data.model.PostType
+import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
 import frgp.utn.edu.ar.quepasa.data.model.enums.SubnationalDivisionDenomination
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.card.components.CardButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
+import okhttp3.internal.userAgent
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.ln
+import kotlin.math.pow
+
+fun formatNumber(number: Int): String {
+    if (number < 1000) return "$number"
+    val exp = (ln(abs(number.toDouble())) / ln(1000.0)).toInt()
+    val suffix = "KMBT"[exp - 1]
+    return String.format("%.1f%s", number / 1000.0.pow(exp.toDouble()), suffix)
+}
 
 fun Timestamp.formatTimeAgo(): String {
     val now = System.currentTimeMillis()
@@ -32,9 +45,11 @@ fun Timestamp.formatTimeAgo(): String {
         else -> "hace más de una semana"
     }
 }
+
 @Composable
 fun PostCard(
     post: Post,
+    user: User? = null,
     onLikeClick: () -> Unit,
     onDislikeClick: () -> Unit,
     onCommentClick: () -> Unit,
@@ -110,43 +125,58 @@ fun PostCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                CardButton(
-                    description = "Like",
-                    icon = R.drawable.baseline_arrow_upward_24,
-                    onClick = onLikeClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable(onClick = onLikeClick)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_arrow_upward_24),
+                        contentDescription = "Like",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
                     )
-                )
-
-                CardButton(
-                    description = "Dislike",
-                    icon = R.drawable.baseline_arrow_downward_24,
-                    onClick = onDislikeClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = formatNumber(post.votes?.votes ?: 0),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                )
+                }
 
-                CardButton(
-                    description = "Comment",
-                    icon = R.drawable.baseline_comment_24,
-                    onClick = onCommentClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable(onClick = onDislikeClick)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_arrow_downward_24),
+                        contentDescription = "Dislike",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp)
                     )
-                )
+                }
 
-                if (post.owner?.id == post.id) {
-                    CardButton(
-                        description = "Edit",
-                        icon = R.drawable.edit,
-                        onClick = { post.id?.let { onEditClick(it) } },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable(onClick = onCommentClick)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_comment_24),
+                        contentDescription = "Comment",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                if (user != null && post.owner?.id == user.id) {
+                    Icon(
+                        painter = painterResource(R.drawable.edit),
+                        contentDescription = "Edit",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { post.id?.let { onEditClick(it) } }
                     )
                 }
             }
@@ -154,37 +184,18 @@ fun PostCard(
     }
 }
 
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewPostCard() {
     val examplePost = Post(
         id = 1,
-        owner = frgp.utn.edu.ar.quepasa.data.model.User(
+        owner = User(
             id = 1,
             username = "patriciobor1",
             name = "Patricio Bordon",
             phone = emptySet(),
             address = "123 Calle Falsa",
-            neighbourhood = frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood(
-                id = 1,
-                name = "General Pacheco",
-                city = frgp.utn.edu.ar.quepasa.data.model.geo.City(1, "Buenos Aires", subdivision = frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision(
-                    iso3= "",
-                    label="",
-                    denomination= SubnationalDivisionDenomination.CITY,
-                    country = frgp.utn.edu.ar.quepasa.data.model.geo.Country(
-                        iso3= "Arg",
-                        label= "Argentina",
-                        active= true
-
-                    ),
-                    active = true
-                ), true),
-                active = true
-            ),
+            neighbourhood = null,
             picture = null,
             email = emptySet(),
             role = frgp.utn.edu.ar.quepasa.data.model.enums.Role.USER,
@@ -192,26 +203,11 @@ fun PreviewPostCard() {
         ),
         title = "Título ejemplo",
         subtype = PostSubtype(1, PostType(1, "PostType ejemplo"), "PostSubtype ejemplo"),
-        description = "Este es un ejemplo estoy usando preview como me recomendo Maximo, ahora la pc suena mas fuerte jajjaj. mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto mas texto ",
+        description = "Este es un ejemplo de cómo debería verse un post con una descripción más larga para probar el diseño.",
         timestamp = Timestamp(System.currentTimeMillis()),
-        neighbourhood = frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood(
-            id = 1,
-            name = "General Pacheco",
-            city = frgp.utn.edu.ar.quepasa.data.model.geo.City(1, "Buenos Aires", subdivision = frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision(
-                iso3= "",
-                label="",
-                denomination= SubnationalDivisionDenomination.CITY,
-                country = frgp.utn.edu.ar.quepasa.data.model.geo.Country(
-                    iso3= "Arg",
-                    label= "Argentina",
-                    active= true
-
-                ),
-                active = true
-            ), true),
-            active = true
-        ),        isActive = true,
-        votes = frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount(10, 1, Timestamp(System.currentTimeMillis()))
+        neighbourhood = null,
+        isActive = true,
+        votes = frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount(12500, 300, Timestamp(System.currentTimeMillis()))
     )
 
     MaterialTheme {

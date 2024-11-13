@@ -57,6 +57,7 @@ fun TitleFieldPreview() {
     var title by remember { mutableStateOf("") }
     TitleField(
         modifier = Modifier,
+        value = title,
         validator = {
             StringValidator("title")
                 .isNotBlank()
@@ -64,9 +65,6 @@ fun TitleFieldPreview() {
                 .hasMaximumLength(60)
         },
         onChange = { title = it },
-        onValidityChange = {
-
-        },
-        value = title
+        onValidityChange = {}
     )
 }

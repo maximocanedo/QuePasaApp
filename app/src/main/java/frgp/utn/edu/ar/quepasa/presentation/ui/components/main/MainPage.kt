@@ -33,15 +33,15 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
                 Text(text = "Bienvenido, ${user?.name ?: "Usuario"}")
             }
 
-            PostScreen(user)
-
-
             Button(
                 onClick = { navController.navigate("postEdit") },
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text("PostEditScreen test")
             }
+
+            PostScreen(user)
+
         }
         Column {
             Spacer(modifier = Modifier.weight(1f))

@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.Column
@@ -47,8 +48,10 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -62,6 +65,8 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(152)
+            viewModel.toggleValidationField(0, true)
+            viewModel.toggleValidationField(1, true)
             pictureViewModel.getPicturesByPost(152, 0, 10)
             imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
         }
@@ -87,7 +92,6 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                             loadBySubtype = true,
                             onItemSelected = {
                                 type = it
-                                subtype = 0
                             }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -120,7 +124,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                             StringValidator(title)
                                 .isNotBlank()
                                 .hasMaximumLength(15)
-                                .hasMinimumLength(4)
+                                .hasMinimumLength(3)
                         },
                         onChange = { newTags ->
                             tag = newTags
@@ -183,7 +187,41 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     ) {
                         Button(onClick = {
                             CoroutineScope(IO).launch {
-                                // TODO: Not implemented yet
+                                val validation = viewModel.checkValidationFields()
+
+                                if (validation) {
+                                    val result = viewModel.updatePost(
+                                        id = 152,
+                                        audience = audience,
+                                        title = title,
+                                        subtype = subtype,
+                                        description = description,
+                                        neighbourhood = neighbourhood,
+                                        tags = tags
+                                    )
+
+                                    withContext(Dispatchers.Main) {
+                                        if (result) {
+                                            if(!imageViewModel.areUrisEmpty()) {
+                                                viewModel.post.value?.let {
+                                                    imageViewModel.selectedUris.value.forEach { uri ->
+                                                        pictureViewModel.upload(context, uri, it.id)
+                                                    }
+                                                }
+                                            }
+                                            navController.navigate("home")
+                                            Toast.makeText(context, "Publicación modificada", Toast.LENGTH_SHORT).show()
+                                        }
+                                        else {
+                                            Toast.makeText(context, "Publicación no modificada (error)", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                                else {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "Tiene campos sin completar", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
                         }) {
                             Text("Modificar")
@@ -203,6 +241,5 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 fun PostEditScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    lateinit var pickMultipleMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
     PostEditScreen(navController = navController, user = user)
 }

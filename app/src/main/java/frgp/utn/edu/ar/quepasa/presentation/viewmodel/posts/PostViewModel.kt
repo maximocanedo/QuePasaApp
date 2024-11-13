@@ -195,8 +195,8 @@ class PostViewModel @Inject constructor(
                 tags = tagsString
             )
             println("New post: Title ${request.title} + Audience ${request.audience} + Subtype ${request.subtype} + Desc ${request.description} + Neigh ${request.neighbourhood} + Tags ${request.tags}")
-            val newType = repository.createPost(request)
-            _post.value = newType
+            val newPost = repository.createPost(request)
+            _post.value = newPost
             clearTags()
             return true
         }
@@ -207,13 +207,38 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    suspend fun updatePost(id: Int, request: PostPatchEditRequest) {
+    suspend fun updatePost(
+        id: Int,
+        audience: String,
+        title: String,
+        subtype: Int,
+        description: String,
+        neighbourhood: Long,
+        tags: List<String>
+    ): Boolean {
         try {
-            val newType = repository.updatePost(id, request)
-            _post.value = newType
+            var tagsString = ""
+            tags.forEachIndexed { index, tag ->
+                tagsString += tag
+                if(index < tags.size - 1) tagsString += ","
+            }
+            val request = PostPatchEditRequest(
+                audience = Audience.valueOf(audience),
+                title = title,
+                subtype = subtype,
+                description = description,
+                neighbourhood = neighbourhood,
+                tags = tagsString
+            )
+            println("Updated post: Title ${request.title} + Audience ${request.audience} + Subtype ${request.subtype} + Desc ${request.description} + Neigh ${request.neighbourhood} + Tags ${request.tags}")
+            val updatedPost = repository.updatePost(id, request)
+            _post.value = updatedPost
+            clearTags()
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 

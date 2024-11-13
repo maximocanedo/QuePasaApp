@@ -1,12 +1,14 @@
 package frgp.utn.edu.ar.quepasa.data.source.remote
 
 import android.content.Context
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
+import frgp.utn.edu.ar.quepasa.data.model.utils.LocalDateTimeDeserializer
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.EventPictureService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.PostPictureService
@@ -15,8 +17,10 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,10 +43,13 @@ object ApiClient {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val gsonBuilder = GsonBuilder()
+        gsonBuilder.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeDeserializer())
+        val gson = gsonBuilder.create()
         return Retrofit.Builder()
             .baseUrl("http://canedo.com.ar:8080/api/")
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 

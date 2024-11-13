@@ -42,7 +42,9 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun CreateEventScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current

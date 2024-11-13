@@ -20,9 +20,10 @@ data class Event (
     var category: EventCategory? = null,
     var createdAt: Timestamp? = null,
     var audience: Audience? = null,
-    var isActive: Boolean = false,
+    var active: Boolean = false,
     var neighbourhoods: Set<Neighbourhood>? = null,
-    val votes: VoteCount? = null
+    val votes: VoteCount? = null,
+    val commentCount: CommentCount? = null
 )
 
 

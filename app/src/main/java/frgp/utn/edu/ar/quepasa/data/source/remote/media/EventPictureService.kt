@@ -19,7 +19,7 @@ interface EventPictureService {
     @POST("event-pictures")
     suspend fun upload(
         @Part file: MultipartBody.Part,
-        @Part("event") event: RequestBody,
+        @Part("eventId") event: RequestBody,
         @Part("description") description: RequestBody
     ): Response<EventPicture>
 

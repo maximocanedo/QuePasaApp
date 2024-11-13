@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.data.model.User
@@ -45,15 +43,11 @@ abstract class AuthenticatedActivity : ComponentActivity() {
 
     }
 
-    fun getCurrentUser() : User? {
-        var user: User? = null
-        lifecycleScope.launch {
-            user = authViewModel.getCurrentUser()
-        }
-        return user
+    suspend fun getCurrentUser() : User? {
+        return authViewModel.getCurrentUser()
     }
 
-    fun getCurrentUserOrDie() : User {
+    suspend fun getCurrentUserOrDie() : User {
         return getCurrentUser() ?: throw Exception("No user authenticated.")
     }
 

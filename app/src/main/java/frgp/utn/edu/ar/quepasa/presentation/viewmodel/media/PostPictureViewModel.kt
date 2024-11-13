@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.Post
@@ -11,6 +12,7 @@ import frgp.utn.edu.ar.quepasa.data.model.media.PostPicture
 import frgp.utn.edu.ar.quepasa.domain.repository.media.PostPictureRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.io.IOException
 import java.io.File
 import java.io.FileOutputStream
@@ -22,8 +24,10 @@ class PostPictureViewModel @Inject constructor(
     private val repository: PostPictureRepository
 ): ViewModel() {
     private val _pictures = MutableStateFlow<Page<PostPicture>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
+    val pictures: StateFlow<Page<PostPicture>> get() = _pictures
 
     private val _picture = MutableStateFlow<PostPicture?>(null)
+    val picture: StateFlow<PostPicture?> get() = _picture
 
     private val _post = MutableStateFlow<Post?>(null)
 

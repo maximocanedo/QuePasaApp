@@ -1,10 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -27,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,7 +42,9 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -54,12 +54,16 @@ import quepasa.api.validators.commons.StringValidator
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PostEditScreen(navController: NavHostController, user: User?) {
+    val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
+    val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
-            viewModel.getPostById(1)
+            viewModel.getPostById(152)
+            pictureViewModel.getPicturesByPost(152, 0, 10)
+            imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
         }
 
         val post by viewModel.post.collectAsState()
@@ -170,6 +174,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         onChange = { newDesc -> description = newDesc },
                         onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
+                    PostEditImagesPreview(modifier = Modifier, viewModel = imageViewModel)
                     ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
                     Column(

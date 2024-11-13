@@ -21,7 +21,7 @@ import coil3.compose.rememberAsyncImagePainter
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 
 @Composable
-fun ImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
+fun PostCreateImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
     val uris = viewModel.selectedUris.collectAsState()
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {

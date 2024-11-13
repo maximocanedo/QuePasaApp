@@ -40,7 +40,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.ImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostCreateImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
@@ -163,7 +163,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                 onChange = { newDesc -> description = newDesc },
                 onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
             )
-            ImagesPreview(modifier = Modifier, viewModel = imageViewModel)
+            PostCreateImagesPreview(modifier = Modifier, viewModel = imageViewModel)
             ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

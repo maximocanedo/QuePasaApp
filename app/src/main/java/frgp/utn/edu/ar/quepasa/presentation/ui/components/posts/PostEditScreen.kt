@@ -200,7 +200,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
 
                                 if (validation) {
                                     val result = viewModel.updatePost(
-                                        id = 152,
+                                        id = postId,
                                         audience = audience,
                                         title = title,
                                         subtype = subtype,
@@ -211,7 +211,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
 
                                     withContext(Dispatchers.Main) {
                                         if (result) {
-                                            if(!imageViewModel.areUrisEmpty()) {
+                                            if (!imageViewModel.areUrisEmpty()) {
                                                 viewModel.post.value?.let {
                                                     imageViewModel.selectedUris.value.forEach { uri ->
                                                         pictureViewModel.upload(context, uri, it.id)
@@ -220,13 +220,11 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                                             }
                                             navController.navigate("home")
                                             Toast.makeText(context, "Publicación modificada", Toast.LENGTH_SHORT).show()
-                                        }
-                                        else {
+                                        } else {
                                             Toast.makeText(context, "Publicación no modificada (error)", Toast.LENGTH_SHORT).show()
                                         }
                                     }
-                                }
-                                else {
+                                } else {
                                     withContext(Dispatchers.Main) {
                                         Toast.makeText(context, "Tiene campos sin completar", Toast.LENGTH_SHORT).show()
                                     }
@@ -235,6 +233,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                         }) {
                             Text("Modificar")
                         }
+
                     }
                 }
             }

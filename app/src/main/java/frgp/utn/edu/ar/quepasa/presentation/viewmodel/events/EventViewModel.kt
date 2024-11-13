@@ -24,6 +24,7 @@ import quepasa.api.validators.events.EventTitleValidator
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.uuid.ExperimentalUuidApi
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -189,6 +190,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun getEventById(id: UUID) {
         try {
             val event = repository.getEventById(id)

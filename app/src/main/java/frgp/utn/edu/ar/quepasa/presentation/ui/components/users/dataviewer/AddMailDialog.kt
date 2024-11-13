@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.MailField
@@ -29,40 +30,44 @@ import quepasa.api.validators.users.MailValidator
 @Composable
 fun AddMailDialog(
     onRequest: suspend (String) -> Unit,
-    onDismiss: suspend () -> Unit,
-    state: SheetState = rememberModalBottomSheetState(true)
+    onDismiss: () -> Unit
 ) {
     val co = rememberCoroutineScope()
     var mail by remember { mutableStateOf("") }
     var isValid by remember { mutableStateOf(false) }
     ModalBottomSheet(
-        sheetState = state,
-        onDismissRequest = { co.launch { onDismiss() } }
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(true)
     ) {
         val rowModifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(horizontal = 24.dp, vertical = 12.dp)
         Row(modifier = rowModifier) {
             Text(
                 text = "Agregar correo",
-                style = MaterialTheme.typography.labelLarge,
+                textAlign = Center,
+                style = MaterialTheme.typography.headlineMedium,
             )
         }
         Row(modifier = rowModifier) {
-            MailField(validator = {
-                MailValidator(it)
-                    .isNotNull()
-                    .isNotBlank()
-                    .isValidAddress()
-            }, onChange = { value, valid ->
-                isValid = valid
-                mail = value
-            })
+            MailField(
+                modifier = Modifier.fillMaxWidth(),
+                validator = {
+                    MailValidator(it)
+                        .isNotNull()
+                        .isNotBlank()
+                        .isValidAddress()
+                }, onChange = { value, valid ->
+                    isValid = valid
+                    mail = value
+                }
+            )
         }
         Row(modifier = rowModifier, horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = {
                     co.launch { onRequest(mail) }
+                    onDismiss()
                 },
                 enabled = isValid
             ) {

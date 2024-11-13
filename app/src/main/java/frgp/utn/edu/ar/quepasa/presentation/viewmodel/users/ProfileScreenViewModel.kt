@@ -10,6 +10,8 @@ import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,13 +23,19 @@ class ProfileScreenViewModel @Inject constructor(
     var user = MutableStateFlow<User?>(null)
         private set
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     fun updateUser(user: User? = null) {
+        _isRefreshing.update { true }
         CoroutineScope(IO).launch {
             if(user == null) {
                 val updated = usersRepository.getAuthenticatedUser()
-                this@ProfileScreenViewModel.user.tryEmit(updated)
+                this@ProfileScreenViewModel.user.update { updated }
+                _isRefreshing.update { false }
             } else {
-                this@ProfileScreenViewModel.user.tryEmit(user)
+                this@ProfileScreenViewModel.user.update { user }
+                _isRefreshing.update { false }
             }
         }
     }
@@ -41,7 +49,7 @@ class ProfileScreenViewModel @Inject constructor(
                 val updatedUser = currentUser.copy(
                     email = currentUser.email + mail.data
                 )
-                user.emit(updatedUser)
+                updateUser(updatedUser)
             }
             is ApiResponse.ValidationError -> {
 

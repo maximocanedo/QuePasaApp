@@ -11,11 +11,11 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +37,8 @@ fun MailsCard(
     onMailDeleteRequest: suspend (Mail) -> Unit,
     onMailValidationRequest: suspend (Mail, String) -> Boolean
 ) {
-    val addMailDialogState = rememberModalBottomSheetState(true)
+    var addMailDialogState by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -68,13 +69,18 @@ fun MailsCard(
             )
         }
         OutlinedButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                addMailDialogState = true
+            },
             modifier = Modifier.padding(8.dp)
         ) {
             Text("Registrar nueva dirección de correo")
         }
     }
-    AddMailDialog(onRequest = onMailRegistration, onDismiss = { addMailDialogState.hide() }, addMailDialogState)
+    if(addMailDialogState) AddMailDialog(
+        onRequest = onMailRegistration,
+        onDismiss = { addMailDialogState = false }
+    )
 }
 
 @Preview

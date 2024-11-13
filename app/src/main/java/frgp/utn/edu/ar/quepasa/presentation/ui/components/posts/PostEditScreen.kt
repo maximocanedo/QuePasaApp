@@ -56,7 +56,7 @@ import quepasa.api.validators.commons.StringValidator
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PostEditScreen(navController: NavHostController, user: User?) {
+fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
     val typeViewModel: PostTypeViewModel = hiltViewModel()
@@ -66,10 +66,10 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
-            viewModel.getPostById(152)
+            viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)
             viewModel.toggleValidationField(1, true)
-            pictureViewModel.getPicturesByPost(152, 0, 10)
+            pictureViewModel.getPicturesByPost(postId, 0, 10)
             imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
         }
 
@@ -200,7 +200,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 
                                 if (validation) {
                                     val result = viewModel.updatePost(
-                                        id = 152,
+                                        id = postId,
                                         audience = audience,
                                         title = title,
                                         subtype = subtype,
@@ -211,7 +211,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 
                                     withContext(Dispatchers.Main) {
                                         if (result) {
-                                            if(!imageViewModel.areUrisEmpty()) {
+                                            if (!imageViewModel.areUrisEmpty()) {
                                                 viewModel.post.value?.let {
                                                     imageViewModel.selectedUris.value.forEach { uri ->
                                                         pictureViewModel.upload(context, uri, it.id)
@@ -220,13 +220,11 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                                             }
                                             navController.navigate("home")
                                             Toast.makeText(context, "Publicación modificada", Toast.LENGTH_SHORT).show()
-                                        }
-                                        else {
+                                        } else {
                                             Toast.makeText(context, "Publicación no modificada (error)", Toast.LENGTH_SHORT).show()
                                         }
                                     }
-                                }
-                                else {
+                                } else {
                                     withContext(Dispatchers.Main) {
                                         Toast.makeText(context, "Tiene campos sin completar", Toast.LENGTH_SHORT).show()
                                     }
@@ -235,6 +233,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                         }) {
                             Text("Modificar")
                         }
+
                     }
                 }
             }
@@ -251,5 +250,5 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
 fun PostEditScreenPreview() {
     val navController = rememberNavController()
     val user = User(1, "", "", emptySet(), "", null, null, emptySet(), Role.USER, true)
-    PostEditScreen(navController = navController, user = user)
+    PostEditScreen(navController = navController, user = user,1)
 }

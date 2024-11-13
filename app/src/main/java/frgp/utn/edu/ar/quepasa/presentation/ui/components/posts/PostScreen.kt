@@ -26,6 +26,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 
 @Composable
 fun PostScreen(
+    navController: NavHostController,
     user : User?
 ) {
     val postViewModel: PostViewModel = hiltViewModel()
@@ -55,7 +56,11 @@ fun PostScreen(
                 onCommentClick = {
                 },
                 onEditClick = { postId ->
+                    postId?.let {
+                        navController.navigate("postEdit/$it")
+                    }
                 }
+
             )
         }
     }

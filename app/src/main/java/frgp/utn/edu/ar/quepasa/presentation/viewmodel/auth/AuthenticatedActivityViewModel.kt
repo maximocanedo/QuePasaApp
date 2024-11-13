@@ -10,6 +10,7 @@ import frgp.utn.edu.ar.quepasa.domain.repository.AuthRepository
 import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,11 +22,13 @@ class AuthenticatedActivityViewModel @Inject constructor(
     private val _authenticated = MutableStateFlow<Boolean>(true)
     val authenticated = _authenticated.asStateFlow()
 
+    private val _au = MutableStateFlow<User?>(null)
+    val current = _au.asStateFlow()
 
     suspend fun getCurrentUser(): User? {
-        Log.d("AUTHENTICATED ACTIVITY", "Solicitar usuario autenticado. ")
         val u = users.getAuthenticatedUser()
         _authenticated.tryEmit(u != null && u.active)
+        _au.update { u }
         return u
     }
 }

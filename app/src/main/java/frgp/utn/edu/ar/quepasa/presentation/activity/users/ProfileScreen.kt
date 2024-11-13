@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
@@ -34,16 +34,18 @@ class ProfileScreen: AuthenticatedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: ProfileScreenViewModel = hiltViewModel()
-            viewModel.updateUser()
-            val user: User? by viewModel.user.collectAsState()
-            if(user == null) return@setContent
-            ProfileScreenContent(
-                user!!,
-                viewModel::onMailRegistrationRequest,
-                viewModel::onMailValidationRequest,
-                viewModel::onMailDeleteRequest
-            )
+            AuthenticationProvider {
+                val viewModel: ProfileScreenViewModel = hiltViewModel()
+                viewModel.updateUser()
+                val user: User? by viewModel.user.collectAsState()
+                if(user == null) return@AuthenticationProvider
+                ProfileScreenContent(
+                    user!!,
+                    viewModel::onMailRegistrationRequest,
+                    viewModel::onMailValidationRequest,
+                    viewModel::onMailDeleteRequest
+                )
+            }
         }
     }
 }
@@ -58,7 +60,8 @@ fun ProfileScreenContent(
     val navController = rememberNavController()
     BaseComponent(navController, user, title = "Perfil", back = false) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 12.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)

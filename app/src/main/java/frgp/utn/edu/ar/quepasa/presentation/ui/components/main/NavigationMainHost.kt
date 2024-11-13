@@ -11,12 +11,12 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.UserProfileScreen
 
 @Composable
-fun NavigationMainHost(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
+fun NavigationMainHost(navController: NavHostController, user: User?) {
     NavHost(
         navController = navController,
         startDestination = "home"
     ) {
-        composable("home") { MainPage(navController, user) }
+        composable("home") { MainPage(navController) }
         composable("userProfile") { UserProfileScreen(navController, user) }
         composable("postCreate") { PostCreateScreen(navController, user) }
         composable("postEdit") { PostEditScreen(navController, user) }

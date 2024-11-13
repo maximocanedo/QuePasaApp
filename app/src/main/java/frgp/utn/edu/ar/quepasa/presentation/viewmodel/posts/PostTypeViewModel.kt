@@ -73,6 +73,14 @@ class PostTypeViewModel @Inject constructor(
         }
     }
 
+    fun getTypeFirstId(): Int {
+        return _postTypes.value.content[0].id
+    }
+
+    fun getTypeFirstDescription(): String {
+        return _postTypes.value.content[0].description
+    }
+
     suspend fun createType(description: String) {
         try {
             val newType = repository.createType(description)

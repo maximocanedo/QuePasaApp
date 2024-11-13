@@ -27,14 +27,19 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
 @Composable
 fun TypeField(
     modifier: Modifier,
+    viewModel: PostTypeViewModel,
     subtype: Int,
     loadBySubtype: Boolean,
     onItemSelected: (Int) -> Unit) {
-    val viewModel: PostTypeViewModel = hiltViewModel()
+
+    var selectedItem by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if(loadBySubtype) {
             viewModel.getTypesBySubtype(subtype, 0, 10)
+            selectedItem = viewModel.getTypeFirstDescription()
+            onItemSelected(viewModel.getTypeFirstId())
         }
     }
 
@@ -43,9 +48,6 @@ fun TypeField(
     val itemsId = postTypes.content.map { it.id }
 
     if(items.isNotEmpty()) {
-        var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
-        var expanded by remember { mutableStateOf(false) }
-
         Box(modifier = modifier) {
             TextField(
                 value = selectedItem,
@@ -97,7 +99,8 @@ fun TypeField(
 @Preview
 @Composable
 fun TypeFieldPreview() {
+    val viewModel: PostTypeViewModel = hiltViewModel()
     var type by remember { mutableIntStateOf(0) }
     val subtype by remember { mutableIntStateOf(0) }
-    TypeField(modifier = Modifier.fillMaxWidth(), subtype,false, onItemSelected = { type = it })
+    TypeField(modifier = Modifier.fillMaxWidth(), viewModel, subtype,false, onItemSelected = { type = it })
 }

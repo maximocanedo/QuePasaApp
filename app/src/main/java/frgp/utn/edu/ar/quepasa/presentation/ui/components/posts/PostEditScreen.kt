@@ -1,8 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -46,6 +44,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubty
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +59,8 @@ import quepasa.api.validators.commons.StringValidator
 fun PostEditScreen(navController: NavHostController, user: User?) {
     val context = LocalContext.current
     val viewModel: PostViewModel = hiltViewModel()
+    val typeViewModel: PostTypeViewModel = hiltViewModel()
+    val subtypeViewModel: PostSubtypeViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
@@ -88,16 +90,21 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TypeField(
                             modifier = Modifier.weight(1f),
+                            typeViewModel,
                             subtype = subtype,
                             loadBySubtype = true,
                             onItemSelected = {
                                 type = it
+                                subtype = subtypeViewModel.getSubtypeByType(type)
                             }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         TypeSubtypeField(
                             modifier = Modifier.weight(1f),
-                            type,
+                            viewModel = subtypeViewModel,
+                            type = type,
+                            subtype = subtype,
+                            loadBySelected = true,
                             onItemSelected = { subtype = it }
                         )
                     }
@@ -232,6 +239,7 @@ fun PostEditScreen(navController: NavHostController, user: User?) {
         }
         else {
             //navController.navigate("home")
+            //Toast.makeText(context, "Publicación no encontrada (error)", Toast.LENGTH_SHORT).show()
         }
     }
 }

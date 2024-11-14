@@ -12,6 +12,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
+import frgp.utn.edu.ar.quepasa.domain.context.feedback.LocalFeedback
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.MailField
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import quepasa.api.validators.users.MailValidator
 
@@ -35,6 +38,8 @@ fun AddMailDialog(
     val co = rememberCoroutineScope()
     var mail by remember { mutableStateOf("") }
     var isValid by remember { mutableStateOf(false) }
+    val feedback by LocalFeedback.current.collectAsState()
+    var mutableFeedback = LocalFeedback.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(true)
@@ -60,7 +65,8 @@ fun AddMailDialog(
                 }, onChange = { value, valid ->
                     isValid = valid
                     mail = value
-                }
+                }, serverError = if (feedback?.field == "mail") feedback?.message else "",
+                clearServerError = { mutableFeedback.update { null } }
             )
         }
         Row(modifier = rowModifier, horizontalArrangement = Arrangement.End) {

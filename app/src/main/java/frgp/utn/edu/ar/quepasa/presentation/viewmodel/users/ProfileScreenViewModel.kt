@@ -17,10 +17,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+
+
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val usersRepository: UserRepository
 ): ViewModel() {
+
+    var feedback = MutableSharedFlow<Feedback?>()
 
     var username = MutableStateFlow<String?>(null)
         private set
@@ -68,17 +73,13 @@ class ProfileScreenViewModel @Inject constructor(
         when(mail) {
             is ApiResponse.Success -> {
                 if(mail.data == null || user.value == null) return
-                val currentUser = user.value!!
-                val updatedUser = currentUser.copy(
-                    email = currentUser.email + mail.data
-                )
-                updateUser(updatedUser)
+                updateUser()
             }
             is ApiResponse.ValidationError -> {
-
+                feedback.emit(Feedback(field = "mail", message = mail.details.errors.first()))
             }
             is ApiResponse.Error -> {
-
+                feedback.emit(Feedback(field = "mail", message = mail.exception.message))
             }
         }
     }

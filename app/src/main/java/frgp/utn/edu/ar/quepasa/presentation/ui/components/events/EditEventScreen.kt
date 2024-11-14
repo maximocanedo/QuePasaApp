@@ -49,13 +49,15 @@ import java.util.UUID
 fun EditEventScreen(navController: NavHostController, user: User?, eventId: UUID) {
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
-    val imageViewModel = ImageViewModel()
+    val imageViewModel: ImageViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val event by viewModel.event.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.getEventById(eventId)
         viewModel.setEventDataFields()
+        eventPictureViewModel.getPicturesByEvent(eventId)
+        imageViewModel.loadUrisFromEventPictures(eventPictureViewModel.pictures.value.content)
     }
-    val event by viewModel.event.collectAsState()
     if (event != null) {
         BaseComponent(navController, user, "Editar de Evento", true) {
             val title by viewModel.title.collectAsState()

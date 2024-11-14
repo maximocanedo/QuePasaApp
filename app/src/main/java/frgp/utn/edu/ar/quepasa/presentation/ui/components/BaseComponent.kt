@@ -22,13 +22,14 @@ fun BaseComponent(
     user: User?,
     title: String,
     back: Boolean,
+    backRoute: String = "home",
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user) }) {
         Scaffold(
-            topBar = { if(back) TopBackBar(title, navController) else TopMainBar(title, scope, drawerState) }
+            topBar = { if(back) TopBackBar(title, navController, backRoute) else TopMainBar(title, scope, drawerState) }
         ) { paddingValues ->
             Box(
                 modifier = Modifier

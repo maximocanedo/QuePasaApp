@@ -77,7 +77,7 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                     userScrollEnabled = true
                 ) {
                     items(events.content) { event ->
-                        EventCard(event = event)
+                        EventCard(navController, event)
                     }
                 }
             }

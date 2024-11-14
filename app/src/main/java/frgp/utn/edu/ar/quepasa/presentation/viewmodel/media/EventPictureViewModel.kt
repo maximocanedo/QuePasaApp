@@ -31,8 +31,10 @@ class EventPictureViewModel @Inject constructor(
             pageNumber = 0
         )
     )
+    val pictures = _pictures.asStateFlow()
 
     private val _picture = MutableStateFlow<EventPicture?>(null)
+    val picture = _picture.asStateFlow()
 
     private val _event = MutableStateFlow<Event?>(null)
 
@@ -54,7 +56,7 @@ class EventPictureViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPicturesByEvent(id: UUID, page: Int, size: Int) {
+    suspend fun getPicturesByEvent(id: UUID, page: Int = 0, size: Int = 10) {
         try {
             val pictures = repository.getPicturesByEvent(id, page, size)
             _pictures.value = pictures

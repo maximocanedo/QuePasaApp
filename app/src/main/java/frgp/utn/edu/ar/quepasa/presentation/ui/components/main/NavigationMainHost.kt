@@ -12,10 +12,12 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateRequestScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
 import java.util.UUID
 
 @Composable
@@ -53,6 +55,16 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             }
         }
         composable("events") { EventsScreen(navController, user) }
-        composable("roleRequest") { RoleUpdateRequestScreen(navController) }
+        composable(
+            route = "eventDetailedScreen/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            if (eventId.isNotEmpty()) {
+                EventDetailedScreen(navController, user, UUID.fromString(eventId))
+            }
+        }
+        composable("roleRequestUserList") { RoleUpdateUserListScreen(navController)}
+        composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
     }
 }

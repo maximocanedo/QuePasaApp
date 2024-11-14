@@ -6,6 +6,7 @@ import frgp.utn.edu.ar.quepasa.data.model.media.EventPicture
 import frgp.utn.edu.ar.quepasa.data.model.media.PostPicture
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
 import java.util.UUID
 
 class ImageViewModel : ViewModel() {
@@ -54,6 +55,26 @@ class ImageViewModel : ViewModel() {
     }
 
     fun loadUrisFromEventPictures(pictures: List<EventPicture>) {
+        val uris: MutableList<Uri> = mutableListOf()
+        val urls: MutableList<String> = mutableListOf()
+        val urlsId: MutableList<UUID> = mutableListOf()
+        pictures.forEach { picture ->
+            val url = "http://canedo.com.ar:8080/api/event-pictures/" + picture.id + "/view"
+            val file =
+                Uri.fromFile(File("http://canedo.com.ar:8080/api/event-pictures/" + picture.id + "/view"))
+
+            urls.add(url)
+            urlsId.add(picture.id)
+            uris.add(file)
+            println("url $url")
+        }
+
+        urls.forEach { url ->
+            _selectedUrls.value += url
+        }
+        urlsId.forEach { id ->
+            _selectedUrlsId.value += id
+        }
 
     }
 }

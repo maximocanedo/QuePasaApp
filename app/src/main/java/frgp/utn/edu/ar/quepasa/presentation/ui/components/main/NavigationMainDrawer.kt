@@ -118,7 +118,7 @@ fun NavigationMainDrawer(navController: NavHostController, user: User?) {
                             text = "Roles",
                             fontSize = 20.sp,
                             color = Black1,
-                            modifier = Modifier.clickable { navController.navigate("roleRequest") }
+                            modifier = Modifier.clickable { navController.navigate("roleRequestUserList") }
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {

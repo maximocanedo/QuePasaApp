@@ -11,9 +11,11 @@ import androidx.navigation.navArgument
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateRequestScreen
+import java.util.UUID
 
 @Composable
 fun NavigationMainHost(navController: NavHostController, user: User?) {
@@ -41,6 +43,15 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             }
         }
         composable("eventCreate") { CreateEventScreen(navController, user) }
+        composable(
+            route = "eventEdit/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            if (eventId.isNotEmpty()) {
+                EditEventScreen(navController, user, UUID.fromString(eventId))
+            }
+        }
         composable("roleRequest") { RoleUpdateRequestScreen(navController) }
     }
 }

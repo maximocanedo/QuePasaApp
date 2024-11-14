@@ -1,28 +1,21 @@
 package frgp.utn.edu.ar.quepasa.presentation.activity.users
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,13 +29,13 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.FeedbackProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.domain.context.user.toContext
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.MailsCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewModel
+import kotlinx.coroutines.flow.update
 import java.sql.Timestamp
 
 @AndroidEntryPoint
@@ -56,6 +49,7 @@ class ProfileScreen: AuthenticatedActivity() {
             AuthenticationProvider(cur) {
                 FeedbackProvider(feedback) {
                     val username: String? = intent.getStringExtra("username")
+                    viewModel.username.update { username }
                     viewModel.updateUser()
                     val isRefreshing by viewModel.isRefreshing.collectAsState()
                     val user: User? by viewModel.user.collectAsState()

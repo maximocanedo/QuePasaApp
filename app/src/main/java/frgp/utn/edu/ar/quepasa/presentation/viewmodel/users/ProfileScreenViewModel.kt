@@ -7,6 +7,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.Fail
 import frgp.utn.edu.ar.quepasa.data.dto.request.CodeVerificationRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
+import frgp.utn.edu.ar.quepasa.domain.context.feedback.Feedback
 import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -25,7 +26,7 @@ class ProfileScreenViewModel @Inject constructor(
     private val usersRepository: UserRepository
 ): ViewModel() {
 
-    var feedback = MutableSharedFlow<Feedback?>()
+    var feedback = MutableStateFlow<Feedback?>(null)
 
     var username = MutableStateFlow<String?>(null)
         private set
@@ -76,10 +77,10 @@ class ProfileScreenViewModel @Inject constructor(
                 updateUser()
             }
             is ApiResponse.ValidationError -> {
-                feedback.emit(Feedback(field = "mail", message = mail.details.errors.first()))
+                feedback.update { Feedback(field = "mail", message = mail.details.errors.first()) }
             }
             is ApiResponse.Error -> {
-                feedback.emit(Feedback(field = "mail", message = mail.exception.message))
+                feedback.update { Feedback(field = "mail", message = mail.exception.message) }
             }
         }
     }
@@ -92,14 +93,12 @@ class ProfileScreenViewModel @Inject constructor(
             is ApiResponse.Success -> {
                 true
             }
-
             is ApiResponse.ValidationError -> {
-
+                feedback.update { Feedback(field = "mailCodeVerification", message = response.details.errors.first()) }
                 false
             }
-
             is ApiResponse.Error -> {
-
+                feedback.update { Feedback(field = "mailCodeVerification", message = response.exception.message) }
                 false
             }
         }

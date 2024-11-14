@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,9 +32,11 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.media.Picture
+import frgp.utn.edu.ar.quepasa.domain.context.feedback.LocalFeedback
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.OtpTextField
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.sql.Timestamp
 import java.time.ZoneId
@@ -59,7 +63,9 @@ fun MailDialog(
 ) {
     var vrs by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
-    var errorOtp by remember { mutableStateOf(false) }
+    val feedback by LocalFeedback.current.collectAsState()
+    var mutableFeedback = LocalFeedback.current
+    val errorOtp by remember { derivedStateOf<Boolean> { feedback?.field == "mailCodeVerification" } }
     if(mail.verified && mail.verifiedAt != null) {
         vrs = "Verificado el " + convertTimestampToFormattedString(mail.verifiedAt)
     } else vrs = "Agregado el " + convertTimestampToFormattedString(mail.requestedAt)
@@ -77,22 +83,31 @@ fun MailDialog(
             )
         )
         if(!mail.verified) {
-            Text(text = "Verificá este correo", textAlign = Center, modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp).fillMaxWidth())
+            Text(text = "Verificá este correo", textAlign = Center, modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 12.dp)
+                .fillMaxWidth())
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .fillMaxWidth()
             ) {
-                OtpTextField(modifier = Modifier.padding(vertical = 12.dp), otpText = otp, isError = errorOtp, onClearError = { errorOtp = false }, onOtpTextChange = { value, ready ->
-                    otp = value
-                    errorOtp = false
-                    if(ready) {
-                        CoroutineScope(IO).launch {
-                            errorOtp = !onValidateRequest(mail, otp)
+                OtpTextField(modifier = Modifier.padding(vertical = 12.dp),
+                    otpText = otp,
+                    isError = errorOtp,
+                    onClearError = {
+                        mutableFeedback.update { null }
+                    },
+                    onOtpTextChange = { value, ready ->
+                        otp = value
+                        mutableFeedback.update { null }
+                        if(ready) {
+                            CoroutineScope(IO).launch {
+                                onValidateRequest(mail, otp)
+                            }
                         }
                     }
-                })
+                )
             }
         }
         Row(

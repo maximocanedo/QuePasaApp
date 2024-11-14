@@ -54,6 +54,7 @@ class EventViewModel @Inject constructor(
     private val startMutable = MutableStateFlow(LocalDateTime.now())
     fun setStart(x: LocalDateTime) {
         startMutable.value = x
+        println(startMutable.value)
     }
 
     val start = startMutable.asStateFlow()
@@ -412,13 +413,22 @@ class EventViewModel @Inject constructor(
         event.value?.title?.let { setTitle(it) }
         event.value?.description?.let { setDescription(it) }
         event.value?.address?.let { setAddress(it) }
-        event.value?.start?.let { setStart(it) }
-        event.value?.end?.let { setEnd(it) }
+        event.value?.start?.let {
+            setStart(it)
+        }
+        event.value?.end?.let {
+            setEnd(it)
+        }
         event.value?.neighbourhoods?.let { it ->
             setNeighbourhoods(it.map { it.id }.toSet())
             setNeighbourhoodsNames(it.map { it.name })
         }
         event.value?.category?.let { setCategory(it.name) }
         event.value?.audience?.let { setAudience(it.name) }
+        startDateValidation()
+        endDateValidation()
+        if (neighbourhoods.value.isNotEmpty()) {
+            neighbourhoodIsValidMutable.value = true
+        }
     }
 }

@@ -47,6 +47,16 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
+    fun getRequestsByStatus(status: RequestStatus): List<RoleUpdateRequest> {
+        val requests: MutableList<RoleUpdateRequest> = mutableListOf()
+
+        _roleRequests.value.filter { it.status != status }.forEach { request ->
+            requests.add(request)
+        }
+
+        return requests
+    }
+
     suspend fun createRoleRequest(role: Role, remarks: String): Boolean {
         try {
             val newRequest = repository.createRoleRequest(role, remarks)

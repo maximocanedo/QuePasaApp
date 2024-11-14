@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.card.components
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
-import frgp.utn.edu.ar.quepasa.data.model.Event
+import java.util.UUID
 
 @Composable
-fun CardButtonsBar(event: Event, voteCount: VoteCount) {
+fun CardButtonsBar(eventId: UUID, voteCount: VoteCount) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

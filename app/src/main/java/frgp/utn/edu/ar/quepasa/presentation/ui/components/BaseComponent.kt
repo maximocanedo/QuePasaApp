@@ -26,7 +26,6 @@ fun BaseComponent(
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user) }) {
         Scaffold(
             topBar = { if(back) TopBackBar(title, navController) else TopMainBar(title, scope, drawerState) }

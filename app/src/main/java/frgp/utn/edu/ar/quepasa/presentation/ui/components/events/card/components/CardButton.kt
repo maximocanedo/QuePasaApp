@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.card.components
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size

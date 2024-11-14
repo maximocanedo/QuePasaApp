@@ -47,13 +47,15 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
-    suspend fun createRoleRequest(role: Role, remarks: String) {
+    suspend fun createRoleRequest(role: Role, remarks: String): Boolean {
         try {
             val newRequest = repository.createRoleRequest(role, remarks)
             _roleRequest.value = newRequest
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 

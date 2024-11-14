@@ -16,7 +16,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedSc
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateRequestScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
 import java.util.UUID
 
 @Composable
@@ -63,6 +64,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 EventDetailedScreen(navController, user, UUID.fromString(eventId))
             }
         }
-        composable("roleRequest") { RoleUpdateRequestScreen(navController) }
+        composable("roleRequestUserList") { RoleUpdateUserListScreen(navController)}
+        composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.DocumentFileField
@@ -35,14 +36,14 @@ import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
 @Composable
-fun RoleUpdateRequestScreen(navController: NavHostController) {
+fun RoleUpdateUserRequestScreen(navController: NavHostController) {
     val context = LocalContext.current
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
     var dni by remember { mutableStateOf("") }
     var role by remember { mutableStateOf("") }
 
-    BaseComponent(navController, null, "Solicitud de rol", true) {
+    BaseComponent(navController, null, "Solicitud de rol", true, "roleRequestUserList") {
         Column(
             modifier = Modifier
                 .padding(32.dp)
@@ -88,7 +89,17 @@ fun RoleUpdateRequestScreen(navController: NavHostController) {
                     CoroutineScope(IO).launch {
                         val validation = viewModel.checkValidationFields()
                         if(validation) {
-                            //val result = viewModel.createRoleRequest(Role.NEIGHBOUR, dni)
+                            val result = viewModel.createRoleRequest(Role.valueOf(role), "DNI: $dni")
+
+                            withContext(Dispatchers.Main) {
+                                if(result) {
+                                    Toast.makeText(context, "Solicitud de rol enviada", Toast.LENGTH_SHORT).show()
+                                }
+                                else {
+                                    Toast.makeText(context, "Solicitud de rol no enviada (error)", Toast.LENGTH_SHORT).show()
+                                }
+                                navController.navigate("roleRequestUserList")
+                            }
                         }
                         else {
                             withContext(Dispatchers.Main) {
@@ -106,7 +117,7 @@ fun RoleUpdateRequestScreen(navController: NavHostController) {
 
 @Preview
 @Composable
-fun RoleUpdateRequestScreenPreview() {
+fun RoleUpdateUserRequestScreenPreview() {
     val navController = rememberNavController()
-    RoleUpdateRequestScreen(navController = navController)
+    RoleUpdateUserRequestScreen(navController = navController)
 }

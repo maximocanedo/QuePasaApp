@@ -16,6 +16,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedSc
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
 import java.util.UUID
@@ -65,6 +66,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             }
         }
         composable("roleRequestUserList") { RoleUpdateUserListScreen(navController)}
+        composable("roleRequestAdminList") { RoleUpdateAdminListScreen(navController) }
         composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
     }
 }

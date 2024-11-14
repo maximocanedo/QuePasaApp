@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,12 +26,12 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.Role
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestViewModel
 
 @Composable
-fun RoleUpdateUserListScreen(navController: NavHostController) {
+fun RoleUpdateAdminListScreen(navController: NavHostController) {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getMyRequests()
+        viewModel.getRequests()
     }
 
     BaseComponent(navController, null, "Solicitudes de rol", false) {
@@ -41,19 +40,6 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
-
-            Spacer(modifier = Modifier.padding(vertical = 8.dp))
-
-            Button(
-                modifier = Modifier,
-                onClick = {
-                    navController.navigate("roleRequest")
-                }
-            ) {
-                Text("Solicitar rol")
-            }
-
-            Spacer(modifier = Modifier.padding(vertical = 32.dp))
 
             Text(
                 text = "En espera",
@@ -121,7 +107,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
 
 @Preview
 @Composable
-fun RoleUpdateUserListScreenPreview() {
+fun RoleUpdateAdminListScreenPreview() {
     val navController = rememberNavController()
-    RoleUpdateUserListScreen(navController = navController)
+    RoleUpdateAdminListScreen(navController = navController)
 }

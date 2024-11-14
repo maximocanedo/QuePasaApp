@@ -24,13 +24,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(navController: NavHostController, event: Event) {
     val context = LocalContext.current
     ElevatedCard(
         onClick = {
@@ -40,6 +41,7 @@ fun EventCard(event: Event) {
                 Toast.LENGTH_SHORT
             ).show()
             /* TODO Detalles y comentarios on click */
+            navController.navigate("eventDetailedScreen/${event.id}")
         },
         modifier = Modifier
             .fillMaxWidth()

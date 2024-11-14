@@ -31,8 +31,10 @@ class EventPictureViewModel @Inject constructor(
             pageNumber = 0
         )
     )
+    val pictures = _pictures.asStateFlow()
 
     private val _picture = MutableStateFlow<EventPicture?>(null)
+    val picture = _picture.asStateFlow()
 
     private val _event = MutableStateFlow<Event?>(null)
 

@@ -56,7 +56,7 @@ class EventPictureViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPicturesByEvent(id: UUID, page: Int, size: Int) {
+    suspend fun getPicturesByEvent(id: UUID, page: Int = 0, size: Int = 10) {
         try {
             val pictures = repository.getPicturesByEvent(id, page, size)
             _pictures.value = pictures

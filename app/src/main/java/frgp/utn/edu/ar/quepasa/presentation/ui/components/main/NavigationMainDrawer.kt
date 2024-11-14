@@ -121,6 +121,22 @@ fun NavigationMainDrawer(navController: NavHostController, user: User?) {
                             modifier = Modifier.clickable { navController.navigate("roleRequest") }
                         )
                     }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = {
+
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_event_24),
+                                contentDescription = "Event Icon",
+                            )
+                        }
+                        Text(
+                            text = "Eventos",
+                            fontSize = 20.sp,
+                            color = Black1,
+                            modifier = Modifier.clickable { navController.navigate("events") }
+                        )
+                    }
                 }
             }
         }

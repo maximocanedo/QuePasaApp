@@ -172,7 +172,7 @@ class EventViewModel @Inject constructor(
     }
 
     /** GET **/
-    suspend fun getEvents(page: Int, size: Int, active: Boolean) {
+    suspend fun getEvents(page: Int = 0, size: Int = 10, active: Boolean = true) {
         try {
             val events = repository.getEvents(page = page, size = size, active = active)
             _events.value = events

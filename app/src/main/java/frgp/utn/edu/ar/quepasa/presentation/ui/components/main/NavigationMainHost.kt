@@ -12,6 +12,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateRequestScreen
@@ -39,7 +40,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             val postId = backStackEntry.arguments?.getInt("postId") ?: -1
             if (postId != -1) {
                 PostEditScreen(navController, user, postId)
-            } else {
             }
         }
         composable("eventCreate") { CreateEventScreen(navController, user) }
@@ -52,6 +52,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 EditEventScreen(navController, user, UUID.fromString(eventId))
             }
         }
+        composable("events") { EventsScreen() }
         composable("roleRequest") { RoleUpdateRequestScreen(navController) }
     }
 }

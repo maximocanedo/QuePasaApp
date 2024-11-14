@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,13 +33,6 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
                 Text(text = "Bienvenido, ${if(user.ok) user.name else "Usuario"}")
-            }
-
-            Button(
-                onClick = { navController.navigate("postEdit") },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("PostEditScreen test")
             }
 
             PostScreen(navController,user.user)

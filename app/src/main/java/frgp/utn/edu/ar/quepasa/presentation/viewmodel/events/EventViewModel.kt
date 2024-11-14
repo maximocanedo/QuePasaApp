@@ -181,7 +181,13 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEvents(query: String, page: Int, size: Int, activeOnly: Boolean, sort: String) {
+    suspend fun getEvents(
+        query: String,
+        page: Int = 0,
+        size: Int = 10,
+        activeOnly: Boolean = true,
+        sort: String = "title,asc"
+    ) {
         try {
             val events = repository.getEvents(query, page, size, activeOnly, sort)
             _events.value = events

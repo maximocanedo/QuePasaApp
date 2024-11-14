@@ -71,7 +71,9 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 modifier = Modifier
                     .padding(vertical = 8.dp),
                 viewModel = viewModel,
-                status = RequestStatus.WAITING
+                status = RequestStatus.WAITING,
+                isAdmin = false,
+                hasDeleteButton = true
             )
 
             Spacer(modifier = Modifier.padding(vertical = 32.dp))
@@ -92,7 +94,9 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 modifier = Modifier
                     .padding(vertical = 8.dp),
                 viewModel = viewModel,
-                status = RequestStatus.APPROVED
+                status = RequestStatus.APPROVED,
+                isAdmin = false,
+                hasDeleteButton = false
             )
 
             Spacer(modifier = Modifier.padding(vertical = 32.dp))
@@ -113,7 +117,9 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 modifier = Modifier
                     .padding(vertical = 8.dp),
                 viewModel = viewModel,
-                status = RequestStatus.REJECTED
+                status = RequestStatus.REJECTED,
+                isAdmin = false,
+                hasDeleteButton = false
             )
         }
     }

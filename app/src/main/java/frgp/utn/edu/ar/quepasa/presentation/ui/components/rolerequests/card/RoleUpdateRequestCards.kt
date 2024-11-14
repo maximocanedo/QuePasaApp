@@ -14,7 +14,9 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestV
 fun RoleUpdateRequestCards(
     modifier: Modifier,
     viewModel: RoleUpdateRequestViewModel,
-    status: RequestStatus
+    status: RequestStatus,
+    isAdmin: Boolean,
+    hasDeleteButton: Boolean,
 ) {
     var requests: List<RoleUpdateRequest> = emptyList()
     LaunchedEffect(Unit) {
@@ -22,7 +24,7 @@ fun RoleUpdateRequestCards(
     }
     if(requests.isNotEmpty()) {
         requests.forEach { request ->
-            RoleUpdateRequestCard()
+            RoleUpdateRequestCard(requests, isAdmin, hasDeleteButton)
         }
     }
     else {
@@ -34,5 +36,5 @@ fun RoleUpdateRequestCards(
 @Composable
 fun RoleUpdateRequestCardsPreview() {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
-    RoleUpdateRequestCards(modifier = Modifier, viewModel = viewModel, status = RequestStatus.WAITING)
+    RoleUpdateRequestCards(modifier = Modifier, viewModel = viewModel, status = RequestStatus.WAITING, false, false)
 }

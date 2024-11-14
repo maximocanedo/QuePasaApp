@@ -18,9 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
 
 @Composable
-fun RoleUpdateRequestCard() {
+fun RoleUpdateRequestCard(requests: List<RoleUpdateRequest>, isAdmin: Boolean, hasDeleteButton: Boolean) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,5 +64,5 @@ fun RoleUpdateRequestCard() {
 @Preview
 @Composable
 fun RoleUpdateRequestCardPreview() {
-    RoleUpdateRequestCard()
+    RoleUpdateRequestCard(emptyList(),false, false)
 }

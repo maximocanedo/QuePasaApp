@@ -12,6 +12,7 @@ import frgp.utn.edu.ar.quepasa.data.model.utils.LocalDateTimeDeserializer
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.EventPictureService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.PostPictureService
+import frgp.utn.edu.ar.quepasa.data.source.remote.request.RoleUpdateRequestService
 import frgp.utn.edu.ar.quepasa.domain.repository.ApiResponseHandler
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -65,6 +66,13 @@ object ApiClient {
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit
             .create(UserService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRoleUpdateRequestService(retrofit: Retrofit): RoleUpdateRequestService {
+        return retrofit
+            .create(RoleUpdateRequestService::class.java)
     }
 
     @Provides

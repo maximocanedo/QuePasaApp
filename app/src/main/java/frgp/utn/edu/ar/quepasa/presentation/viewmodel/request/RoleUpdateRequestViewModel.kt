@@ -1,16 +1,12 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.request
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.enums.RequestStatus
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
 import frgp.utn.edu.ar.quepasa.domain.repository.request.RoleUpdateRequestRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -22,9 +18,14 @@ class RoleUpdateRequestViewModel @Inject constructor(
 
     private val _roleRequest = MutableStateFlow(RoleUpdateRequest(null, null, null, null, "", null, RequestStatus.WAITING, false))
 
-    private val _fieldValidation = MutableSharedFlow<Boolean>()
+    private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }
 
     private val _errorMessage = MutableStateFlow<String?>(null)
+
+    init {
+        toggleValidationField(0, false)
+        toggleValidationField(1, false)
+    }
 
     suspend fun getRequests() {
         try {
@@ -81,17 +82,12 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
-    fun toggleValidationField(state: Boolean) {
-        viewModelScope.launch {
-            _fieldValidation.emit(state)
-        }
+    fun toggleValidationField(index: Int, state: Boolean) {
+        require(index in _fieldsValidation.indices) { "Index out of bounds" }
+        _fieldsValidation[index].value = state
     }
 
-    suspend fun checkValidationField(): Boolean {
-        var isValid = false
-        _fieldValidation.collectLatest { value ->
-            isValid = value
-        }
-        return isValid
+    fun checkValidationFields(): Boolean {
+        return _fieldsValidation.all { it.value }
     }
 }

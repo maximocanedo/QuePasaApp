@@ -13,7 +13,7 @@ import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.UserProfileScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateRequestScreen
 
 @Composable
 fun NavigationMainHost(navController: NavHostController, user: User?) {
@@ -23,6 +23,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         startDestination = "home"
     ) {
         composable("home") { MainPage(navController) }
+        composable("trends") { TrendsScreen() }
         composable("userProfile") {
             val intent = Intent(context, ProfileScreen::class.java)
             // intent.putExtra("username", "") // No agregamos nada para que nos muestre el perfil del usuario autenticado.
@@ -40,6 +41,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             }
         }
         composable("eventCreate") { CreateEventScreen(navController, user) }
-        composable("trends") { TrendsScreen() }
+        composable("roleRequest") { RoleUpdateRequestScreen(navController) }
     }
 }

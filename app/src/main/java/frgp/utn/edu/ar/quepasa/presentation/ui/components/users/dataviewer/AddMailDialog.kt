@@ -12,16 +12,20 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
+import frgp.utn.edu.ar.quepasa.domain.context.feedback.LocalFeedback
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.MailField
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import quepasa.api.validators.users.MailValidator
 
@@ -29,40 +33,47 @@ import quepasa.api.validators.users.MailValidator
 @Composable
 fun AddMailDialog(
     onRequest: suspend (String) -> Unit,
-    onDismiss: suspend () -> Unit,
-    state: SheetState = rememberModalBottomSheetState(true)
+    onDismiss: () -> Unit
 ) {
     val co = rememberCoroutineScope()
     var mail by remember { mutableStateOf("") }
     var isValid by remember { mutableStateOf(false) }
+    val feedback by LocalFeedback.current.collectAsState()
+    var mutableFeedback = LocalFeedback.current
     ModalBottomSheet(
-        sheetState = state,
-        onDismissRequest = { co.launch { onDismiss() } }
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(true)
     ) {
         val rowModifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(horizontal = 24.dp, vertical = 12.dp)
         Row(modifier = rowModifier) {
             Text(
                 text = "Agregar correo",
-                style = MaterialTheme.typography.labelLarge,
+                textAlign = Center,
+                style = MaterialTheme.typography.headlineMedium,
             )
         }
         Row(modifier = rowModifier) {
-            MailField(validator = {
-                MailValidator(it)
-                    .isNotNull()
-                    .isNotBlank()
-                    .isValidAddress()
-            }, onChange = { value, valid ->
-                isValid = valid
-                mail = value
-            })
+            MailField(
+                modifier = Modifier.fillMaxWidth(),
+                validator = {
+                    MailValidator(it)
+                        .isNotNull()
+                        .isNotBlank()
+                        .isValidAddress()
+                }, onChange = { value, valid ->
+                    isValid = valid
+                    mail = value
+                }, serverError = if (feedback?.field == "mail") feedback?.message else "",
+                clearServerError = { mutableFeedback.update { null } }
+            )
         }
         Row(modifier = rowModifier, horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = {
                     co.launch { onRequest(mail) }
+                    onDismiss()
                 },
                 enabled = isValid
             ) {

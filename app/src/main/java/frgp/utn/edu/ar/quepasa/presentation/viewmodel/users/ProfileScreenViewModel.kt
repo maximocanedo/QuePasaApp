@@ -12,13 +12,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+
 
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val usersRepository: UserRepository
 ): ViewModel() {
+
+    var feedback = MutableSharedFlow<Feedback?>()
 
     var username = MutableStateFlow<String?>(null)
         private set
@@ -26,15 +33,19 @@ class ProfileScreenViewModel @Inject constructor(
     var user = MutableStateFlow<User?>(null)
         private set
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
     var error = MutableSharedFlow<Fail?>(1)
         private set
 
     fun updateUser(user: User? = null) {
+        _isRefreshing.update { true }
         CoroutineScope(IO).launch {
             if(user == null) {
                 var updated: User? = null
                 if(username.value == null || username.value?.isBlank() ?: true) {
                     updated = usersRepository.getAuthenticatedUser()
+                    _isRefreshing.update { false }
                 } else {
                     val response = usersRepository.findByUsername(username.value!!)
                     when(response) {
@@ -49,8 +60,10 @@ class ProfileScreenViewModel @Inject constructor(
                 }
 
                 this@ProfileScreenViewModel.user.tryEmit(updated)
+                _isRefreshing.update { false }
             } else {
-                this@ProfileScreenViewModel.user.tryEmit(user)
+                this@ProfileScreenViewModel.user.update { user }
+                _isRefreshing.update { false }
             }
         }
     }
@@ -60,17 +73,13 @@ class ProfileScreenViewModel @Inject constructor(
         when(mail) {
             is ApiResponse.Success -> {
                 if(mail.data == null || user.value == null) return
-                val currentUser = user.value!!
-                val updatedUser = currentUser.copy(
-                    email = currentUser.email + mail.data
-                )
-                user.emit(updatedUser)
+                updateUser()
             }
             is ApiResponse.ValidationError -> {
-
+                feedback.emit(Feedback(field = "mail", message = mail.details.errors.first()))
             }
             is ApiResponse.Error -> {
-
+                feedback.emit(Feedback(field = "mail", message = mail.exception.message))
             }
         }
     }

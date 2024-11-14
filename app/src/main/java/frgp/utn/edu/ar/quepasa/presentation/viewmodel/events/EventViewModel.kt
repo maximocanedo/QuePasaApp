@@ -24,7 +24,6 @@ import quepasa.api.validators.events.EventTitleValidator
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.uuid.ExperimentalUuidApi
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -190,7 +189,6 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     suspend fun getEventById(id: UUID) {
         try {
             val event = repository.getEventById(id)
@@ -268,12 +266,14 @@ class EventViewModel @Inject constructor(
     }
 
     /** PATCH **/
-    suspend fun updateEvent(eventId: UUID, event: EventPatchRequest) {
+    suspend fun updateEvent(eventId: UUID, event: EventPatchRequest): Boolean {
         try {
             val updatedEvent = repository.updateEvent(eventId, event)
             _event.value = updatedEvent
+            return true
         } catch (e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 
@@ -397,7 +397,7 @@ class EventViewModel @Inject constructor(
                 && neighbourhoodIsValid.value
     }
 
-    fun resetEvent() {
+    private fun resetEvent() {
         titleMutable.value = ""
         descriptionMutable.value = ""
         addressMutable.value = ""
@@ -406,5 +406,19 @@ class EventViewModel @Inject constructor(
         neighbourhoodsMutable.value = emptySet()
         categoryMutable.value = "EDUCATIVE"
         audienceMutable.value = "PUBLIC"
+    }
+
+    fun setEventDataFields() {
+        event.value?.title?.let { setTitle(it) }
+        event.value?.description?.let { setDescription(it) }
+        event.value?.address?.let { setAddress(it) }
+        event.value?.start?.let { setStart(it) }
+        event.value?.end?.let { setEnd(it) }
+        event.value?.neighbourhoods?.let { it ->
+            setNeighbourhoods(it.map { it.id }.toSet())
+            setNeighbourhoodsNames(it.map { it.name })
+        }
+        event.value?.category?.let { setCategory(it.name) }
+        event.value?.audience?.let { setAudience(it.name) }
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
+import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -42,14 +43,22 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Composable
-fun CreateEventScreen(navController: NavHostController, user: User?) {
+fun EditEventScreen(navController: NavHostController, user: User?, eventId: UUID) {
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
-    BaseComponent(navController, user, "Crear de Evento", true) {
+    BaseComponent(navController, user, "Editar de Evento", true) {
+        LaunchedEffect(Unit) {
+            viewModel.viewModelScope.launch {
+                viewModel.getEventById(eventId)
+                viewModel.setEventDataFields()
+            }
+        }
+
         val title by viewModel.title.collectAsState()
         val description by viewModel.description.collectAsState()
         val address by viewModel.address.collectAsState()
@@ -75,8 +84,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = title,
                     validator = viewModel::titleValidator,
                     onChange = { value, valid ->
-                            viewModel.setTitle(value)
-                            viewModel.setTitleIsValid(valid)
+                        viewModel.setTitle(value)
+                        viewModel.setTitleIsValid(valid)
                     }
                 )
             }
@@ -86,8 +95,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = description,
                     validator = viewModel::descriptionValidator,
                     onChange = { value, valid ->
-                            viewModel.setDescription(value)
-                            viewModel.setDescriptionIsValid(valid)
+                        viewModel.setDescription(value)
+                        viewModel.setDescriptionIsValid(valid)
                     }
                 )
             }
@@ -97,8 +106,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     value = address,
                     validator = viewModel::addressValidator,
                     onChange = { value, valid ->
-                            viewModel.setAddress(value)
-                            viewModel.setAddressIsValid(valid)
+                        viewModel.setAddress(value)
+                        viewModel.setAddressIsValid(valid)
                     }
                 )
             }
@@ -114,8 +123,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         value = start,
                         validator = { viewModel.startValidator(it) },
                         onChange = { value, valid ->
-                                viewModel.setStart(value)
-                                viewModel.setStartDateIsValid(valid)
+                            viewModel.setStart(value)
+                            viewModel.setStartDateIsValid(valid)
                             viewModel.endDateValidation()
                         },
                         label = "Fecha de inicio",
@@ -131,8 +140,8 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                         value = end,
                         validator = { viewModel.endValidator(it) },
                         onChange = { value, valid ->
-                                viewModel.setEnd(value)
-                                viewModel.setEndDateIsValid(valid)
+                            viewModel.setEnd(value)
+                            viewModel.setEndDateIsValid(valid)
                             viewModel.startDateValidation()
                         },
                         label = "Fecha de fin",
@@ -225,7 +234,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                                 val startDate = start.format(formatter)
                                 val endDate = end.format(formatter)
-                                val eventRequest = EventCreateRequest(
+                                val eventRequest = EventPatchRequest(
                                     title = title,
                                     description = description,
                                     address = address,
@@ -235,7 +244,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                     audience = Audience.valueOf(audience),
                                     neighbourhoods = neighbourhoods
                                 )
-                                val request: Boolean = viewModel.createEvent(eventRequest)
+                                val request: Boolean = viewModel.updateEvent(eventId, eventRequest)
                                 if (request) {
                                     if (!imageViewModel.areUrisEmpty()) {
                                         viewModel.event.value?.let {
@@ -249,7 +258,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                                     navController.navigate("home")
                                     Toast.makeText(
                                         context,
-                                        "Evento Creado!",
+                                        "Evento Editado!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -258,7 +267,7 @@ fun CreateEventScreen(navController: NavHostController, user: User?) {
                     },
                     enabled = viewModel.isEventValid(),
                 ) {
-                    Text("Crear Evento")
+                    Text("Editar Evento")
                 }
             }
         }

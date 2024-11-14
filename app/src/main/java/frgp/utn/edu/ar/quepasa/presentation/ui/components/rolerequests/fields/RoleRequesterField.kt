@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.utils.role.roleToEnglish
@@ -83,4 +84,10 @@ fun RoleRequesterField(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun RoleRequesterFieldPreview() {
+    RoleRequesterField(modifier = Modifier, onItemSelected = {}, onValidityChange = {})
 }

@@ -52,7 +52,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 EditEventScreen(navController, user, UUID.fromString(eventId))
             }
         }
-        composable("events") { EventsScreen() }
+        composable("events") { EventsScreen(navController, user) }
         composable("roleRequest") { RoleUpdateRequestScreen(navController) }
     }
 }

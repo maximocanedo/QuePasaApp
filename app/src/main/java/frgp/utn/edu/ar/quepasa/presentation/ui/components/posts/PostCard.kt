@@ -179,6 +179,7 @@ fun PostCard(
                             .clickable { post.id?.let { onEditClick(it) } }
                     )
                 }
+
             }
         }
     }

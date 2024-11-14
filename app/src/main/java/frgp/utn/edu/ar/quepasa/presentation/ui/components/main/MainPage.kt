@@ -40,7 +40,7 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
                 Text("PostEditScreen test")
             }
 
-            PostScreen(user)
+            PostScreen(navController,user)
 
         }
         Column {

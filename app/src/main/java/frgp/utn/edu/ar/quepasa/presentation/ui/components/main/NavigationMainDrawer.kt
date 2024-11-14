@@ -50,12 +50,12 @@ fun NavigationMainDrawer(navController: NavHostController, user: User?) { // TOD
                 ) {
                     Column {
                         Text(
-                            text = "Nombre Apellido ${user?.name}",
+                            text = "${user?.name}",
                             fontSize = 20.sp,
                             color = Color.White
                         )
                         Text(
-                            text = "Usuario ${user?.username}",
+                            text = "@${user?.username}",
                             fontSize = 15.sp,
                             color = Color.White
                         )

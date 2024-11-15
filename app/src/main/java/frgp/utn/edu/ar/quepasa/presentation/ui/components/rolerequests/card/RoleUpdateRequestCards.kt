@@ -2,12 +2,12 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.enums.RequestStatus
-import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestViewModel
 
 @Composable
@@ -18,13 +18,23 @@ fun RoleUpdateRequestCards(
     isAdmin: Boolean,
     hasDeleteButton: Boolean,
 ) {
-    var requests: List<RoleUpdateRequest> = emptyList()
-    LaunchedEffect(Unit) {
-        requests = viewModel.getRequestsByStatus(status)
-    }
+    val requests by viewModel.roleRequests.collectAsState()
+
     if(requests.isNotEmpty()) {
+        var count = 0
         requests.forEach { request ->
-            RoleUpdateRequestCard(requests, isAdmin, hasDeleteButton)
+            if(request.status == status) {
+                if(!isAdmin) {
+                    RoleUpdateRequestCardUser(request, hasDeleteButton)
+                }
+                else {
+                    RoleUpdateRequestCardAdmin(request)
+                }
+                count++
+            }
+        }
+        if(count == 0) {
+            Text(modifier = modifier, text = "Sin solicitudes.")
         }
     }
     else {

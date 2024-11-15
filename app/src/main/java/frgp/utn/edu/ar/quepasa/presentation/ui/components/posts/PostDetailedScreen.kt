@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
@@ -215,10 +218,6 @@ fun PostDetailedScreen(
                                 )
                             }
                         }
-
-                        Row {
-                            //CardButtonsBar(event!!.id!!, event!!.votes!!)
-                        }
                     }
                 }
                 Row {
@@ -232,5 +231,7 @@ fun PostDetailedScreen(
 @Preview
 @Composable
 fun PostDetailedScreenPreview() {
-
+    val navController = rememberNavController()
+    val postId by remember { mutableStateOf(1) }
+    PostDetailedScreen(navController = navController, postId = postId)
 }

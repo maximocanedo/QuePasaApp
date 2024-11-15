@@ -31,7 +31,7 @@ class PictureViewModel @Inject constructor(
 
     fun clearBitmap(bitmap: Bitmap) {
         val bitmaps: MutableList<Bitmap> = mutableListOf()
-        _pictures.value.filter { it == bitmap }.forEach { bit ->
+        _pictures.value.filter { it != bitmap }.forEach { bit ->
             if(bit != null) {
                 bitmaps.add(bit)
             }

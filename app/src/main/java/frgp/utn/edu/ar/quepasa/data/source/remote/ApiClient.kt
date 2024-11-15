@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
 import frgp.utn.edu.ar.quepasa.data.model.utils.LocalDateTimeDeserializer
+import frgp.utn.edu.ar.quepasa.data.source.remote.commenting.CommentService
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.EventPictureService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.PictureService
@@ -139,5 +140,11 @@ object ApiClient {
     @Singleton
     fun providePictureService(retrofit: Retrofit): PictureService {
         return retrofit.create(PictureService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCommentService(retrofit: Retrofit): CommentService {
+        return retrofit.create(CommentService::class.java)
     }
 }

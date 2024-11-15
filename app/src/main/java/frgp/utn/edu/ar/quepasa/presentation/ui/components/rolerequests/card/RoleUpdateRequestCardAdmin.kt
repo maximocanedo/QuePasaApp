@@ -21,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,10 +30,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.dialog.RoleUpdateRespondDialog
 import frgp.utn.edu.ar.quepasa.utils.role.roleToSpanish
+import java.util.UUID
 
 @Composable
-fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
+fun RoleUpdateRequestCardAdmin(
+    request: RoleUpdateRequest,
+    onUpdateRequest: (UUID, Boolean, String) -> Unit,
+    onDeleteRequest: (UUID) -> Unit,
+) {
+    val openDialog = remember { mutableStateOf(false) }
+    val title = remember { mutableStateOf("") }
+    val approve = remember { mutableStateOf(false) }
+    val delete = remember { mutableStateOf(false) }
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,7 +125,12 @@ fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .padding(horizontal = 1.dp),
-                            onClick = { /*TODO*/ }) {
+                            onClick = {
+                                approve.value = true
+                                delete.value = false
+                                title.value = "Aprobar"
+                                openDialog.value = true
+                            }) {
                                 Text("Aprobar"
                             )
                         }
@@ -120,7 +138,12 @@ fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .padding(horizontal = 1.dp),
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                approve.value = false
+                                delete.value = false
+                                title.value = "Rechazar"
+                                openDialog.value = true
+                            }
                         ) {
                             Text("Rechazar")
                         }
@@ -129,11 +152,31 @@ fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(horizontal = 1.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            delete.value = true
+                            title.value = "Eliminar"
+                            openDialog.value = true
+                        }
                     ) {
                         Text("Eliminar")
                     }
                 }
+            }
+        }
+    }
+
+    when {
+        openDialog.value -> {
+            request.id?.let {
+                RoleUpdateRespondDialog(
+                    onDismissRequest = { openDialog.value = false },
+                    id = it,
+                    title = title.value,
+                    approve = approve.value,
+                    delete = delete.value,
+                    onUpdateRequest = onUpdateRequest,
+                    onDeleteRequest = onDeleteRequest
+                )
             }
         }
     }
@@ -143,5 +186,9 @@ fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
 @Composable
 fun RoleUpdateRequestCardAdminPreview() {
     val roleUpdateRequest = RoleUpdateRequest()
-    RoleUpdateRequestCardAdmin(roleUpdateRequest)
+    RoleUpdateRequestCardAdmin(
+        request = roleUpdateRequest,
+        onUpdateRequest = { id, approve, remark -> println("Working $id $approve $remark")},
+        onDeleteRequest = {}
+    )
 }

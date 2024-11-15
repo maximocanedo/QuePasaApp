@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.enums.RequestStatus
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.RoleUpdateRequestCards
@@ -30,9 +34,13 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestV
 fun RoleUpdateUserListScreen(navController: NavHostController) {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
+    var enabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.getMyRequests()
+
+        val role = user.user?.role
+        enabled = !viewModel.checkForRoleRequestPending() && role != Role.GOVT
     }
 
     BaseComponent(navController, null, "Solicitudes de rol", false) {
@@ -49,6 +57,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
             item {
                 Button(
                     modifier = Modifier,
+                    enabled = enabled,
                     onClick = {
                         navController.navigate("roleRequest")
                     }
@@ -84,6 +93,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.WAITING,
                     isAdmin = false,
                     hasDeleteButton = true
@@ -117,6 +127,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.APPROVED,
                     isAdmin = false,
                     hasDeleteButton = false
@@ -150,6 +161,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.REJECTED,
                     isAdmin = false,
                     hasDeleteButton = false

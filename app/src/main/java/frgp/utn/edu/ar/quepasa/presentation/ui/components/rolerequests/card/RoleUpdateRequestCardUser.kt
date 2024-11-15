@@ -18,6 +18,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,10 +28,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.dialog.RoleUpdateRequestDialog
 import frgp.utn.edu.ar.quepasa.utils.role.roleToSpanish
+import java.util.UUID
 
 @Composable
-fun RoleUpdateRequestCardUser(request: RoleUpdateRequest, hasDeleteButton: Boolean) {
+fun RoleUpdateRequestCardUser(
+    request: RoleUpdateRequest,
+    hasDeleteButton: Boolean,
+    onUpdateRequest: (UUID) -> Unit
+) {
+    val openDialog = remember { mutableStateOf(false) }
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,10 +115,25 @@ fun RoleUpdateRequestCardUser(request: RoleUpdateRequest, hasDeleteButton: Boole
                 }
 
                 if(hasDeleteButton) {
-                    Button(onClick = { /*TODO*/ }) {
-                        Text("Cancelar")
+                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Button(onClick = { openDialog.value = true }) {
+                            Text("Cancelar")
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    when {
+        openDialog.value -> {
+            request.id?.let {
+                RoleUpdateRequestDialog(
+                    onDismissRequest = { openDialog.value = false },
+                    id = it,
+                    title = "Cancelar",
+                    onUpdateRequest = onUpdateRequest
+                )
             }
         }
     }
@@ -117,5 +143,9 @@ fun RoleUpdateRequestCardUser(request: RoleUpdateRequest, hasDeleteButton: Boole
 @Composable
 fun RoleUpdateRequestCardUserPreview() {
     val roleUpdateRequest = RoleUpdateRequest()
-    RoleUpdateRequestCardUser(roleUpdateRequest, false)
+    RoleUpdateRequestCardUser(
+        request = roleUpdateRequest,
+        hasDeleteButton = false,
+        onUpdateRequest = {}
+    )
 }

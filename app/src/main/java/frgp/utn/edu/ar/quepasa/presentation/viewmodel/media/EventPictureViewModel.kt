@@ -7,6 +7,7 @@ import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.Event
+import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.data.model.media.EventPicture
 import frgp.utn.edu.ar.quepasa.domain.repository.media.EventPictureRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
@@ -37,16 +38,19 @@ class EventPictureViewModel @Inject constructor(
     private val _picture = MutableStateFlow<EventPicture?>(null)
     val picture = _picture.asStateFlow()
 
+    private val _eventPictureDTO = MutableStateFlow<List<EventPictureDTO?>>(emptyList())
+    val eventPictureDTO = _eventPictureDTO.asStateFlow()
+    fun setEventPictureDTO(eventPictureDTO: List<EventPictureDTO?>) {
+        _eventPictureDTO.value = eventPictureDTO
+    }
+
+    fun addEventPictureDTO(eventPictureDTO: EventPictureDTO) {
+        _eventPictureDTO.value += eventPictureDTO
+    }
+
     private val _event = MutableStateFlow<Event?>(null)
 
     private val _errorMessage = MutableStateFlow<String?>(null)
-
-    /** Valid **/
-    private val picturesIsValidMutable = MutableStateFlow(false)
-    val picturesIsValid = picturesIsValidMutable.asStateFlow()
-    fun setPicturesIsValid(value: Boolean) {
-        picturesIsValidMutable.value = value
-    }
 
     suspend fun getPictureById(id: UUID) {
         try {

@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.Bitmap
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.User
@@ -36,6 +38,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewMode
 
 @Composable
 fun EventCard(
+    bitmap: Bitmap?,
     navController: NavHostController,
     event: Event,
     user: User?,
@@ -73,19 +76,30 @@ fun EventCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column {
-                Image(
-                    painter = painterResource(R.drawable.baseline_broken_image_24),
-                    modifier = Modifier
-                        .size(100.dp)
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.secondary,
-                            RoundedCornerShape(10.dp)
-                        )
-                        .clip(shape = MaterialTheme.shapes.medium),
-                    contentDescription = "No Image",
-                    contentScale = ContentScale.Crop,
-                )
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = "Event Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_broken_image_24),
+                        contentDescription = "Event Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                shape = RoundedCornerShape(10.dp)
+                            ),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             Column {
                 event.title?.let {

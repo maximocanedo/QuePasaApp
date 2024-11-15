@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -22,21 +23,46 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.EventCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun EventsScreen(navController: NavHostController, user: User?) {
     val viewModel: EventViewModel = hiltViewModel()
+    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
     val events by viewModel.events.collectAsState()
+    val pictures by eventPictureViewModel.pictures.collectAsState()
+    val eventPictureDTO by eventPictureViewModel.eventPictureDTO.collectAsState()
+    val bitmap by pictureViewModel.bitmap.collectAsState()
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        events.content.forEach { event ->
+            eventPictureViewModel.getPicturesByEvent(event.id!!)
+            if (pictures.content.isNotEmpty()) {
+                pictureViewModel.setPictureBitmap(
+                    pictures.content.first().id
+                )
+                eventPictureViewModel.addEventPictureDTO(
+                    EventPictureDTO(
+                        event.id,
+                        bitmap
+                    )
+                )
+            }
+        }
+    }
 
     BaseComponent(navController, user, "Listado Eventos", false) {
         Column(
@@ -85,10 +111,13 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     userScrollEnabled = true,
                 ) {
-                    items(events.content) { event ->
+                    itemsIndexed(events.content) { index, event ->
                         key(event.id) {
                             EventCard(
-                                navController, event, user,
+                                eventPictureDTO.find { it?.eventId == event.id }?.bitmap,
+                                navController,
+                                event,
+                                user,
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)

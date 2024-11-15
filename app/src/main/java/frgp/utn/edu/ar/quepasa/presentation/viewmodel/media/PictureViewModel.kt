@@ -25,7 +25,7 @@ class PictureViewModel @Inject constructor(
     private val _bitmap = MutableStateFlow<Bitmap?>(null)
     val bitmap = _bitmap.asStateFlow()
 
-    fun setBitmap(bitmap: Bitmap) {
+    fun setBitmap(bitmap: Bitmap?) {
         _bitmap.value = bitmap
     }
 

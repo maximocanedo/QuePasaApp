@@ -36,7 +36,7 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
                 Text(text = "Bienvenido, ${if(user.ok) user.name else "Usuario"}")
             }
 
-            PostScreen(navController,user.user)
+            PostScreen(navController)
 
         }
         Column {

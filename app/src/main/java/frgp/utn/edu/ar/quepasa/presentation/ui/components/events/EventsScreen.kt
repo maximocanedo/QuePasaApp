@@ -126,6 +126,7 @@ fun EventsScreen(navController: NavHostController) {
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
+                                        resetEvents(viewModel, category, search)
                                     }
                                 },
                                 onRemoveClick = {
@@ -162,11 +163,7 @@ fun resetEvents(
 ) {
     viewModel.viewModelScope.launch {
         if (category.isNotBlank()) {
-            viewModel.getEventsByCategory(
-                EventCategory.valueOf(
-                    category
-                )
-            )
+            viewModel.getEventsByCategory(EventCategory.valueOf(category))
         } else if (search.isNotBlank()) {
             viewModel.getEvents(search)
         } else {

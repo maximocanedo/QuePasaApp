@@ -36,7 +36,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventAud
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventImageField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews.EventImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews.EventCreateImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
@@ -208,7 +208,7 @@ fun CreateEventScreen(navController: NavHostController) {
                 }
             }
             Row {
-                EventImagesPreview(
+                EventCreateImagesPreview(
                     modifier = Modifier,
                     imageViewModel.selectedUris,
                     imageViewModel::clearImage

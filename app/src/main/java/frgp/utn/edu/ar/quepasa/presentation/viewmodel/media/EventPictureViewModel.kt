@@ -40,6 +40,9 @@ class EventPictureViewModel @Inject constructor(
     private val _picture = MutableStateFlow<EventPicture?>(null)
     val picture = _picture.asStateFlow()
 
+    private val _picturesIds = MutableStateFlow<List<UUID>>(emptyList())
+    val picturesIds = _picturesIds.asStateFlow()
+
     private val _event = MutableStateFlow<Event?>(null)
 
     private val _errorMessage = MutableStateFlow<String?>(null)
@@ -56,7 +59,11 @@ class EventPictureViewModel @Inject constructor(
     suspend fun getPicturesByEvent(id: UUID, page: Int = 0, size: Int = 10) {
         try {
             val pictures = repository.getPicturesByEvent(id, page, size)
-            _pictures.value = pictures
+            val picturesIds: MutableList<UUID> = mutableListOf()
+            pictures.content.forEach { picture ->
+                picturesIds.add(picture.id)
+            }
+            _picturesIds.value = picturesIds
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -71,7 +78,7 @@ class EventPictureViewModel @Inject constructor(
         }
     }
 
-    suspend fun clearEventPictures() {
+    fun clearEventPictures() {
         _eventPictures.value = emptyList()
     }
 

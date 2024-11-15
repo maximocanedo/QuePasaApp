@@ -22,7 +22,7 @@ import coil3.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun EventImagesPreview(
+fun EventCreateImagesPreview(
     modifier: Modifier,
     selectedUris: StateFlow<List<Uri>>,
     deleteImage: (Uri) -> Unit

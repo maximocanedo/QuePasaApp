@@ -223,18 +223,28 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEventsByAudience(audience: Audience, page: Int, size: Int) {
+    suspend fun getEventsByAudience(
+        audience: Audience,
+        page: Int,
+        size: Int,
+        active: Boolean = true
+    ) {
         try {
-            val events = repository.getEventsByAudience(audience, page, size)
+            val events = repository.getEventsByAudience(audience, page, size, active)
             _events.value = events
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
     }
 
-    suspend fun getEventsByCategory(category: EventCategory, page: Int = 0, size: Int = 10) {
+    suspend fun getEventsByCategory(
+        category: EventCategory,
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true
+    ) {
         try {
-            val events = repository.getEventsByCategory(category, page, size)
+            val events = repository.getEventsByCategory(category, page, size, active)
             _events.value = events
         } catch (e: Exception) {
             _errorMessage.value = e.message

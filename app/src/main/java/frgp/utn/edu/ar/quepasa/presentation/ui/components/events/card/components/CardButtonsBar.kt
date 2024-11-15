@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
@@ -19,6 +20,7 @@ fun CardButtonsBar(
     event: Event,
     user: User?,
     voteCount: VoteCount,
+    navController: NavHostController,
     onAssistanceClick: () -> Unit,
     onRemoveClick: () -> Unit,
     onUpvoteClick: () -> Unit,
@@ -54,7 +56,9 @@ fun CardButtonsBar(
                 CardButton(
                     "editar",
                     R.drawable.baseline_edit_document_24,
-                    onClick = {}
+                    onClick = {
+                        navController.navigate("eventEdit/${event.id}")
+                    }
                 )
             }
         }

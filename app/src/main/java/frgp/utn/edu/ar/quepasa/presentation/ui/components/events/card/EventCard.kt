@@ -35,6 +35,7 @@ import coil3.Bitmap
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 
@@ -140,18 +141,20 @@ fun EventCard(
                 }
             }
         }
-        event.votes?.let { voteCount ->
-            event.id?.let {
-                CardButtonsBar(
-                    event,
-                    user,
-                    voteCount,
-                    navController,
-                    onAssistanceClick,
-                    onRemoveClick,
-                    onUpvoteClick,
-                    onDownvoteClick,
-                )
+        if(user?.role != Role.USER) {
+            event.votes?.let { voteCount ->
+                event.id?.let {
+                    CardButtonsBar(
+                        event,
+                        user,
+                        voteCount,
+                        navController,
+                        onAssistanceClick,
+                        onRemoveClick,
+                        onUpvoteClick,
+                        onDownvoteClick,
+                    )
+                }
             }
         }
     }

@@ -62,17 +62,19 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
-    suspend fun respondToRoleRequest(id: UUID, approve: Boolean, reviewerRemarks: String) {
+    suspend fun respondToRoleRequest(id: UUID, approve: Boolean, reviewerRemarks: String): Boolean {
         try {
             val newRequest = repository.respondToRoleRequest(id, approve, reviewerRemarks)
             _roleRequest.value = newRequest
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 
-    suspend fun deleteRoleRequest(id: UUID, isRequester: Boolean) {
+    suspend fun deleteRoleRequest(id: UUID, isRequester: Boolean): Boolean {
         try {
             repository.deleteRoleRequest(id)
             if(isRequester) {
@@ -81,9 +83,27 @@ class RoleUpdateRequestViewModel @Inject constructor(
             else {
                 getRequests()
             }
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
+        }
+    }
+
+    fun checkForRoleRequestPending(): Boolean {
+        try {
+            var check = false
+            _roleRequests.value.forEach { request ->
+                if(request.status == RequestStatus.WAITING) {
+                    check = true
+                }
+            }
+            return check
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+            return false
         }
     }
 

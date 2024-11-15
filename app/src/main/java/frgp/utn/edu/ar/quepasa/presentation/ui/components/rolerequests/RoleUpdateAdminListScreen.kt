@@ -64,6 +64,7 @@ fun RoleUpdateAdminListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.WAITING,
                     isAdmin = true,
                     hasDeleteButton = false
@@ -97,6 +98,7 @@ fun RoleUpdateAdminListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.APPROVED,
                     isAdmin = true,
                     hasDeleteButton = false
@@ -130,6 +132,7 @@ fun RoleUpdateAdminListScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     viewModel = viewModel,
+                    navController = navController,
                     status = RequestStatus.REJECTED,
                     isAdmin = true,
                     hasDeleteButton = false

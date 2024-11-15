@@ -32,6 +32,6 @@ class RoleUpdateRequestRepository @Inject constructor(
         handleResponse { roleUpdateRequestService.respondToRoleRequest(id, approve, reviewerRemarks) }
 
     suspend fun deleteRoleRequest(id: UUID) {
-        handleResponse<Void> { roleUpdateRequestService.deleteRoleRequest(id) }
+        roleUpdateRequestService.deleteRoleRequest(id)
     }
 }

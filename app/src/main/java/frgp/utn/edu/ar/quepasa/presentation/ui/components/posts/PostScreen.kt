@@ -40,7 +40,7 @@ fun PostScreen(
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val isLoading by postViewModel.isLoading.collectAsStateWithLifecycle()
-
+    TrendsScreen()
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier

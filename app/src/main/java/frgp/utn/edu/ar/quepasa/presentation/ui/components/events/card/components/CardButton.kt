@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
@@ -17,7 +18,8 @@ fun CardButton(
     description: String,
     icon: Int,
     onClick: () -> Unit,
-    colors: ButtonColors = ButtonDefaults.buttonColors()
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    tint: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Button(
         onClick = onClick,
@@ -28,7 +30,7 @@ fun CardButton(
         Icon(
             painter = painterResource(icon),
             contentDescription = description,
-            tint = MaterialTheme.colorScheme.onPrimary
+            tint = tint
         )
     }
 }

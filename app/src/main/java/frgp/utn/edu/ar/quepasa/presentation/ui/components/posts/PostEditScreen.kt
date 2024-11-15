@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +45,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
@@ -62,20 +65,21 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val typeViewModel: PostTypeViewModel = hiltViewModel()
     val subtypeViewModel: PostSubtypeViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
-    val pictureViewModel: PostPictureViewModel = hiltViewModel()
+    val postPictureViewModel: PostPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
 
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)
             viewModel.toggleValidationField(1, true)
-            pictureViewModel.getPicturesByPost(postId, 0, 10)
-            imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
+            postPictureViewModel.getPicturesByPost(postId, 0, 10)
+            pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
         }
 
         val post by viewModel.post.collectAsState()
 
-        if(post != null) {
+        if (post != null) {
             post?.let { safePost ->
                 var title by remember { mutableStateOf(safePost.title) }
                 var audience by remember { mutableStateOf(safePost.audience.name) }
@@ -86,109 +90,120 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                 var tag by remember { mutableStateOf("") }
                 val tags by viewModel.tags.collectAsState()
 
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        TypeField(
-                            modifier = Modifier.weight(1f),
-                            typeViewModel,
-                            subtype = subtype,
-                            loadBySubtype = true,
-                            onItemSelected = {
-                                type = it
-                                subtype = subtypeViewModel.getSubtypeByType(type)
-                            }
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        TypeSubtypeField(
-                            modifier = Modifier.weight(1f),
-                            viewModel = subtypeViewModel,
-                            type = type,
-                            subtype = subtype,
-                            loadBySelected = true,
-                            onItemSelected = { subtype = it }
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AudienceField(
-                            modifier = Modifier.weight(1f),
-                            audience = audience,
-                            onItemSelected = { audience = it }
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        NeighbourhoodField(
-                            modifier = Modifier.weight(1f),
-                            audience = audience,
-                            neighbourhood = neighbourhood,
-                            loadBySelected = true,
-                            onItemSelected = { neighbourhood = it }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                    TagField(
-                        modifier = Modifier.padding(2.dp),
-                        value = tag,
-                        validator = {
-                            StringValidator(title)
-                                .isNotBlank()
-                                .hasMaximumLength(15)
-                                .hasMinimumLength(3)
-                        },
-                        onChange = { newTags ->
-                            tag = newTags
-                        },
-                        onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
-                        onAdded = { tag = "" },
-                        viewModel
-                    )
-
-                    if (tags.isNotEmpty()) {
-                        FlowRow(modifier = Modifier.fillMaxWidth()) {
-                            tags.forEachIndexed { index, tag ->
-                                TagValue(
-                                    modifier = Modifier
-                                        .weight(1f),
-                                    value = tag,
-                                    viewModel = viewModel
+                Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                    androidx.compose.foundation.rememberScrollState().let { scrollState ->
+                        androidx.compose.foundation.layout.Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(scrollState)
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                TypeField(
+                                    modifier = Modifier.weight(1f),
+                                    typeViewModel,
+                                    subtype = subtype,
+                                    loadBySubtype = true,
+                                    onItemSelected = {
+                                        type = it
+                                        subtype = subtypeViewModel.getSubtypeByType(type)
+                                    }
                                 )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                TypeSubtypeField(
+                                    modifier = Modifier.weight(1f),
+                                    viewModel = subtypeViewModel,
+                                    type = type,
+                                    subtype = subtype,
+                                    loadBySelected = true,
+                                    onItemSelected = { subtype = it }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                AudienceField(
+                                    modifier = Modifier.weight(1f),
+                                    audience = audience,
+                                    onItemSelected = { audience = it }
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                NeighbourhoodField(
+                                    modifier = Modifier.weight(1f),
+                                    audience = audience,
+                                    neighbourhood = neighbourhood,
+                                    loadBySelected = true,
+                                    onItemSelected = { neighbourhood = it }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            TagField(
+                                modifier = Modifier.padding(2.dp),
+                                value = tag,
+                                validator = {
+                                    StringValidator(title)
+                                        .isNotBlank()
+                                        .hasMaximumLength(15)
+                                        .hasMinimumLength(3)
+                                },
+                                onChange = { newTags ->
+                                    tag = newTags
+                                },
+                                onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
+                                onAdded = { tag = "" },
+                                viewModel
+                            )
 
-                                if (index < tags.size - 1) {
-                                    Spacer(modifier = Modifier.width(4.dp))
+                            if (tags.isNotEmpty()) {
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    maxItemsInEachRow = 3
+                                ) {
+                                    tags.forEachIndexed { index, tag ->
+                                        TagValue(
+                                            modifier = Modifier
+                                                .padding(4.dp),
+                                            value = tag,
+                                            viewModel = viewModel
+                                        )
+                                    }
                                 }
                             }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                            TitleField(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                value = title,
+                                validator = {
+                                    StringValidator(title)
+                                        .isNotBlank()
+                                        .hasMaximumLength(100)
+                                        .hasMinimumLength(1)
+                                },
+                                onChange = { newTitle -> title = newTitle },
+                                onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
+                            )
+                            DescriptionField(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                value = description,
+                                validator = {
+                                    StringValidator(title)
+                                        .isNotBlank()
+                                        .hasMaximumLength(256)
+                                        .hasMinimumLength(4)
+                                },
+                                onChange = { newDesc -> description = newDesc },
+                                onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
+                            )
+                            PostEditImagesPreview(
+                                modifier = Modifier,
+                                pictureViewModel = pictureViewModel,
+                                imageviewModel = imageViewModel,
+                                onPictureDelete = { id -> pictureViewModel.flagPictureForDeletion(id) }
+                            )
+                            ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    TitleField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        value = title,
-                        validator = {
-                            StringValidator(title)
-                                .isNotBlank()
-                                .hasMaximumLength(100)
-                                .hasMinimumLength(1)
-                        },
-                        onChange = { newTitle -> title = newTitle },
-                        onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
-                    )
-                    DescriptionField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        value = description,
-                        validator = {
-                            StringValidator(title)
-                                .isNotBlank()
-                                .hasMaximumLength(256)
-                                .hasMinimumLength(4)
-                        },
-                        onChange = { newDesc -> description = newDesc },
-                        onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
-                    )
-                    PostEditImagesPreview(modifier = Modifier, viewModel = imageViewModel)
-                    ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -209,12 +224,18 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                                         tags = tags
                                     )
 
+                                    if(pictureViewModel.picturesForDeletion.value.isNotEmpty()) {
+                                        pictureViewModel.picturesForDeletion.value.forEach { picture ->
+                                            postPictureViewModel.deletePicture(picture)
+                                        }
+                                    }
+
                                     withContext(Dispatchers.Main) {
                                         if (result) {
                                             if (!imageViewModel.areUrisEmpty()) {
                                                 viewModel.post.value?.let {
                                                     imageViewModel.selectedUris.value.forEach { uri ->
-                                                        pictureViewModel.upload(context, uri, it.id)
+                                                        postPictureViewModel.upload(context, uri, it.id)
                                                     }
                                                 }
                                             }
@@ -233,14 +254,9 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                         }) {
                             Text("Modificar")
                         }
-
                     }
                 }
             }
-        }
-        else {
-            //navController.navigate("home")
-            //Toast.makeText(context, "Publicación no encontrada (error)", Toast.LENGTH_SHORT).show()
         }
     }
 }

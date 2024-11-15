@@ -7,6 +7,7 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
 import frgp.utn.edu.ar.quepasa.domain.repository.request.RoleUpdateRequestRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
 import javax.inject.Inject
 
@@ -15,8 +16,10 @@ class RoleUpdateRequestViewModel @Inject constructor(
     private val repository: RoleUpdateRequestRepository
 ): ViewModel() {
     private val _roleRequests = MutableStateFlow<List<RoleUpdateRequest>>(emptyList())
+    val roleRequests: StateFlow<List<RoleUpdateRequest>> get() = _roleRequests
 
     private val _roleRequest = MutableStateFlow(RoleUpdateRequest(null, null, null, null, "", null, RequestStatus.WAITING, false))
+    val roleRequest: StateFlow<RoleUpdateRequest> get() = _roleRequest
 
     private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }
 
@@ -47,16 +50,6 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
-    fun getRequestsByStatus(status: RequestStatus): List<RoleUpdateRequest> {
-        val requests: MutableList<RoleUpdateRequest> = mutableListOf()
-
-        _roleRequests.value.filter { it.status != status }.forEach { request ->
-            requests.add(request)
-        }
-
-        return requests
-    }
-
     suspend fun createRoleRequest(role: Role, remarks: String): Boolean {
         try {
             val newRequest = repository.createRoleRequest(role, remarks)
@@ -69,17 +62,19 @@ class RoleUpdateRequestViewModel @Inject constructor(
         }
     }
 
-    suspend fun respondToRoleRequest(id: UUID, approve: Boolean, reviewerRemarks: String) {
+    suspend fun respondToRoleRequest(id: UUID, approve: Boolean, reviewerRemarks: String): Boolean {
         try {
             val newRequest = repository.respondToRoleRequest(id, approve, reviewerRemarks)
             _roleRequest.value = newRequest
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 
-    suspend fun deleteRoleRequest(id: UUID, isRequester: Boolean) {
+    suspend fun deleteRoleRequest(id: UUID, isRequester: Boolean): Boolean {
         try {
             repository.deleteRoleRequest(id)
             if(isRequester) {
@@ -88,9 +83,27 @@ class RoleUpdateRequestViewModel @Inject constructor(
             else {
                 getRequests()
             }
+            return true
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
+            return false
+        }
+    }
+
+    fun checkForRoleRequestPending(): Boolean {
+        try {
+            var check = false
+            _roleRequests.value.forEach { request ->
+                if(request.status == RequestStatus.WAITING) {
+                    check = true
+                }
+            }
+            return check
+        }
+        catch(e: Exception) {
+            _errorMessage.value = e.message
+            return false
         }
     }
 

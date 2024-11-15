@@ -26,17 +26,28 @@ fun TrendsCarousel(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
             .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),  // Menor espacio entre elementos
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (trends.value.isNotEmpty()) {
             trends.value.forEach { trend ->
-                TrendItem(tag = trend.tag ?: "Sin etiqueta", cantidad = trend.cantidad)
+                if (trend != null) {
+                    TrendItem(
+                        tag = trend.tag ?: "Sin etiqueta",
+                        cantidad = trend.cantidad ?: 0
+                    )
+                } else {
+                    Text(
+                        text = "Tendencia no válida",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         } else {
             Text(
                 "No hay tendencias disponibles",
-                fontSize = 12.sp,  // Tamaño de fuente más pequeño
+                fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }

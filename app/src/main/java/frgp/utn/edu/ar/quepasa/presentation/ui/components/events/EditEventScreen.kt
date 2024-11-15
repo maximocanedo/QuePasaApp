@@ -25,9 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
-import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
@@ -37,29 +37,34 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventAud
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventImageField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.TitleField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews.EventImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews.EventEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Composable
-fun EditEventScreen(navController: NavHostController, user: User?, eventId: UUID) {
+fun EditEventScreen(navController: NavHostController, eventId: UUID) {
+    val user by LocalAuth.current.collectAsState()
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel: ImageViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val event by viewModel.event.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.getEventById(eventId)
         viewModel.setEventDataFields()
         eventPictureViewModel.getPicturesByEvent(eventId)
         imageViewModel.loadUrisFromEventPictures(eventPictureViewModel.pictures.value.content)
+        pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
     }
     if (event != null) {
-        BaseComponent(navController, user, "Editar de Evento", true) {
+        BaseComponent(navController, user.user, "Editar de Evento", true) {
             val title by viewModel.title.collectAsState()
             val description by viewModel.description.collectAsState()
             val address by viewModel.address.collectAsState()
@@ -217,10 +222,12 @@ fun EditEventScreen(navController: NavHostController, user: User?, eventId: UUID
                     }
                 }
                 Row {
-                    EventImagesPreview(
+                    EventEditImagesPreview(
                         modifier = Modifier,
+                        pictureViewModel,
                         imageViewModel.selectedUris,
-                        imageViewModel::clearImage
+                        onDeleteUriImage = imageViewModel::clearImage,
+                        onPictureDelete = { id -> pictureViewModel.flagPictureForDeletion(id) }
                     )
                     EventImageField(
                         modifier = Modifier.fillMaxWidth(),
@@ -247,6 +254,13 @@ fun EditEventScreen(navController: NavHostController, user: User?, eventId: UUID
                                     )
                                     val request: Boolean =
                                         viewModel.updateEvent(eventId, eventRequest)
+
+                                    if (pictureViewModel.picturesForDeletion.value.isNotEmpty()) {
+                                        pictureViewModel.picturesForDeletion.value.forEach { picture ->
+                                            eventPictureViewModel.deletePicture(picture)
+                                        }
+                                    }
+
                                     if (request) {
                                         if (!imageViewModel.areUrisEmpty()) {
                                             viewModel.event.value?.let {

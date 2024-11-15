@@ -38,10 +38,20 @@ interface EventService {
     suspend fun getEventsByAuthUser(@Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
 
     @GET("events/audience/{audience}")
-    suspend fun getEventsByAudience(@Path("audience") audience: Audience, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
+    suspend fun getEventsByAudience(
+        @Path("audience") audience: Audience,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("active") active: Boolean
+    ): Response<Page<Event>>
 
     @GET("events/eventCategory/{category}")
-    suspend fun getEventsByCategory(@Path("category") category: EventCategory, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Event>>
+    suspend fun getEventsByCategory(
+        @Path("category") category: EventCategory,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("active") active: Boolean
+    ): Response<Page<Event>>
 
     /** SECCION POSTs **/
     @POST("events")

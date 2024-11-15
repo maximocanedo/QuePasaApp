@@ -1,5 +1,6 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.events.previews
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,23 +20,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
-import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
+import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
 
 @Composable
-fun PostEditImagesPreview(
+fun EventEditImagesPreview(
     modifier: Modifier,
     pictureViewModel: PictureViewModel,
-    imageviewModel: ImageViewModel,
+    selectedUris: StateFlow<List<Uri>>,
+    onDeleteUriImage: (Uri) -> Unit,
     onPictureDelete: (UUID) -> Unit
 ) {
     val bitmaps = pictureViewModel.pictures.collectAsState()
-    val uris = imageviewModel.selectedUris.collectAsState()
+    val uris = selectedUris.collectAsState()
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
         bitmaps.value.forEachIndexed { index, bitmap ->
-            if(bitmap != null) {
+            if (bitmap != null) {
                 Box(
                     contentAlignment = Alignment.TopEnd,
                     modifier = Modifier
@@ -65,7 +67,7 @@ fun PostEditImagesPreview(
             }
         }
         uris.value.forEach { uri ->
-            if(uri.path != null) {
+            if (uri.path != null) {
                 Box(
                     contentAlignment = Alignment.TopEnd,
                     modifier = Modifier
@@ -81,7 +83,7 @@ fun PostEditImagesPreview(
 
                     IconButton(
                         onClick = {
-                            imageviewModel.clearImage(uri)
+                            onDeleteUriImage(uri)
                         },
                         modifier = Modifier.size(24.dp)
                     ) {

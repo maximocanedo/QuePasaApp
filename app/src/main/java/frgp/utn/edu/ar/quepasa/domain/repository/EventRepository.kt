@@ -34,10 +34,21 @@ class EventRepository @Inject constructor(
         handleResponse { eventService.getEventsByUser(username, page, size) }
     suspend fun getEventsByAuthUser(page: Int, size: Int): Page<Event> =
         handleResponse { eventService.getEventsByAuthUser(page, size) }
-    suspend fun getEventsByAudience(audience: Audience, page: Int, size: Int): Page<Event> =
-        handleResponse { eventService.getEventsByAudience(audience, page, size) }
-    suspend fun getEventsByCategory(category: EventCategory, page: Int, size: Int): Page<Event> =
-        handleResponse { eventService.getEventsByCategory(category, page, size) }
+    suspend fun getEventsByAudience(
+        audience: Audience,
+        page: Int,
+        size: Int,
+        active: Boolean
+    ): Page<Event> =
+        handleResponse { eventService.getEventsByAudience(audience, page, size, active) }
+
+    suspend fun getEventsByCategory(
+        category: EventCategory,
+        page: Int,
+        size: Int,
+        active: Boolean
+    ): Page<Event> =
+        handleResponse { eventService.getEventsByCategory(category, page, size, active) }
 
     /** POSTs **/
     suspend fun createEvent(event: EventCreateRequest): Event =

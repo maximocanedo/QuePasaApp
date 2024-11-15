@@ -31,9 +31,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Black1
 import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue2
+import frgp.utn.edu.ar.quepasa.utils.role.roleLowerThan
 import kotlinx.coroutines.launch
 
 @Composable
@@ -118,7 +120,16 @@ fun NavigationMainDrawer(navController: NavHostController, user: User?) {
                             text = "Roles",
                             fontSize = 20.sp,
                             color = Black1,
-                            modifier = Modifier.clickable { navController.navigate("roleRequestUserList") }
+                            modifier = Modifier.clickable {
+                                val currentRole: Role? = user.user?.role
+                                if(currentRole != null) {
+                                    if (roleLowerThan(currentRole, Role.MOD)) {
+                                        navController.navigate("roleRequestUserList")
+                                    } else {
+                                        navController.navigate("roleRequestAdminList")
+                                    }
+                                }
+                            }
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {

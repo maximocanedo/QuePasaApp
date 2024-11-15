@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.Post
@@ -17,6 +16,7 @@ import kotlinx.io.IOException
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +25,12 @@ class PostPictureViewModel @Inject constructor(
 ): ViewModel() {
     private val _pictures = MutableStateFlow<Page<PostPicture>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val pictures: StateFlow<Page<PostPicture>> get() = _pictures
+
+    private val _picturesId = MutableStateFlow<List<UUID>>(emptyList())
+    val picturesId: StateFlow<List<UUID>> get() = _picturesId
+
+    private val _picturesForDeletion = MutableStateFlow<List<UUID>>(emptyList())
+    val picturesForDeletion: StateFlow<List<UUID>> get() = _picturesForDeletion
 
     private val _picture = MutableStateFlow<PostPicture?>(null)
     val picture: StateFlow<PostPicture?> get() = _picture
@@ -47,6 +53,12 @@ class PostPictureViewModel @Inject constructor(
         try {
             val pictures = repository.getPicturesByPost(id, page, size)
             _pictures.value = pictures
+
+            val picturesId: MutableList<UUID> = mutableListOf()
+            pictures.content.forEach { picture ->
+                picturesId.add(picture.id)
+            }
+            _picturesId.value = picturesId
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -67,7 +79,7 @@ class PostPictureViewModel @Inject constructor(
         }
     }
 
-    suspend fun deletePicture(id: Int) {
+    suspend fun deletePicture(id: UUID) {
         try {
             repository.deletePicture(id)
         }

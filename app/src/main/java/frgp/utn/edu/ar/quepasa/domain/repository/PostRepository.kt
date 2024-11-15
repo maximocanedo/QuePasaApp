@@ -64,7 +64,7 @@ class PostRepository @Inject constructor(
         handleResponse { postService.updatePost(id, request) }
 
     suspend fun deletePost(id: Int) {
-        handleResponse<Void> { postService.deletePost(id) }
+        postService.deletePost(id)
     }
 
     suspend fun getVotes(id: Int): VoteCount =

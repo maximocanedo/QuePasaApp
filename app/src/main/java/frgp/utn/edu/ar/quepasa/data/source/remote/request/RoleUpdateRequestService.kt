@@ -12,7 +12,7 @@ import java.util.UUID
 
 interface RoleUpdateRequestService {
     @POST("request/role/request")
-    suspend fun createRoleRequest(@Query("requestedRole") role: Role, @Query("remarks") remarks: String): Response<RoleUpdateRequest>
+    suspend fun createRoleRequest(@Query("requestedRole") requestedRole: Role, @Query("remarks") remarks: String): Response<RoleUpdateRequest>
 
     @POST("request/role/respond")
     suspend fun respondToRoleRequest(@Query("requestId") requestId: UUID, @Query("approve") approve: Boolean, @Query("reviewerRemarks") reviewerRemarks: String): Response<RoleUpdateRequest>

@@ -3,6 +3,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -10,60 +12,42 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 import frgp.utn.edu.ar.quepasa.data.model.PostType
 import frgp.utn.edu.ar.quepasa.data.model.User
-import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
-import frgp.utn.edu.ar.quepasa.data.model.enums.SubnationalDivisionDenomination
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
-import okhttp3.internal.userAgent
+import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
+import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import java.sql.Timestamp
-import java.util.concurrent.TimeUnit
-import kotlin.math.abs
-import kotlin.math.ln
-import kotlin.math.pow
-
-fun formatNumber(number: Int): String {
-    if (number < 1000) return "$number"
-    val exp = (ln(abs(number.toDouble())) / ln(1000.0)).toInt()
-    val suffix = "KMBT"[exp - 1]
-    return String.format("%.1f%s", number / 1000.0.pow(exp.toDouble()), suffix)
-}
-
-fun Timestamp.formatTimeAgo(): String {
-    val now = System.currentTimeMillis()
-    val diff = now - this.time
-
-    return when {
-        diff < TimeUnit.MINUTES.toMillis(1) -> "justo ahora"
-        diff < TimeUnit.HOURS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toMinutes(diff)}m atrás"
-        diff < TimeUnit.DAYS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toHours(diff)}h atrás"
-        diff < TimeUnit.DAYS.toMillis(7) -> "${TimeUnit.MILLISECONDS.toDays(diff)}d atrás"
-        else -> "hace más de una semana"
-    }
-}
 
 @Composable
 fun PostCard(
     post: Post,
-    user: User? = null,
+    navController: NavHostController,
     onLikeClick: () -> Unit,
     onDislikeClick: () -> Unit,
     onCommentClick: () -> Unit,
     onEditClick: (Int) -> Unit
 ) {
+    val user by LocalAuth.current.collectAsState()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        onClick = {
+            navController.navigate("postDetailedScreen/${post.id}")
+        }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -98,20 +82,18 @@ fun PostCard(
                             )
                         }
                     }
-                    post.timestamp?.let {
-                        Text(
-                            text = it.formatTimeAgo(),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = post.timestamp.formatTimeAgo(),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ReadMoreText(
-                text = post.description ?: "Sin descripción",
+                text = post.description,
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -129,6 +111,7 @@ fun PostCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
+
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable(onClick = onLikeClick)
                 ) {
@@ -169,17 +152,16 @@ fun PostCard(
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                if (user != null && post.owner?.id == user.id) {
+                if (post.owner?.id == user.id || user.user?.role  == Role.ADMIN) {
                     Icon(
                         painter = painterResource(R.drawable.edit),
                         contentDescription = "Edit",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .size(24.dp)
-                            .clickable { post.id?.let { onEditClick(it) } }
+                            .clickable { onEditClick(post.id) }
                     )
                 }
-
             }
         }
     }
@@ -199,7 +181,7 @@ fun PreviewPostCard() {
             neighbourhood = null,
             picture = null,
             email = emptySet(),
-            role = frgp.utn.edu.ar.quepasa.data.model.enums.Role.USER,
+            role = Role.USER,
             active = true
         ),
         title = "Título ejemplo",
@@ -212,8 +194,10 @@ fun PreviewPostCard() {
     )
 
     MaterialTheme {
+        val navController = rememberNavController()
         PostCard(
             post = examplePost,
+            navController = navController,
             onLikeClick = {},
             onDislikeClick = {},
             onCommentClick = {},

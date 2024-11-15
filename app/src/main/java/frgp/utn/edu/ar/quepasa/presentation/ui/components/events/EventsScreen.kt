@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -22,25 +23,53 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.EventCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EventsScreen(navController: NavHostController, user: User?) {
+fun EventsScreen(navController: NavHostController) {
+    val user by LocalAuth.current.collectAsState()
     val viewModel: EventViewModel = hiltViewModel()
+    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
     val events by viewModel.events.collectAsState()
+    val pictures by eventPictureViewModel.eventPictures.collectAsState()
+    val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
 
-    val category by remember { mutableStateOf(EventCategory.EDUCATIVE) }
+    var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        viewModel.getEvents()
+    LaunchedEffect(Unit, events) {
+        viewModel.viewModelScope.launch {
+            events.content.forEach { event ->
+                eventPictureViewModel.setEventsPicture(event.id!!)
+            }
+        }
     }
-    BaseComponent(navController, user, "Listado Eventos", false) {
+
+    LaunchedEffect(pictures) {
+        pictureViewModel.viewModelScope.launch {
+            pictures.forEach { picture ->
+                picture.event?.id?.let {
+                    pictureViewModel.setPictureEvents(
+                        picture.id,
+                        it,
+                    )
+                }
+            }
+            pictureViewModel.setEventPictureDTO(eventPictureDTO)
+        }
+    }
+
+
+    BaseComponent(navController, user.user, "Listado Eventos", false) {
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -57,6 +86,7 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                         search = it
                         viewModel.viewModelScope.launch {
                             viewModel.getEvents(search)
+                            category = ""
                         }
                     },
                     label = {
@@ -68,19 +98,76 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                 )
             }
             Row {
-                /* TODO busqueda por categoria */
+                EventCategoryField(
+                    modifier = Modifier.fillMaxWidth(),
+                    category = category,
+                    onItemSelected = {
+                        category = it
+                        viewModel.viewModelScope.launch {
+                            viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                            search = ""
+                        }
+                    }
+                )
             }
             Row {
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    userScrollEnabled = true
+                    userScrollEnabled = true,
                 ) {
                     items(events.content) { event ->
-                        EventCard(navController, event)
+                        key(event.id) {
+                            EventCard(
+                                eventPictureDTO.find { it?.eventId == event.id }?.bitmap,
+                                navController,
+                                event,
+                                user.user,
+                                onAssistanceClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.rsvpEvent(event.id!!)
+                                        resetEvents(viewModel, category, search)
+                                    }
+                                },
+                                onRemoveClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.deleteEvent(event.id!!)
+                                        resetEvents(viewModel, category, search)
+                                    }
+                                },
+                                onUpvoteClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.upVote(event.id!!)
+                                        resetEvents(viewModel, category, search)
+                                    }
+                                },
+                                onDownvoteClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.downVote(event.id!!)
+                                        resetEvents(viewModel, category, search)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+fun resetEvents(
+    viewModel: EventViewModel,
+    category: String,
+    search: String
+) {
+    viewModel.viewModelScope.launch {
+        if (category.isNotBlank()) {
+            viewModel.getEventsByCategory(EventCategory.valueOf(category))
+        } else if (search.isNotBlank()) {
+            viewModel.getEvents(search)
+        } else {
+            viewModel.getEvents()
         }
     }
 }

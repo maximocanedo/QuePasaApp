@@ -52,6 +52,10 @@ class PostViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow<String?>(null)
 
+    private val _isLoading = MutableStateFlow(false)
+
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
     init {
         viewModelScope.launch {
             getPosts(0, 10,  true)
@@ -264,21 +268,44 @@ class PostViewModel @Inject constructor(
 
     suspend fun upVote(id: Int) {
         try {
+            _isLoading.value = true
             val votes = repository.upVote(id)
             _votes.value = votes
-        }
-        catch(e: Exception) {
+            _posts.value = _posts.value.copy(
+                content = _posts.value.content.map { post ->
+                    if (post.id == id) {
+                        post.copy(votes = votes)
+                    } else {
+                        post
+                    }
+                }
+            )
+        } catch (e: Exception) {
             _errorMessage.value = e.message
+        }finally {
+            _isLoading.value = false
+
         }
     }
 
     suspend fun downVote(id: Int) {
         try {
+            _isLoading.value = true
             val votes = repository.downVote(id)
             _votes.value = votes
-        }
-        catch(e: Exception) {
+            _posts.value = _posts.value.copy(
+                content = _posts.value.content.map { post ->
+                    if (post.id == id) {
+                        post.copy(votes = votes)
+                    } else {
+                        post
+                    }
+                }
+            )
+        } catch (e: Exception) {
             _errorMessage.value = e.message
+        }finally {
+            _isLoading.value = false
         }
     }
 

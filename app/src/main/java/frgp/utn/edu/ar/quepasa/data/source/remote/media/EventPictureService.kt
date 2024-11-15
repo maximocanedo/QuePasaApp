@@ -35,5 +35,4 @@ interface EventPictureService {
 
     @DELETE("event-pictures/{id}")
     suspend fun deletePicture(@Path("id") id: UUID): Response<Void>
-
 }

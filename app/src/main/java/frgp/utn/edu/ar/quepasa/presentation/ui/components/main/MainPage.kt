@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
@@ -35,13 +36,15 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
                 Text(text = "Bienvenido, ${if(user.ok) user.name else "Usuario"}")
             }
 
-            PostScreen(navController,user.user)
+            PostScreen(navController)
 
         }
         Column {
-            Spacer(modifier = Modifier.weight(1f))
-
-            CreateContentDropdown(navController =  navController)
+            val role: Role? = user.user?.role
+            if(role != null && role != Role.USER) {
+                Spacer(modifier = Modifier.weight(1f))
+                CreateContentDropdown(navController = navController)
+            }
         }
     }
 }

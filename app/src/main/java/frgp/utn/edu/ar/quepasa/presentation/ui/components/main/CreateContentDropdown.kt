@@ -34,7 +34,7 @@ fun CreateContentDropdown(navController : NavHostController) {
     ) {
         FloatingActionButton(
             onClick = { expanded = true },
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(end = 60.dp, bottom = 60.dp),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ) {
             Icon(
@@ -47,7 +47,7 @@ fun CreateContentDropdown(navController : NavHostController) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = DpOffset(x = (-10).dp, y = 0.dp)
+            offset = DpOffset(x = (-40).dp, y = (-10).dp)
         ) {
             DropdownMenuItem(
                 text = { Text("Publicación") },

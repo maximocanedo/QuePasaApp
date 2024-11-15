@@ -18,21 +18,32 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 
 @Composable
 fun EventCard(navController: NavHostController, event: Event) {
     val context = LocalContext.current
+    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
+    LaunchedEffect(Unit) {
+        eventPictureViewModel.getPicturesByEvent(event.id!!)
+        eventPictureViewModel.pictures.value.content.firstOrNull()
+            ?.let { pictureViewModel.setPictureBitmap(it.id) }
+    }
     ElevatedCard(
         onClick = {
             Toast.makeText(
@@ -61,18 +72,20 @@ fun EventCard(navController: NavHostController, event: Event) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column {
-                Image(
-                    painter = painterResource(R.drawable.baseline_broken_image_24),
-                    modifier = Modifier
-                        .size(100.dp)
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.secondary,
-                            RoundedCornerShape(10.dp)
-                        ),
-                    contentDescription = "Event Image",
-                    contentScale = ContentScale.Crop
-                )
+                if (pictureViewModel.bitmap.collectAsState().value != null) {
+                    Image(
+                        bitmap = pictureViewModel.bitmap.collectAsState().value!!.asImageBitmap(),
+                        modifier = Modifier
+                            .size(100.dp)
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.secondary,
+                                RoundedCornerShape(10.dp)
+                            ),
+                        contentDescription = "Event Image",
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             Column {
                 event.title?.let {

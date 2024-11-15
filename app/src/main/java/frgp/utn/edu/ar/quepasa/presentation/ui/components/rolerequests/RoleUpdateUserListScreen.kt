@@ -1,9 +1,9 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -36,91 +36,125 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
     }
 
     BaseComponent(navController, null, "Solicitudes de rol", false) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Spacer(modifier = Modifier.padding(vertical = 8.dp))
-
-            Button(
-                modifier = Modifier,
-                onClick = {
-                    navController.navigate("roleRequest")
-                }
-            ) {
-                Text("Solicitar rol")
+            item {
+                Spacer(modifier = Modifier.padding(vertical = 8.dp))
             }
 
-            Spacer(modifier = Modifier.padding(vertical = 32.dp))
+            item {
+                Button(
+                    modifier = Modifier,
+                    onClick = {
+                        navController.navigate("roleRequest")
+                    }
+                ) {
+                    Text("Solicitar rol")
+                }
+            }
 
-            Text(
-                text = "En espera",
-                modifier = Modifier.padding(horizontal = 6.dp),
-                style = MaterialTheme.typography.titleLarge,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            RoleUpdateRequestCards(
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                viewModel = viewModel,
-                status = RequestStatus.WAITING,
-                isAdmin = false,
-                hasDeleteButton = true
-            )
+            item {
+                Spacer(modifier = Modifier.padding(vertical = 16.dp))
+            }
 
-            Spacer(modifier = Modifier.padding(vertical = 32.dp))
+            item {
+                Text(
+                    text = "En espera",
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
 
-            Text(
-                text = "Aprobadas",
-                modifier = Modifier.padding(horizontal = 6.dp),
-                style = MaterialTheme.typography.titleLarge,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            RoleUpdateRequestCards(
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                viewModel = viewModel,
-                status = RequestStatus.APPROVED,
-                isAdmin = false,
-                hasDeleteButton = false
-            )
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
+                    thickness = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
 
-            Spacer(modifier = Modifier.padding(vertical = 32.dp))
+            item {
+                RoleUpdateRequestCards(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp),
+                    viewModel = viewModel,
+                    status = RequestStatus.WAITING,
+                    isAdmin = false,
+                    hasDeleteButton = true
+                )
+            }
 
-            Text(
-                text = "Rechazadas",
-                modifier = Modifier.padding(horizontal = 6.dp),
-                style = MaterialTheme.typography.titleLarge,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            RoleUpdateRequestCards(
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                viewModel = viewModel,
-                status = RequestStatus.REJECTED,
-                isAdmin = false,
-                hasDeleteButton = false
-            )
+            item {
+                Spacer(modifier = Modifier.padding(vertical = 16.dp))
+            }
+
+            item {
+                Text(
+                    text = "Aprobadas",
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
+                    thickness = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            item {
+                RoleUpdateRequestCards(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp),
+                    viewModel = viewModel,
+                    status = RequestStatus.APPROVED,
+                    isAdmin = false,
+                    hasDeleteButton = false
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.padding(vertical = 16.dp))
+            }
+
+            item {
+                Text(
+                    text = "Rechazadas",
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 64.dp),
+                    thickness = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            item {
+                RoleUpdateRequestCards(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp),
+                    viewModel = viewModel,
+                    status = RequestStatus.REJECTED,
+                    isAdmin = false,
+                    hasDeleteButton = false
+                )
+            }
         }
     }
 }

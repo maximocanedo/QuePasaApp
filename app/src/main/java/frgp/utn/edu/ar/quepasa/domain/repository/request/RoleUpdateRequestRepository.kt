@@ -26,7 +26,7 @@ class RoleUpdateRequestRepository @Inject constructor(
         handleResponse { roleUpdateRequestService.getMyRequests() }
 
     suspend fun createRoleRequest(role: Role, remarks: String): RoleUpdateRequest =
-        handleResponse { roleUpdateRequestService.createRoleRequest(role.name, remarks) }
+        handleResponse { roleUpdateRequestService.createRoleRequest(role, remarks) }
 
     suspend fun respondToRoleRequest(id: UUID, approve: Boolean, reviewerRemarks: String): RoleUpdateRequest =
         handleResponse { roleUpdateRequestService.respondToRoleRequest(id, approve, reviewerRemarks) }

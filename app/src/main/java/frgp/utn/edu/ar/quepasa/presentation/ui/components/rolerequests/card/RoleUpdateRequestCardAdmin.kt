@@ -11,17 +11,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
 import frgp.utn.edu.ar.quepasa.utils.role.roleToSpanish
 
@@ -43,35 +48,65 @@ fun RoleUpdateRequestCardAdmin(request: RoleUpdateRequest) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column {
-                if(request.requestedRole != null) {
-                    Text(
-                        text = "Solicitud de rol - ${roleToSpanish(request.requestedRole.name)}",
-                        modifier = Modifier.padding(6.dp),
-                        style = MaterialTheme.typography.titleLarge,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                }
+                Text(
+                    text = "Solicitud de rol",
+                    modifier = Modifier.padding(6.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+
                 HorizontalDivider(
                     thickness = 2.dp,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                Text(
-                    text = "Comentario: ${request.remarks}",
-                    modifier = Modifier.padding(6.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-                val reviewer = if(request.reviewer != null) request.reviewer.name else "No asignado"
-                Text(
-                    text = "Revisor: $reviewer",
-                    modifier = Modifier.padding(6.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-                Row() {
+
+                if(request.requestedRole != null) {
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_supervised_user_circle_24),
+                            contentDescription = "Role Image",
+                        )
+                        Text(
+                            text = "Rol: ${roleToSpanish(request.requestedRole.name)}",
+                            modifier = Modifier.padding(6.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                Row {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_comment_24),
+                        contentDescription = "Role Comment",
+                    )
+                    Text(
+                        text = "Comentario: ${request.remarks}",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Role Reviewer",
+                    )
+                    val reviewer = if(request.reviewer != null) request.reviewer.name else "No asignado"
+                    Text(
+                        text = "Revisor: $reviewer",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+
+                Row {
                     if(request.status == RequestStatus.WAITING) {
                         Button(
                             modifier = Modifier

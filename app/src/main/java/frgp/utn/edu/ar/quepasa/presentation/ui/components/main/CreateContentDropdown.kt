@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue1
 
 @Composable
 fun CreateContentDropdown(navController : NavHostController) {
@@ -34,8 +35,8 @@ fun CreateContentDropdown(navController : NavHostController) {
     ) {
         FloatingActionButton(
             onClick = { expanded = true },
-            modifier = Modifier.padding(end = 60.dp, bottom = 60.dp),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.padding(end = 60.dp, bottom = 10.dp),
+            containerColor = Blue1,
         ) {
             Icon(
                 Icons.Filled.Add,

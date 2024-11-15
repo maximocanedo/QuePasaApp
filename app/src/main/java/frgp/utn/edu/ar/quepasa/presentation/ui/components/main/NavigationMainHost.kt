@@ -15,6 +15,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
@@ -45,6 +46,16 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 PostEditScreen(navController, user, postId)
             }
         }
+        composable(
+            route = "postDetailedScreen/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            if (postId.isNotEmpty()) {
+                PostDetailedScreen(navController, postId.toInt())
+            }
+        }
+
         composable("eventCreate") { CreateEventScreen(navController) }
         composable(
             route = "eventEdit/{eventId}",

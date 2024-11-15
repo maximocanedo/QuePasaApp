@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -70,10 +71,12 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    userScrollEnabled = true
+                    userScrollEnabled = true,
                 ) {
                     items(events.content) { event ->
-                        EventCard(navController, event)
+                        key(event.id) {
+                            EventCard(navController, event)
+                        }
                     }
                 }
             }

@@ -21,7 +21,7 @@ class PictureRepository @Inject constructor(
             }
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (!response.isSuccessful || response.body() == null || response.errorBody() != null) {
+                if (!response.isSuccessful || response.body() == null || response.errorBody() != null || response.code() != 200) {
                     onComplete(null)
                     return
                 }

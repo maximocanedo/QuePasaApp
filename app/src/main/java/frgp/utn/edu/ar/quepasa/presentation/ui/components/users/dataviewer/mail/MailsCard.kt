@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.mail
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding

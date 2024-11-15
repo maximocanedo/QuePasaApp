@@ -20,12 +20,10 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TrendsScreen
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.launch
-import frgp.utn.edu.ar.quepasa.data.model.User
 
 @Composable
 fun PostScreen(
     navController: NavHostController,
-    user: User?
 ) {
     val postViewModel: PostViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
@@ -41,7 +39,6 @@ fun PostScreen(
             postsState.value.content.forEach { post ->
                 PostCard(
                     post = post,
-                    user = user,
                     navController = navController,
                     onLikeClick = {
                         coroutineScope.launch {

@@ -3,6 +3,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -17,6 +19,8 @@ import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 import frgp.utn.edu.ar.quepasa.data.model.PostType
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
@@ -26,13 +30,13 @@ import java.sql.Timestamp
 @Composable
 fun PostCard(
     post: Post,
-    user: User? = null,
     navController: NavHostController,
     onLikeClick: () -> Unit,
     onDislikeClick: () -> Unit,
     onCommentClick: () -> Unit,
     onEditClick: (Int) -> Unit
 ) {
+    val user by LocalAuth.current.collectAsState()
 
     Card(
         modifier = Modifier
@@ -148,7 +152,7 @@ fun PostCard(
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                if (user != null && post.owner?.id == user.id) {
+                if (post.owner?.id == user.id || user.user?.role  == Role.ADMIN) {
                     Icon(
                         painter = painterResource(R.drawable.edit),
                         contentDescription = "Edit",
@@ -177,7 +181,7 @@ fun PreviewPostCard() {
             neighbourhood = null,
             picture = null,
             email = emptySet(),
-            role = frgp.utn.edu.ar.quepasa.data.model.enums.Role.USER,
+            role = Role.USER,
             active = true
         ),
         title = "Título ejemplo",

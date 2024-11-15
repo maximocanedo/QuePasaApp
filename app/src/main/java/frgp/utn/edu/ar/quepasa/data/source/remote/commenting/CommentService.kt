@@ -36,5 +36,5 @@ interface CommentService {
     suspend fun updateComment(@Path("id") id: UUID, @Body content: String): Response<Comment>
 
     @DELETE("/comments/{id}")
-    suspend fun deleteComment(@Path("id") id: UUID): Response<Unit>
+    suspend fun deleteComment(@Path("id") id: UUID): Response<Void>
 }

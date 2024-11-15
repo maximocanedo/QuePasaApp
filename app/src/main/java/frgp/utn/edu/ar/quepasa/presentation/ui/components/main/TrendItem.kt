@@ -54,12 +54,7 @@ fun TrendItem(tag: String, cantidad: Int) {
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Start
                 )
-                Text(
-                    text = "# $cantidad",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Start
-                )
+
             }
         }
     }

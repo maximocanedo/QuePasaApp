@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
+import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.FeedbackProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
@@ -32,7 +33,8 @@ import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.MailsCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.mail.MailsCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.phone.PhonesCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewModel
 import kotlinx.coroutines.flow.update
@@ -60,7 +62,10 @@ class ProfileScreen: AuthenticatedActivity() {
                         viewModel::onMailValidationRequest,
                         viewModel::onMailDeleteRequest,
                         isRefreshing,
-                        viewModel::updateUser
+                        viewModel::updateUser,
+                        viewModel::onPhoneRegistrationRequest,
+                        viewModel::onPhoneValidationRequest,
+                        viewModel::onPhoneDeleteRequest
                     )
                 }
             }
@@ -76,7 +81,10 @@ fun ProfileScreenContent(
     onMailValidationRequest: suspend (Mail, String) -> Boolean,
     onMailDeleteRequest: suspend (Mail) -> Unit,
     isRefreshing: Boolean,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onPhoneRegistration: suspend (String) -> Unit,
+    onPhoneValidationRequest: suspend (Phone, String) -> Boolean,
+    onPhoneDeleteRequest: suspend (Phone) -> Unit
 ) {
     val me by LocalAuth.current.collectAsState()
     val itsMe by remember {
@@ -102,6 +110,13 @@ fun ProfileScreenContent(
                 if(itsMe) MailsCard(
                     user.email, Modifier.fillMaxWidth(),
                     onMailRegistration, onMailDeleteRequest, onMailValidationRequest
+                )
+                if(itsMe) PhonesCard(
+                    phones = user.phone,
+                    Modifier.fillMaxWidth(),
+                    onPhoneRegistration,
+                    onPhoneDeleteRequest,
+                    onPhoneValidationRequest
                 )
                 Spacer(modifier = Modifier.height(56.dp))
             }
@@ -138,10 +153,13 @@ fun ProfileScreenContentPreview() {
         role = Role.ADMIN,
         active = true
     ),
-        { mailAddress -> },
+        { mailAddress ->  },
         { mail, code -> true },
-        { mail -> },
+        { mail ->  },
         isRefreshing = false,
-        onRefresh = {}
+        onRefresh = {  },
+        onPhoneRegistration = {  },
+        onPhoneValidationRequest = { phone, code -> true },
+        onPhoneDeleteRequest = {  }
     )
 }

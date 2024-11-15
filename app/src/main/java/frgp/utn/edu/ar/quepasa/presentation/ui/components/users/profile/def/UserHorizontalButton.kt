@@ -26,16 +26,26 @@ import java.util.UUID
 
 
 @Composable
-fun UserHorizontalButton(user: User, modifier: Modifier = Modifier, onClick: (User) -> Unit) {
+fun UserHorizontalButton(
+    user: User,
+    modifier: Modifier = Modifier,
+    onClick: (User) -> Unit,
+    caption: String? = null
+) {
     TextButton(onClick = { onClick(user) }) {
-        UserHorizontalDesign(user = user, modifier = modifier.height(48.dp).padding(0.dp))
+        UserHorizontalDesign(user = user, modifier = modifier.height(48.dp).padding(0.dp), caption = caption)
     }
 }
 
 @Composable
-fun UserHorizontalDesign(user: User, modifier: Modifier = Modifier
-    .height(60.dp)
-    .padding(6.dp)) {
+fun UserHorizontalDesign(
+    user: User,
+    modifier: Modifier = Modifier
+        .height(60.dp)
+        .padding(6.dp),
+    caption: String? = null
+) {
+    val captionOn = caption != null && caption.isNotBlank()
     val img = if(user.picture == null) null else
         "http://canedo.com.ar:8080/api/pictures/"+user.picture.id+"/view"
     Row(
@@ -64,7 +74,7 @@ fun UserHorizontalDesign(user: User, modifier: Modifier = Modifier
                     .wrapContentWidth()
             )
             Text(
-                text = "@" + user.username,
+                text = "@" + user.username + if (captionOn) " · " + caption else "",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
@@ -96,5 +106,9 @@ fun UserHorizontalButtonPreview() {
     ),
         onClick = {
 
-        })
+        },
+        caption = "Hace un instante")
 }
+
+
+

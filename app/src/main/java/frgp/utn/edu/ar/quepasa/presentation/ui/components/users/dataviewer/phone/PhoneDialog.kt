@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -55,6 +56,7 @@ fun PhoneDialog(
     onDeleteRequest: suspend (Phone) -> Unit,
     onValidateRequest: suspend (Phone, String) -> Boolean
 ) {
+    var showDeleteDialog by remember { mutableStateOf<Boolean>(false) }
     var vrs by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     val feedback by LocalFeedback.current.collectAsState()
@@ -115,7 +117,7 @@ fun PhoneDialog(
                 .fillMaxWidth()
         ) {
             TextButton(
-                onClick = { CoroutineScope(IO).launch { onDeleteRequest(phone) } },
+                onClick = { showDeleteDialog = true },
                 modifier = Modifier.padding(horizontal = 2.dp)
             ) {
                 Text("Eliminar")
@@ -128,6 +130,27 @@ fun PhoneDialog(
             }
         }
     }
+    if(showDeleteDialog) AlertDialog(
+        title = {
+          Text("¿Estás seguro?")
+        },
+        text = {
+            Text("Estás a punto de desvincular este número de teléfono de tu cuenta de QuePasa. ")
+        },
+        onDismissRequest = {
+            showDeleteDialog = false
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    showDeleteDialog = false
+                    CoroutineScope(IO).launch { onDeleteRequest(phone) }
+                }
+            ) {
+                Text("Eliminar")
+            }
+        }
+    )
 }
 
 @Preview @Composable

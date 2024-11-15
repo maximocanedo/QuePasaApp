@@ -92,7 +92,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
 
                 Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                     androidx.compose.foundation.rememberScrollState().let { scrollState ->
-                        androidx.compose.foundation.layout.Column(
+                        Column(
                             modifier = Modifier
                                 .weight(1f)
                                 .verticalScroll(scrollState)

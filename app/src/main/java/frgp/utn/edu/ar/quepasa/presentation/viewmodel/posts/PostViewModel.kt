@@ -80,8 +80,6 @@ class PostViewModel @Inject constructor(
         _filteredPosts.value = _posts.value.content
     }
 
-
-
     private suspend fun getPosts(page: Int, size: Int, activeOnly: Boolean) {
         try {
             val posts = repository.getPosts(page, size, activeOnly)

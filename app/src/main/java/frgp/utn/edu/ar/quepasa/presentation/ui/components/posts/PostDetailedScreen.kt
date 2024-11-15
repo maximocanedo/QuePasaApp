@@ -149,73 +149,77 @@ fun PostDetailedScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        if(user.user?.role != Role.USER) {
                             Row(
-
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.clickable(onClick = {
-                                    coroutineScope.launch {
-                                        try {
-                                            viewModel.upVote(post!!.id)
-                                            Log.d("PostCard", "like ${post!!.id}")
-                                        } catch (e: Exception) {
-                                            Log.e("PostCard", "error: ${e.message}")
-                                        }
-                                    }
-                                })
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                                    contentDescription = "Like",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = formatNumber(votes?.votes ?: post!!.votes?.votes ?: 0),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
+                                Row(
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.clickable(onClick = {
-                                    coroutineScope.launch {
-                                        try {
-                                            viewModel.downVote(post!!.id)
-                                            Log.d("PostCard", "dislike ${post!!.id}")
-                                        } catch (e: Exception) {
-                                            Log.e("PostCard", "error: ${e.message}")
-                                        }
-                                    }
-                                })
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                                    contentDescription = "Dislike",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-
-                            if (post!!.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                                Icon(
-                                    painter = painterResource(R.drawable.edit),
-                                    contentDescription = "Edit",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clickable { ->
-                                            post!!.id.let {
-                                                navController.navigate("postEdit/$it")
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable(onClick = {
+                                        coroutineScope.launch {
+                                            try {
+                                                viewModel.upVote(post!!.id)
+                                                Log.d("PostCard", "like ${post!!.id}")
+                                            } catch (e: Exception) {
+                                                Log.e("PostCard", "error: ${e.message}")
                                             }
                                         }
-                                )
+                                    })
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_arrow_upward_24),
+                                        contentDescription = "Like",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = formatNumber(
+                                            votes?.votes ?: post!!.votes?.votes ?: 0
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable(onClick = {
+                                        coroutineScope.launch {
+                                            try {
+                                                viewModel.downVote(post!!.id)
+                                                Log.d("PostCard", "dislike ${post!!.id}")
+                                            } catch (e: Exception) {
+                                                Log.e("PostCard", "error: ${e.message}")
+                                            }
+                                        }
+                                    })
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_arrow_downward_24),
+                                        contentDescription = "Dislike",
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+
+                                if (post!!.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.edit),
+                                        contentDescription = "Edit",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable { ->
+                                                post!!.id.let {
+                                                    navController.navigate("postEdit/$it")
+                                                }
+                                            }
+                                    )
+                                }
                             }
                         }
                     }

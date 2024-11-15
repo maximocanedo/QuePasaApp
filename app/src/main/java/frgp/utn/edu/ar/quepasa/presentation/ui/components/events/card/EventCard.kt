@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.card
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -24,14 +24,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.card.components.CardButtonsBar
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 
 @Composable
-fun EventCard(event: Event) {
-    var context = LocalContext.current
+fun EventCard(navController: NavHostController, event: Event) {
+    val context = LocalContext.current
     ElevatedCard(
         onClick = {
             Toast.makeText(
@@ -39,6 +40,8 @@ fun EventCard(event: Event) {
                 "Card Clicked",
                 Toast.LENGTH_SHORT
             ).show()
+            /* TODO Detalles y comentarios on click */
+            navController.navigate("eventDetailedScreen/${event.id}")
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -47,6 +50,9 @@ fun EventCard(event: Event) {
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
     ) {
         Row(
             modifier = Modifier
@@ -82,12 +88,16 @@ fun EventCard(event: Event) {
                     thickness = 2.dp,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                ReadMoreText(
-                    "Lorem ipsum odor amet, consectetuer adipiscing elit. Gravida nisi non himenaeos dis neque; sollicitudin quisque dui. Malesuada eleifend dapibus odio facilisis nibh metus massa.",
-                    Modifier.padding(16.dp), MaterialTheme.typography.bodyLarge, 1, 10
-                )
+                event.description?.let {
+                    ReadMoreText(
+                        it,
+                        Modifier.padding(16.dp), MaterialTheme.typography.bodyLarge,
+                        1,
+                        10
+                    )
+                }
             }
         }
-        event.votes?.let { CardButtonsBar(event, it) }
+        event.votes?.let { event.id?.let { id -> CardButtonsBar(id, it) } }
     }
 }

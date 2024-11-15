@@ -8,20 +8,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 
 @Composable
-fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to User (non-nullable) after login is implemented
-    BaseComponent(navController, user, "¿Qué pasa?", false) {
+fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nullable) after login is implemented
+    val user by LocalAuth.current.collectAsState()
+    BaseComponent(navController, user.user, "¿Qué pasa?", false) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -30,23 +33,18 @@ fun MainPage(navController: NavHostController, user: User?) { // TODO: Change to
                 .background(Color.White)
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                Text(text = "Bienvenido, ${user?.name ?: "Usuario"}")
+                Text(text = "Bienvenido, ${if(user.ok) user.name else "Usuario"}")
             }
 
-            Button(
-                onClick = { navController.navigate("postEdit") },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("PostEditScreen test")
-            }
-
-            PostScreen(navController,user)
+            PostScreen(navController,user.user)
 
         }
         Column {
-            Spacer(modifier = Modifier.weight(1f))
-
-            CreateContentDropdown(navController =  navController)
+            val role: Role? = user.user?.role
+            if(role != null && role != Role.USER) {
+                Spacer(modifier = Modifier.weight(1f))
+                CreateContentDropdown(navController = navController)
+            }
         }
     }
 }

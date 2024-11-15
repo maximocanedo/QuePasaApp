@@ -121,12 +121,10 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
                         .hasMaximumLength(15)
                         .hasMinimumLength(3)
                 },
-                onChange = {
-                        newTags -> tag = newTags
-                },
+                onChange = { newTags -> tag = newTags },
                 onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
                 onAdded = { tag = "" },
-                viewModel
+                viewModel = viewModel
             )
 
             if(tags.isNotEmpty()) {

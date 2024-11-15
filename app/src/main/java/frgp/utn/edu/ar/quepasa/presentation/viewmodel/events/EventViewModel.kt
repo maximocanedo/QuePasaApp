@@ -24,7 +24,6 @@ import quepasa.api.validators.events.EventTitleValidator
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.uuid.ExperimentalUuidApi
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -55,6 +54,7 @@ class EventViewModel @Inject constructor(
     private val startMutable = MutableStateFlow(LocalDateTime.now())
     fun setStart(x: LocalDateTime) {
         startMutable.value = x
+        println(startMutable.value)
     }
 
     val start = startMutable.asStateFlow()
@@ -172,7 +172,7 @@ class EventViewModel @Inject constructor(
     }
 
     /** GET **/
-    suspend fun getEvents(page: Int, size: Int, active: Boolean) {
+    suspend fun getEvents(page: Int = 0, size: Int = 10, active: Boolean = true) {
         try {
             val events = repository.getEvents(page = page, size = size, active = active)
             _events.value = events
@@ -181,7 +181,13 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEvents(query: String, page: Int, size: Int, activeOnly: Boolean, sort: String) {
+    suspend fun getEvents(
+        query: String,
+        page: Int = 0,
+        size: Int = 10,
+        activeOnly: Boolean = true,
+        sort: String = "title,asc"
+    ) {
         try {
             val events = repository.getEvents(query, page, size, activeOnly, sort)
             _events.value = events
@@ -190,7 +196,6 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     suspend fun getEventById(id: UUID) {
         try {
             val event = repository.getEventById(id)
@@ -268,12 +273,14 @@ class EventViewModel @Inject constructor(
     }
 
     /** PATCH **/
-    suspend fun updateEvent(eventId: UUID, event: EventPatchRequest) {
+    suspend fun updateEvent(eventId: UUID, event: EventPatchRequest): Boolean {
         try {
             val updatedEvent = repository.updateEvent(eventId, event)
             _event.value = updatedEvent
+            return true
         } catch (e: Exception) {
             _errorMessage.value = e.message
+            return false
         }
     }
 
@@ -397,7 +404,7 @@ class EventViewModel @Inject constructor(
                 && neighbourhoodIsValid.value
     }
 
-    fun resetEvent() {
+    private fun resetEvent() {
         titleMutable.value = ""
         descriptionMutable.value = ""
         addressMutable.value = ""
@@ -406,5 +413,28 @@ class EventViewModel @Inject constructor(
         neighbourhoodsMutable.value = emptySet()
         categoryMutable.value = "EDUCATIVE"
         audienceMutable.value = "PUBLIC"
+    }
+
+    fun setEventDataFields() {
+        event.value?.title?.let { setTitle(it) }
+        event.value?.description?.let { setDescription(it) }
+        event.value?.address?.let { setAddress(it) }
+        event.value?.start?.let {
+            setStart(it)
+        }
+        event.value?.end?.let {
+            setEnd(it)
+        }
+        event.value?.neighbourhoods?.let { it ->
+            setNeighbourhoods(it.map { it.id }.toSet())
+            setNeighbourhoodsNames(it.map { it.name })
+        }
+        event.value?.category?.let { setCategory(it.name) }
+        event.value?.audience?.let { setAudience(it.name) }
+        startDateValidation()
+        endDateValidation()
+        if (neighbourhoods.value.isNotEmpty()) {
+            neighbourhoodIsValidMutable.value = true
+        }
     }
 }

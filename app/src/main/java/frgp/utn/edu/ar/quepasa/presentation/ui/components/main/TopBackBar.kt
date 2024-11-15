@@ -16,7 +16,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBackBar(title: String, navController: NavHostController) {
+fun TopBackBar(title: String, navController: NavHostController, backRoute: String = "home") {
     Box {
         TopAppBar(
             title = {
@@ -24,7 +24,7 @@ fun TopBackBar(title: String, navController: NavHostController) {
             },
             navigationIcon = {
                 IconButton(onClick = {
-                   navController.navigate("home")
+                   navController.navigate(backRoute)
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_arrow_back_24),

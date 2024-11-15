@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
@@ -40,29 +39,34 @@ fun EventsScreen(navController: NavHostController, user: User?) {
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
     val events by viewModel.events.collectAsState()
-    val pictures by eventPictureViewModel.pictures.collectAsState()
-    val eventPictureDTO by eventPictureViewModel.eventPictureDTO.collectAsState()
-    val bitmap by pictureViewModel.bitmap.collectAsState()
+    val pictures by eventPictureViewModel.eventPictures.collectAsState()
+    val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        events.content.forEach { event ->
-            eventPictureViewModel.getPicturesByEvent(event.id!!)
-            if (pictures.content.isNotEmpty()) {
-                pictureViewModel.setPictureBitmap(
-                    pictures.content.first().id
-                )
-                eventPictureViewModel.addEventPictureDTO(
-                    EventPictureDTO(
-                        event.id,
-                        bitmap
-                    )
-                )
+    LaunchedEffect(Unit, events) {
+        viewModel.viewModelScope.launch {
+            events.content.forEach { event ->
+                eventPictureViewModel.setEventsPicture(event.id!!)
             }
         }
     }
+
+    LaunchedEffect(pictures) {
+        pictureViewModel.viewModelScope.launch {
+            pictures.forEach { picture ->
+                picture.event?.id?.let {
+                    pictureViewModel.setPictureEvents(
+                        picture.id,
+                        it,
+                    )
+                }
+            }
+            pictureViewModel.setEventPictureDTO(eventPictureDTO)
+        }
+    }
+
 
     BaseComponent(navController, user, "Listado Eventos", false) {
         Column(
@@ -111,13 +115,18 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     userScrollEnabled = true,
                 ) {
-                    itemsIndexed(events.content) { index, event ->
+                    items(events.content) { event ->
                         key(event.id) {
                             EventCard(
                                 eventPictureDTO.find { it?.eventId == event.id }?.bitmap,
                                 navController,
                                 event,
                                 user,
+                                onAssistanceClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.rsvpEvent(event.id!!)
+                                    }
+                                },
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
@@ -133,9 +142,6 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                                             viewModel.getEvents()
                                         }
                                     }
-                                },
-                                onAssistanceClick = {
-                                    /* TODO */
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {

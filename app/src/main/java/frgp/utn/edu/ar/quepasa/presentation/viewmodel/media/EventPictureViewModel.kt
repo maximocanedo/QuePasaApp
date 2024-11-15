@@ -7,7 +7,6 @@ import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.Event
-import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.data.model.media.EventPicture
 import frgp.utn.edu.ar.quepasa.domain.repository.media.EventPictureRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
@@ -35,18 +34,11 @@ class EventPictureViewModel @Inject constructor(
     )
     val pictures = _pictures.asStateFlow()
 
+    val _eventPictures = MutableStateFlow<List<EventPicture>>(emptyList())
+    val eventPictures = _eventPictures.asStateFlow()
+
     private val _picture = MutableStateFlow<EventPicture?>(null)
     val picture = _picture.asStateFlow()
-
-    private val _eventPictureDTO = MutableStateFlow<List<EventPictureDTO?>>(emptyList())
-    val eventPictureDTO = _eventPictureDTO.asStateFlow()
-    fun setEventPictureDTO(eventPictureDTO: List<EventPictureDTO?>) {
-        _eventPictureDTO.value = eventPictureDTO
-    }
-
-    fun addEventPictureDTO(eventPictureDTO: EventPictureDTO) {
-        _eventPictureDTO.value += eventPictureDTO
-    }
 
     private val _event = MutableStateFlow<Event?>(null)
 
@@ -68,6 +60,19 @@ class EventPictureViewModel @Inject constructor(
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    suspend fun setEventsPicture(id: UUID) {
+        try {
+            val pictures = repository.getPicturesByEvent(id, 0, 10).content
+            _eventPictures.value += pictures
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun clearEventPictures() {
+        _eventPictures.value = emptyList()
     }
 
     suspend fun upload(context: Context, uri: Uri, event: UUID) {

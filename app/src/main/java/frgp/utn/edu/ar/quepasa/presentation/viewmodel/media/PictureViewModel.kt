@@ -3,6 +3,7 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.media
 import androidx.lifecycle.ViewModel
 import coil3.Bitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
+import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.domain.repository.media.PictureRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +25,14 @@ class PictureViewModel @Inject constructor(
 
     private val _bitmap = MutableStateFlow<Bitmap?>(null)
     val bitmap = _bitmap.asStateFlow()
-
     fun setBitmap(bitmap: Bitmap?) {
         _bitmap.value = bitmap
+    }
+
+    private val _eventPictureDTO = MutableStateFlow<List<EventPictureDTO?>>(emptyList())
+    val eventPictureDTO = _eventPictureDTO.asStateFlow()
+    fun setEventPictureDTO(eventPictureDTO: List<EventPictureDTO?>) {
+        _eventPictureDTO.value = eventPictureDTO
     }
 
     fun clearBitmap(bitmap: Bitmap) {
@@ -58,5 +64,12 @@ class PictureViewModel @Inject constructor(
 
     fun flagPictureForDeletion(pictureId: UUID) {
         _picturesForDeletion.value += pictureId
+    }
+
+    fun setPictureEvents(pictureId: UUID, eventId: UUID) {
+        repository.viewPicture(pictureId, onComplete = {
+            _bitmap.value = it
+            _eventPictureDTO.value += EventPictureDTO(eventId, it)
+        })
     }
 }

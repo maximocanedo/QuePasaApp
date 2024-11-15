@@ -75,13 +75,13 @@ fun RoleUpdateUserRequestScreen(navController: NavHostController) {
                 onItemSelected = { role = it },
                 onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
             )
-            DocumentFileField(
+            /*DocumentFileField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 value = "",
                 onIconClick = {}
-            )
+            )*/
             Button(
                 modifier = Modifier
                     .padding(vertical = 16.dp),

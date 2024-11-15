@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -19,9 +20,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
+import frgp.utn.edu.ar.quepasa.utils.role.roleToSpanish
 
 @Composable
-fun RoleUpdateRequestCard(requests: List<RoleUpdateRequest>, isAdmin: Boolean, hasDeleteButton: Boolean) {
+fun RoleUpdateRequestCardUser(request: RoleUpdateRequest, hasDeleteButton: Boolean) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,24 +40,39 @@ fun RoleUpdateRequestCard(requests: List<RoleUpdateRequest>, isAdmin: Boolean, h
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column {
-                Text(
-                    text = "Solicitud - (rol)",
-                    modifier = Modifier.padding(6.dp),
-                    style = MaterialTheme.typography.titleLarge,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
+                if(request.requestedRole != null) {
+                    Text(
+                        text = "Solicitud de rol - ${roleToSpanish(request.requestedRole.name)}",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.titleLarge,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
                 HorizontalDivider(
                     thickness = 2.dp,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = "Estado: (estado)",
+                    text = "Comentario: ${request.remarks}",
                     modifier = Modifier.padding(6.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
                 )
+                val reviewer = if(request.reviewer != null) request.reviewer.name else "No asignado"
+                Text(
+                    text = "Revisor: $reviewer",
+                    modifier = Modifier.padding(6.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                if(hasDeleteButton) {
+                    Button(onClick = { /*TODO*/ }) {
+                        Text("Cancelar")
+                    }
+                }
             }
         }
     }
@@ -63,6 +80,7 @@ fun RoleUpdateRequestCard(requests: List<RoleUpdateRequest>, isAdmin: Boolean, h
 
 @Preview
 @Composable
-fun RoleUpdateRequestCardPreview() {
-    RoleUpdateRequestCard(emptyList(),false, false)
+fun RoleUpdateRequestCardUserPreview() {
+    val roleUpdateRequest = RoleUpdateRequest()
+    RoleUpdateRequestCardUser(roleUpdateRequest, false)
 }

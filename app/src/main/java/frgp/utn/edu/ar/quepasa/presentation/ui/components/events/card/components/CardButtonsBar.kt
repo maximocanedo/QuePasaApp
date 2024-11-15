@@ -41,8 +41,8 @@ fun CardButtonsBar(
     ) {
         Column {
             CardButton(
-                "asistir",
-                R.drawable.baseline_back_hand_24,
+                description = "asistir",
+                icon = R.drawable.baseline_back_hand_24,
                 onClick = {
                     onAssistanceClick()
                     assist = !assist
@@ -56,8 +56,8 @@ fun CardButtonsBar(
         }
         Column {
             CardButton(
-                "comentar",
-                R.drawable.baseline_delete_24,
+                description = "comentar",
+                icon = R.drawable.baseline_delete_24,
                 onClick = {
                     onRemoveClick()
                 }
@@ -66,8 +66,8 @@ fun CardButtonsBar(
         if (user?.username == event.owner?.username || user?.role.toString().contains("ADMIN")) {
             Column {
                 CardButton(
-                    "editar",
-                    R.drawable.baseline_edit_document_24,
+                    description = "editar",
+                    icon = R.drawable.baseline_edit_document_24,
                     onClick = {
                         navController.navigate("eventEdit/${event.id}")
                     }
@@ -84,8 +84,8 @@ fun CardButtonsBar(
         }
         Column {
             CardButton(
-                "downvote",
-                R.drawable.baseline_arrow_downward_24,
+                description = "downvote",
+                icon = R.drawable.baseline_arrow_downward_24,
                 onClick = {
                     onDownvoteClick()
                 }

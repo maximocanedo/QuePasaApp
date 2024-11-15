@@ -24,14 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Composable
-fun EventDetailedScreen(navController: NavHostController, user: User?, eventId: UUID) {
+fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
+    val user by LocalAuth.current.collectAsState()
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
@@ -45,7 +46,7 @@ fun EventDetailedScreen(navController: NavHostController, user: User?, eventId: 
     if (event != null) {
         BaseComponent(
             navController = navController,
-            user = user,
+            user = user.user,
             title = "Detalle Evento",
             back = true
         ) {

@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.EventCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
@@ -34,7 +34,8 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun EventsScreen(navController: NavHostController, user: User?) {
+fun EventsScreen(navController: NavHostController) {
+    val user by LocalAuth.current.collectAsState()
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
@@ -68,7 +69,7 @@ fun EventsScreen(navController: NavHostController, user: User?) {
     }
 
 
-    BaseComponent(navController, user, "Listado Eventos", false) {
+    BaseComponent(navController, user.user, "Listado Eventos", false) {
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -121,42 +122,28 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                                 eventPictureDTO.find { it?.eventId == event.id }?.bitmap,
                                 navController,
                                 event,
-                                user,
+                                user.user,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
                                     }
                                 },
+                                onRemoveClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.deleteEvent(event.id!!)
+                                        resetEvents(viewModel, category, search)
+                                    }
+                                },
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
-                                        if (category.isNotBlank()) {
-                                            viewModel.getEventsByCategory(
-                                                EventCategory.valueOf(
-                                                    category
-                                                )
-                                            )
-                                        } else if (search.isNotBlank()) {
-                                            viewModel.getEvents(search)
-                                        } else {
-                                            viewModel.getEvents()
-                                        }
+                                        resetEvents(viewModel, category, search)
                                     }
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.downVote(event.id!!)
-                                        if (category.isNotBlank()) {
-                                            viewModel.getEventsByCategory(
-                                                EventCategory.valueOf(
-                                                    category
-                                                )
-                                            )
-                                        } else if (search.isNotBlank()) {
-                                            viewModel.getEvents(search)
-                                        } else {
-                                            viewModel.getEvents(search)
-                                        }
+                                        resetEvents(viewModel, category, search)
                                     }
                                 }
                             )
@@ -164,6 +151,26 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                     }
                 }
             }
+        }
+    }
+}
+
+fun resetEvents(
+    viewModel: EventViewModel,
+    category: String,
+    search: String
+) {
+    viewModel.viewModelScope.launch {
+        if (category.isNotBlank()) {
+            viewModel.getEventsByCategory(
+                EventCategory.valueOf(
+                    category
+                )
+            )
+        } else if (search.isNotBlank()) {
+            viewModel.getEvents(search)
+        } else {
+            viewModel.getEvents()
         }
     }
 }

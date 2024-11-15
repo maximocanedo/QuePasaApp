@@ -20,6 +20,7 @@ fun CardButtonsBar(
     user: User?,
     voteCount: VoteCount,
     onAssistanceClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     onUpvoteClick: () -> Unit,
     onDownvoteClick: () -> Unit
 ) {
@@ -34,17 +35,21 @@ fun CardButtonsBar(
             CardButton(
                 "asistir",
                 R.drawable.baseline_back_hand_24,
-                onClick = {}
+                onClick = {
+                    onAssistanceClick()
+                }
             )
         }
         Column {
             CardButton(
                 "comentar",
-                R.drawable.baseline_comment_24,
-                onClick = {}
+                R.drawable.baseline_delete_24,
+                onClick = {
+                    onRemoveClick()
+                }
             )
         }
-        if (user?.id == event.owner?.id || user?.role.toString() == "ADMIN") {
+        if (user?.username == event.owner?.username || user?.role.toString().contains("ADMIN")) {
             Column {
                 CardButton(
                     "editar",

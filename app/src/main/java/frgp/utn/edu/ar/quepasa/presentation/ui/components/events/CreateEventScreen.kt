@@ -24,9 +24,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
-import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
@@ -44,12 +44,13 @@ import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun CreateEventScreen(navController: NavHostController, user: User?) {
+fun CreateEventScreen(navController: NavHostController) {
+    val user by LocalAuth.current.collectAsState()
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
-    BaseComponent(navController, user, "Crear de Evento", true) {
+    BaseComponent(navController, user.user, "Crear de Evento", true) {
         val title by viewModel.title.collectAsState()
         val description by viewModel.description.collectAsState()
         val address by viewModel.address.collectAsState()

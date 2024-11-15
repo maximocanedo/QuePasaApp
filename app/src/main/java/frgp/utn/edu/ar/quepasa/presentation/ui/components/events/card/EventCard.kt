@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.Bitmap
 import frgp.utn.edu.ar.quepasa.R
@@ -34,7 +33,6 @@ import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
-import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 
 @Composable
 fun EventCard(
@@ -43,11 +41,11 @@ fun EventCard(
     event: Event,
     user: User?,
     onAssistanceClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     onUpvoteClick: () -> Unit,
     onDownvoteClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val eventViewModel: EventPictureViewModel = hiltViewModel()
 
     ElevatedCard(
         onClick = {
@@ -131,6 +129,7 @@ fun EventCard(
                     event,
                     user,
                     it,
+                    onRemoveClick,
                     onAssistanceClick,
                     onUpvoteClick,
                     onDownvoteClick,

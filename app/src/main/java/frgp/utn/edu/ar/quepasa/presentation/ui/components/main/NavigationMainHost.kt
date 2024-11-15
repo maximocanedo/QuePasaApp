@@ -45,24 +45,24 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 PostEditScreen(navController, user, postId)
             }
         }
-        composable("eventCreate") { CreateEventScreen(navController, user) }
+        composable("eventCreate") { CreateEventScreen(navController) }
         composable(
             route = "eventEdit/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
             if (eventId.isNotEmpty()) {
-                EditEventScreen(navController, user, UUID.fromString(eventId))
+                EditEventScreen(navController, UUID.fromString(eventId))
             }
         }
-        composable("events") { EventsScreen(navController, user) }
+        composable("events") { EventsScreen(navController) }
         composable(
             route = "eventDetailedScreen/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
             if (eventId.isNotEmpty()) {
-                EventDetailedScreen(navController, user, UUID.fromString(eventId))
+                EventDetailedScreen(navController, UUID.fromString(eventId))
             }
         }
         composable("roleRequestUserList") { RoleUpdateUserListScreen(navController)}

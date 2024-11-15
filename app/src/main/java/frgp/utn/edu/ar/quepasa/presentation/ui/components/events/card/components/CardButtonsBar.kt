@@ -11,10 +11,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
-import java.util.UUID
+import frgp.utn.edu.ar.quepasa.data.model.Event
+import frgp.utn.edu.ar.quepasa.data.model.User
 
 @Composable
-fun CardButtonsBar(eventId: UUID, voteCount: VoteCount) {
+fun CardButtonsBar(
+    event: Event,
+    user: User?,
+    voteCount: VoteCount,
+    onAssistanceClick: () -> Unit,
+    onUpvoteClick: () -> Unit,
+    onDownvoteClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,24 +44,30 @@ fun CardButtonsBar(eventId: UUID, voteCount: VoteCount) {
                 onClick = {}
             )
         }
-        Column {
-            CardButton(
-                "editar",
-                R.drawable.baseline_edit_document_24,
-                onClick = {}
-            )
+        if (user?.id == event.owner?.id || user?.role.toString() == "ADMIN") {
+            Column {
+                CardButton(
+                    "editar",
+                    R.drawable.baseline_edit_document_24,
+                    onClick = {}
+                )
+            }
         }
         Column {
             UpVoteButton(
                 voteCount.votes.toString(),
-                onClick = {}
+                onClick = {
+                    onUpvoteClick()
+                }
             )
         }
         Column {
             CardButton(
                 "downvote",
                 R.drawable.baseline_arrow_downward_24,
-                onClick = {}
+                onClick = {
+                    onDownvoteClick()
+                }
             )
         }
     }

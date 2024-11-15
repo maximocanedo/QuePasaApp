@@ -232,7 +232,7 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEventsByCategory(category: EventCategory, page: Int, size: Int) {
+    suspend fun getEventsByCategory(category: EventCategory, page: Int = 0, size: Int = 10) {
         try {
             val events = repository.getEventsByCategory(category, page, size)
             _events.value = events

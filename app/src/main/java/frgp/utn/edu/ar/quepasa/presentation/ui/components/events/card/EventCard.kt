@@ -18,9 +18,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -30,28 +27,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.Event
+import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
-import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 
 @Composable
-fun EventCard(navController: NavHostController, event: Event) {
+fun EventCard(
+    navController: NavHostController,
+    event: Event,
+    user: User?,
+    onAssistanceClick: () -> Unit,
+    onUpvoteClick: () -> Unit,
+    onDownvoteClick: () -> Unit
+) {
     val context = LocalContext.current
-    val pictureViewModel: PictureViewModel = hiltViewModel()
-    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val eventViewModel: EventPictureViewModel = hiltViewModel()
 
-    val pictures by eventPictureViewModel.pictures.collectAsState()
-    val bitmap by pictureViewModel.bitmap.collectAsState()
-
-    LaunchedEffect(Unit) {
-        eventPictureViewModel.getPicturesByEvent(event.id!!)
-        pictures.content.firstOrNull()
-            ?.let { pictureViewModel.setPictureBitmap(it.id) }
-    }
     ElevatedCard(
         onClick = {
             Toast.makeText(
@@ -79,35 +73,19 @@ fun EventCard(navController: NavHostController, event: Event) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Column {
-                if (bitmap != null && pictures.content.isNotEmpty()) {
-                    AsyncImage(
-                        model = bitmap,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.secondary,
-                                RoundedCornerShape(10.dp)
-                            )
-                            .clip(shape = MaterialTheme.shapes.medium),
-                        contentDescription = "Event Image",
-                        contentScale = ContentScale.Crop,
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.baseline_broken_image_24),
-                        modifier = Modifier
-                            .size(100.dp)
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.secondary,
-                                RoundedCornerShape(10.dp)
-                            )
-                            .clip(shape = MaterialTheme.shapes.medium),
-                        contentDescription = "No Image",
-                        contentScale = ContentScale.Crop,
-                    )
-                }
+                Image(
+                    painter = painterResource(R.drawable.baseline_broken_image_24),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.secondary,
+                            RoundedCornerShape(10.dp)
+                        )
+                        .clip(shape = MaterialTheme.shapes.medium),
+                    contentDescription = "No Image",
+                    contentScale = ContentScale.Crop,
+                )
             }
             Column {
                 event.title?.let {
@@ -133,6 +111,17 @@ fun EventCard(navController: NavHostController, event: Event) {
                 }
             }
         }
-        event.votes?.let { event.id?.let { id -> CardButtonsBar(id, it) } }
+        event.votes?.let {
+            event.id?.let { id ->
+                CardButtonsBar(
+                    event,
+                    user,
+                    it,
+                    onAssistanceClick,
+                    onUpvoteClick,
+                    onDownvoteClick,
+                )
+            }
+        }
     }
 }

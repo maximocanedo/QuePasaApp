@@ -60,6 +60,9 @@ fun EventDetailedScreen(navController: NavHostController, user: User?, eventId: 
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row {
+
+                        }
+                        Row {
                             event!!.title?.let { Text(text = it, fontSize = 24.sp) }
                         }
                         HorizontalDivider(

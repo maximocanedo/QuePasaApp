@@ -26,6 +26,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.EventCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,7 @@ fun EventsScreen(navController: NavHostController, user: User?) {
     val viewModel: EventViewModel = hiltViewModel()
     val events by viewModel.events.collectAsState()
 
-    val category by remember { mutableStateOf(EventCategory.EDUCATIVE) }
+    var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
 
     BaseComponent(navController, user, "Listado Eventos", false) {
@@ -54,6 +55,7 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                         search = it
                         viewModel.viewModelScope.launch {
                             viewModel.getEvents(search)
+                            category = ""
                         }
                     },
                     label = {
@@ -65,7 +67,17 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                 )
             }
             Row {
-                /* TODO busqueda por categoria */
+                EventCategoryField(
+                    modifier = Modifier.fillMaxWidth(),
+                    category = category,
+                    onItemSelected = {
+                        category = it
+                        viewModel.viewModelScope.launch {
+                            viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                            search = ""
+                        }
+                    }
+                )
             }
             Row {
                 LazyColumn(
@@ -75,7 +87,44 @@ fun EventsScreen(navController: NavHostController, user: User?) {
                 ) {
                     items(events.content) { event ->
                         key(event.id) {
-                            EventCard(navController, event)
+                            EventCard(
+                                navController, event, user,
+                                onUpvoteClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.upVote(event.id!!)
+                                        if (category.isNotBlank()) {
+                                            viewModel.getEventsByCategory(
+                                                EventCategory.valueOf(
+                                                    category
+                                                )
+                                            )
+                                        } else if (search.isNotBlank()) {
+                                            viewModel.getEvents(search)
+                                        } else {
+                                            viewModel.getEvents()
+                                        }
+                                    }
+                                },
+                                onAssistanceClick = {
+                                    /* TODO */
+                                },
+                                onDownvoteClick = {
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.downVote(event.id!!)
+                                        if (category.isNotBlank()) {
+                                            viewModel.getEventsByCategory(
+                                                EventCategory.valueOf(
+                                                    category
+                                                )
+                                            )
+                                        } else if (search.isNotBlank()) {
+                                            viewModel.getEvents(search)
+                                        } else {
+                                            viewModel.getEvents(search)
+                                        }
+                                    }
+                                }
+                            )
                         }
                     }
                 }

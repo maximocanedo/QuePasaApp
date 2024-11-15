@@ -43,6 +43,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
@@ -62,15 +63,16 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val typeViewModel: PostTypeViewModel = hiltViewModel()
     val subtypeViewModel: PostSubtypeViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
-    val pictureViewModel: PostPictureViewModel = hiltViewModel()
+    val postPictureViewModel: PostPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
 
     BaseComponent(navController, user, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)
             viewModel.toggleValidationField(1, true)
-            pictureViewModel.getPicturesByPost(postId, 0, 10)
-            imageViewModel.loadUrlsFromPostPictures(pictureViewModel.pictures.value.content)
+            postPictureViewModel.getPicturesByPost(postId, 0, 10)
+            pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
         }
 
         val post by viewModel.post.collectAsState()
@@ -187,7 +189,12 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                         onChange = { newDesc -> description = newDesc },
                         onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
                     )
-                    PostEditImagesPreview(modifier = Modifier, viewModel = imageViewModel)
+                    PostEditImagesPreview(
+                        modifier = Modifier,
+                        pictureViewModel = pictureViewModel,
+                        imageviewModel = imageViewModel,
+                        onPictureDelete = { id -> pictureViewModel.flagPictureForDeletion(id) }
+                    )
                     ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
 
                     Column(
@@ -209,12 +216,18 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
                                         tags = tags
                                     )
 
+                                    if(pictureViewModel.picturesForDeletion.value.isNotEmpty()) {
+                                        pictureViewModel.picturesForDeletion.value.forEach { picture ->
+                                            postPictureViewModel.deletePicture(picture)
+                                        }
+                                    }
+
                                     withContext(Dispatchers.Main) {
                                         if (result) {
                                             if (!imageViewModel.areUrisEmpty()) {
                                                 viewModel.post.value?.let {
                                                     imageViewModel.selectedUris.value.forEach { uri ->
-                                                        pictureViewModel.upload(context, uri, it.id)
+                                                        postPictureViewModel.upload(context, uri, it.id)
                                                     }
                                                 }
                                             }

@@ -9,6 +9,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 class PostPictureRepository @Inject constructor(
@@ -39,6 +40,6 @@ class PostPictureRepository @Inject constructor(
         return pictureService.upload(filePart, postRequestBody, descriptionRequestBody).body()
     }
 
-    suspend fun deletePicture(id: Int): Void =
+    suspend fun deletePicture(id: UUID): Void =
         handleResponse { pictureService.deletePicture(id) }
 }

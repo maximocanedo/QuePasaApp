@@ -12,6 +12,7 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.util.UUID
 
 interface PostPictureService {
     @Multipart
@@ -25,5 +26,5 @@ interface PostPictureService {
     suspend fun getPicturesByPost(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostPicture>>
 
     @DELETE("post-pictures/{id}")
-    suspend fun deletePicture(@Path("id") id: Int): Response<Void>
+    suspend fun deletePicture(@Path("id") id: UUID): Response<Void>
 }

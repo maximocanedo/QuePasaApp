@@ -16,19 +16,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
+import java.util.UUID
 
 @Composable
-fun PostEditImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
-    val uris = viewModel.selectedUris.collectAsState()
-    val urls = viewModel.selectedUrls.collectAsState()
+fun PostEditImagesPreview(
+    modifier: Modifier,
+    pictureViewModel: PictureViewModel,
+    imageviewModel: ImageViewModel,
+    onPictureDelete: (UUID) -> Unit
+) {
+    val bitmaps = pictureViewModel.pictures.collectAsState()
+    val uris = imageviewModel.selectedUris.collectAsState()
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-        urls.value.forEach { url ->
-            if(url.isNotBlank()) {
+        bitmaps.value.forEachIndexed { index, bitmap ->
+            if(bitmap != null) {
                 Box(
                     contentAlignment = Alignment.TopEnd,
                     modifier = Modifier
@@ -36,15 +43,16 @@ fun PostEditImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
                         .clip(RoundedCornerShape(4.dp))
                         .padding(2.dp)
                 ) {
-                    AsyncImage(
-                        model = url,
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
                         contentDescription = "Image Preview",
                         modifier = Modifier.matchParentSize()
                     )
 
                     IconButton(
                         onClick = {
-                            // TODO: Not implemented yet
+                            pictureViewModel.clearBitmap(bitmap)
+                            onPictureDelete(pictureViewModel.picturesId.value[index])
                         },
                         modifier = Modifier.size(24.dp)
                     ) {
@@ -73,7 +81,7 @@ fun PostEditImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
 
                     IconButton(
                         onClick = {
-                            viewModel.clearImage(uri)
+                            imageviewModel.clearImage(uri)
                         },
                         modifier = Modifier.size(24.dp)
                     ) {

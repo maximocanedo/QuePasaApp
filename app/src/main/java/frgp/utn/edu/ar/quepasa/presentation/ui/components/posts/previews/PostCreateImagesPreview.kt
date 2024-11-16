@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
@@ -37,7 +38,8 @@ fun PostCreateImagesPreview(modifier: Modifier, viewModel: ImageViewModel) {
                     Image(
                         painter = rememberAsyncImagePainter(model = "content://media${uri.path}"),
                         contentDescription = "Image Preview",
-                        modifier = Modifier.matchParentSize()
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop
                     )
 
                     IconButton(

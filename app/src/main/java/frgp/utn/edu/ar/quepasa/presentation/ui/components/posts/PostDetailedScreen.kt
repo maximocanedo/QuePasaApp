@@ -268,20 +268,24 @@ fun PostDetailedScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Row {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        userScrollEnabled = true
-                    ) {
-                        items(comments.content) { comment ->
-                            key(comment.id) {
-                                PostCommentCard(
-                                    comment = comment
-                                )
+                    if (comments.content.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            userScrollEnabled = true
+                        ) {
+                            items(comments.content) { comment ->
+                                key(comment.id) {
+                                    PostCommentCard(
+                                        comment = comment
+                                    )
+                                }
                             }
                         }
+                    } else {
+                        Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

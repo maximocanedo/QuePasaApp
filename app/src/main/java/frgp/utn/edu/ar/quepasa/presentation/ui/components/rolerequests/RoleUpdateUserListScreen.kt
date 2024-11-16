@@ -36,12 +36,14 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
     var enabled by remember { mutableStateOf(true) }
+    var enabledHighestRole by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.getMyRequests()
 
         val role = user.user?.role
         enabled = !viewModel.checkForRoleRequestPending() && role != Role.GOVT
+        enabledHighestRole = role != Role.GOVT
     }
 
     BaseComponent(navController, null, "Solicitudes de rol", false) {
@@ -53,7 +55,12 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
 
             item {
                 if (!enabled) {
-                    WarningMessage("Tienes una solicitud de rol pendiente. Espera a que sea revisada antes de solicitar otra.")
+                    if(enabledHighestRole) {
+                        WarningMessage("Tienes una solicitud de rol pendiente. Espera a que sea revisada antes de solicitar otra.")
+                    }
+                    else {
+                        WarningMessage("Tienes el rol solicitable más alto. No es posible solicitar otro rol por el momento.")
+                    }
                 }
             }
 

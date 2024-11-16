@@ -26,10 +26,10 @@ fun CardButtonsBar(
     user: User?,
     voteCount: VoteCount,
     navController: NavHostController,
-    onAssistanceClick: () -> Unit,
-    onRemoveClick: () -> Unit,
-    onUpvoteClick: () -> Unit,
-    onDownvoteClick: () -> Unit
+    onAssistanceClick: () -> Unit = {},
+    onRemoveClick: () -> Unit = {},
+    onUpvoteClick: () -> Unit = {},
+    onDownvoteClick: () -> Unit = {}
 ) {
     var assist by remember { mutableStateOf(false) }
     Row(
@@ -54,16 +54,16 @@ fun CardButtonsBar(
                 }
             )
         }
-        Column {
+        if (user?.username == event.owner?.username || user?.role.toString().contains("ADMIN")) {
+            Column {
             CardButton(
-                description = "comentar",
+                description = "eliminar",
                 icon = R.drawable.baseline_delete_24,
                 onClick = {
                     onRemoveClick()
                 }
             )
         }
-        if (user?.username == event.owner?.username || user?.role.toString().contains("ADMIN")) {
             Column {
                 CardButton(
                     description = "editar",

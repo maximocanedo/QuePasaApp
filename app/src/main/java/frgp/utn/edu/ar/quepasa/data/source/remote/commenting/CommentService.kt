@@ -1,7 +1,5 @@
 package frgp.utn.edu.ar.quepasa.data.source.remote.commenting
 
-import frgp.utn.edu.ar.quepasa.data.dto.request.EventCommentDTO
-import frgp.utn.edu.ar.quepasa.data.dto.request.PostCommentDTO
 import frgp.utn.edu.ar.quepasa.data.model.Comment
 import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
@@ -17,16 +15,16 @@ import retrofit2.http.Query
 import java.util.UUID
 
 interface CommentService {
-    @POST("comments/post")
-    suspend fun createPostComment(@Body file: PostCommentDTO): Response<Comment>
+    @POST("/api/posts/{id}/comments")
+    suspend fun createPostComment(@Path("id") postId: Int, @Body file: String): Response<Comment>
 
-    @POST("comments/event")
-    suspend fun createEventComment(@Body file: EventCommentDTO): Response<Comment>
+    @POST("/api/events/{id}/comments")
+    suspend fun createEventComment(@Path("id") eventId: UUID, @Body file: String): Response<Comment>
 
-    @GET("/comments/posts/{id}")
+    @GET("/api/posts/{id}/comments")
     suspend fun getCommentsByPost(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostComment>>
 
-    @GET("/comments/events/{id}")
+    @GET("/api/events/{id}/comments")
     suspend fun getCommentsByEvent(@Path("id") id: UUID, @Query("page") page: Int, @Query("size") size: Int): Response<Page<EventComment>>
 
     @GET("/comments/{id}")

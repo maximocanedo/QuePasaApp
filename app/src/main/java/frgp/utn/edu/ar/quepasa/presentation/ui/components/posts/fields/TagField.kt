@@ -43,6 +43,7 @@ fun TagField(
     Column(modifier = modifier) {
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
             var content: String by remember { mutableStateOf(value) }
+            println("value : $value")
             var isValid: Boolean by remember { mutableStateOf(true) }
             var error: String by remember { mutableStateOf("") }
             TextField(
@@ -50,7 +51,7 @@ fun TagField(
                 value = content,
                 onValueChange = {
                     content = it
-                    CoroutineScope(IO).launch {
+                    /*CoroutineScope(IO).launch {
                         var status = false
                         try {
                             validator(it).build()
@@ -61,9 +62,9 @@ fun TagField(
                             error = err.errors.first()
                         }
                         isValid = status
-                        onValidityChange(status)
+                        onValidityChange(status)*/
                         onChange(it)
-                    }
+                    //}
                 },
                 isError = !isValid,
                 placeholder = { Text("Etiquetas")},
@@ -71,7 +72,7 @@ fun TagField(
             )
 
             IconButton(onClick = {
-                if(isValid && content.isNotBlank()) {
+                if(isValid && content.length >= 3 && content.length <= 15) {
                     viewModel.addTag(value)
                     content = ""
                     onAdded()

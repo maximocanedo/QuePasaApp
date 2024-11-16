@@ -21,12 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import java.util.UUID
 
 @Composable
 fun CommentDialog(
-    eventId: UUID,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
 
@@ -36,7 +35,7 @@ fun CommentDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp)
+                .height(250.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
@@ -60,12 +59,8 @@ fun CommentDialog(
                 ) {
                     Button(
                         onClick = {
-                            /*
-                            viewModel.viewModelScope.launch {
-                                viewModel.addComment(eventId, text)
-                            }
+                            onConfirm(text)
                             onDismissRequest()
-                             */
                         },
                         modifier = Modifier
                     ) {
@@ -80,8 +75,4 @@ fun CommentDialog(
 @Preview
 @Composable
 fun CommentDialogPreview() {
-    CommentDialog(
-        eventId = UUID.randomUUID(),
-        onDismissRequest = {}
-    )
 }

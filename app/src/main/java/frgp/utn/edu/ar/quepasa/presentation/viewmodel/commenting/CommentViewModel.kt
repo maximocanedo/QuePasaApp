@@ -3,7 +3,6 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.commenting
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventCommentDTO
-import frgp.utn.edu.ar.quepasa.data.dto.request.PostCommentDTO
 import frgp.utn.edu.ar.quepasa.data.model.Comment
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.Post
@@ -63,8 +62,8 @@ class CommentViewModel @Inject constructor(
 
     suspend fun createPostComment(content: String, post: Post) {
         try {
-            val postCommentDTO = PostCommentDTO(content, post)
-            val comment = repository.createPostComment(postCommentDTO)
+            //val postCommentDTO = PostCommentDTO(content, post)
+            val comment = repository.createPostComment(post.id, content)
             _comment.value = comment
         }
         catch(e: Exception) {
@@ -75,7 +74,7 @@ class CommentViewModel @Inject constructor(
     suspend fun createEventComment(content: String, event: Event) {
         try {
             val eventCommentDTO = EventCommentDTO(content, event)
-            val comment = repository.createEventComment(eventCommentDTO)
+            val comment = event.id?.let { repository.createEventComment(it, content) }
             _comment.value = comment
         }
         catch(e: Exception) {

@@ -53,11 +53,17 @@ class PictureViewModel @Inject constructor(
 
     fun setPicturesBitmap(pictureIds: List<UUID>) {
         val bitmaps = mutableListOf<Bitmap?>()
+        val pictureIdsProcessed = mutableListOf<UUID>()
+
         pictureIds.forEach { pictureId ->
-            repository.viewPicture(pictureId, onComplete = {
-                bitmaps.add(it)
-                _pictures.value = bitmaps
-                _picturesId.value += pictureId
+            repository.viewPicture(pictureId, onComplete = { bitmap ->
+                bitmaps.add(bitmap)
+                pictureIdsProcessed.add(pictureId)
+
+                if (pictureIdsProcessed.size == pictureIds.size) {
+                    _pictures.value = bitmaps
+                    _picturesId.value = pictureIdsProcessed
+                }
             })
         }
     }

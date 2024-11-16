@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
@@ -48,7 +49,8 @@ fun EventEditImagesPreview(
                     Image(
                         bitmap = bitmap.asImageBitmap(),
                         contentDescription = "Image Preview",
-                        modifier = Modifier.matchParentSize()
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop
                     )
 
                     IconButton(
@@ -78,7 +80,8 @@ fun EventEditImagesPreview(
                     Image(
                         painter = rememberAsyncImagePainter(model = "content://media${uri.path}"),
                         contentDescription = "Image Preview",
-                        modifier = Modifier.matchParentSize()
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop
                     )
 
                     IconButton(

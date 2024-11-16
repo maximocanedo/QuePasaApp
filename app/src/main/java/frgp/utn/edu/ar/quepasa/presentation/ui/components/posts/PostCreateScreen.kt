@@ -74,105 +74,107 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
         val tags by viewModel.tags.collectAsState()
 
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                TypeField(
-                    modifier = Modifier.weight(1f),
-                    typeViewModel,
-                    subtype = subtype,
-                    loadBySubtype = false,
-                    onItemSelected = {
-                        type = it
-                    }
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                TypeSubtypeField(
-                    modifier = Modifier.weight(1f),
-                    viewModel = subtypeViewModel,
-                    type = type,
-                    subtype = subtype,
-                    loadBySelected = false,
-                    onItemSelected = { subtype = it }
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AudienceField(
-                    modifier = Modifier.weight(1f),
-                    audience = audience,
-                    onItemSelected = { audience = it }
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                NeighbourhoodField(
-                    modifier = Modifier.weight(1f),
-                    audience = audience,
-                    neighbourhood = neighbourhood,
-                    loadBySelected = false,
-                    onItemSelected = { neighbourhood = it }
-                )
-            }
+            androidx.compose.foundation.rememberScrollState().let { scrollState ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    TypeField(
+                        modifier = Modifier.weight(1f),
+                        typeViewModel,
+                        subtype = subtype,
+                        loadBySubtype = false,
+                        onItemSelected = {
+                            type = it
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TypeSubtypeField(
+                        modifier = Modifier.weight(1f),
+                        viewModel = subtypeViewModel,
+                        type = type,
+                        subtype = subtype,
+                        loadBySelected = false,
+                        onItemSelected = { subtype = it }
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    AudienceField(
+                        modifier = Modifier.weight(1f),
+                        audience = audience,
+                        onItemSelected = { audience = it }
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    NeighbourhoodField(
+                        modifier = Modifier.weight(1f),
+                        audience = audience,
+                        neighbourhood = neighbourhood,
+                        loadBySelected = false,
+                        onItemSelected = { neighbourhood = it }
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(20.dp))
-            TagField(
-                modifier = Modifier.padding(2.dp),
-                value = tag,
-                validator = {
-                    StringValidator(tag)
-                        .isNotBlank()
-                        .hasMaximumLength(15)
-                        .hasMinimumLength(3)
-                },
-                onChange = { newTags -> tag = newTags },
-                onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
-                onAdded = { tag = "" },
-                viewModel = viewModel
-            )
+                Spacer(modifier = Modifier.height(20.dp))
+                TagField(
+                    modifier = Modifier.padding(2.dp),
+                    value = tag,
+                    validator = {
+                        StringValidator(tag)
+                            .isNotBlank()
+                            .hasMaximumLength(15)
+                            .hasMinimumLength(3)
+                    },
+                    onChange = { newTags -> tag = newTags },
+                    onValidityChange = { status -> viewModel.toggleTagValidationField(status) },
+                    onAdded = { tag = "" },
+                    viewModel = viewModel
+                )
 
-            if(tags.isNotEmpty()) {
-                FlowRow(modifier = Modifier.fillMaxWidth()) {
-                    tags.forEachIndexed { index, tag ->
-                        TagValue(
-                            modifier = Modifier
-                                .weight(1f),
-                            value = tag,
-                            viewModel = viewModel
-                        )
+                if (tags.isNotEmpty()) {
+                    FlowRow(modifier = Modifier.fillMaxWidth()) {
+                        tags.forEachIndexed { index, tag ->
+                            TagValue(
+                                modifier = Modifier
+                                    .weight(1f),
+                                value = tag,
+                                viewModel = viewModel
+                            )
 
-                        if(index < tags.size - 1) {
-                            Spacer(modifier = Modifier.width(4.dp))
+                            if (index < tags.size - 1) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                            }
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(10.dp))
-            TitleField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                value = title,
-                validator = {
-                    StringValidator(title)
-                        .isNotBlank()
-                        .hasMaximumLength(30)
-                        .hasMinimumLength(4)
-                },
-                onChange = { newTitle -> title = newTitle },
-                onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
-            )
-            DescriptionField(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                value = description,
-                validator = {
-                    StringValidator(description)
-                        .isNotBlank()
-                        .hasMaximumLength(256)
-                        .hasMinimumLength(4)
-                },
-                onChange = { newDesc -> description = newDesc },
-                onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
-            )
-            PostCreateImagesPreview(modifier = Modifier, viewModel = imageViewModel)
-            ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
+                Spacer(modifier = Modifier.height(10.dp))
+                TitleField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = title,
+                    validator = {
+                        StringValidator(title)
+                            .isNotBlank()
+                            .hasMaximumLength(30)
+                            .hasMinimumLength(4)
+                    },
+                    onChange = { newTitle -> title = newTitle },
+                    onValidityChange = { status -> viewModel.toggleValidationField(0, status) }
+                )
+                DescriptionField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = description,
+                    validator = {
+                        StringValidator(description)
+                            .isNotBlank()
+                            .hasMaximumLength(256)
+                            .hasMinimumLength(4)
+                    },
+                    onChange = { newDesc -> description = newDesc },
+                    onValidityChange = { status -> viewModel.toggleValidationField(1, status) }
+                )
+                PostCreateImagesPreview(modifier = Modifier, viewModel = imageViewModel)
+                ImageField(modifier = Modifier.fillMaxWidth(), viewModel = imageViewModel)
+            }
 
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(onClick = {

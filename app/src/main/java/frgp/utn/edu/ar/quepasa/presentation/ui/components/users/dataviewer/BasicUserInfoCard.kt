@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,13 +23,20 @@ import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.media.Picture
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.AddressEmergentField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NameEmergentField
 import java.sql.Timestamp
 import java.util.UUID
 
 @Composable
-fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
+fun BasicUserInfoCard(
+    user: User,
+    modifier: Modifier = Modifier,
+    onNameUpdateRequest: suspend (String) -> Unit,
+    onAddressUpdateRequest: suspend (String) -> Unit
+) {
     var nameChanging by remember { mutableStateOf(false) }
+    var addressChanging by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -72,13 +80,27 @@ fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
             )
         )
+        ListItem(
+            headlineContent = { Text(user.address) },
+            supportingContent = { Text("Dirección") },
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+            ),
+            modifier = Modifier.clickable {
+                addressChanging = true
+            }
+        )
         Spacer(modifier = Modifier.height(8.dp))
     }
     if(nameChanging) NameEmergentField(
+        placeholder = user.name,
         onDismissRequest = { nameChanging = false },
-        onRequest = {
-
-        }
+        onRequest = onNameUpdateRequest
+    )
+    if(addressChanging) AddressEmergentField(
+        placeholder = user.address,
+        onDismissRequest = { addressChanging = false },
+        onRequest = onAddressUpdateRequest
     )
 }
 
@@ -102,5 +124,5 @@ fun BasicUserInfoCardPreview() {
         email = emptySet(),
         phone = emptySet()
     )
-    BasicUserInfoCard(user)
+    BasicUserInfoCard(user, modifier = Modifier, onNameUpdateRequest = {}, onAddressUpdateRequest = {})
 }

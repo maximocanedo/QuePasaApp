@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
@@ -69,7 +70,8 @@ fun ProfileScreen(navController: NavHostController, username: String? = null) {
             viewModel::updateUser,
             viewModel::onPhoneRegistrationRequest,
             viewModel::onPhoneValidationRequest,
-            viewModel::onPhoneDeleteRequest
+            viewModel::onPhoneDeleteRequest,
+            viewModel::onPatchEditRequest
         )
     }
 
@@ -86,7 +88,8 @@ fun ProfileScreenContent(
     onRefresh: () -> Unit,
     onPhoneRegistration: suspend (String) -> Unit,
     onPhoneValidationRequest: suspend (Phone, String) -> Boolean,
-    onPhoneDeleteRequest: suspend (Phone) -> Unit
+    onPhoneDeleteRequest: suspend (Phone) -> Unit,
+    onPatchEditRequest: suspend (UserPatchEditRequest) -> Unit
 ) {
     val me by LocalAuth.current.collectAsState()
     val itsMe by remember {
@@ -108,7 +111,18 @@ fun ProfileScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 UserDisplayDesign(user, Modifier.fillMaxWidth())
-                BasicUserInfoCard(user, Modifier.fillMaxWidth())
+                BasicUserInfoCard(
+                    user = user,
+                    modifier = Modifier.fillMaxWidth(),
+                    onNameUpdateRequest = {
+                        val req = UserPatchEditRequest(name = it)
+                        onPatchEditRequest(req)
+                    },
+                    onAddressUpdateRequest = {
+                        val req = UserPatchEditRequest(address = it)
+                        onPatchEditRequest(req)
+                    }
+                )
                 if(itsMe) MailsCard(
                     user.email, Modifier.fillMaxWidth(),
                     onMailRegistration, onMailDeleteRequest, onMailValidationRequest
@@ -162,6 +176,7 @@ fun ProfileScreenContentPreview() {
         onRefresh = {  },
         onPhoneRegistration = {  },
         onPhoneValidationRequest = { phone, code -> true },
-        onPhoneDeleteRequest = {  }
+        onPhoneDeleteRequest = {  },
+        onPatchEditRequest = {  }
     )
 }

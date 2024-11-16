@@ -1,6 +1,5 @@
 package frgp.utn.edu.ar.quepasa.domain.repository.commenting
 
-import frgp.utn.edu.ar.quepasa.data.dto.request.PostCommentDTO
 import frgp.utn.edu.ar.quepasa.data.model.Comment
 import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
@@ -31,8 +30,8 @@ class CommentRepository @Inject constructor(
     suspend fun getCommentById(id: UUID): Comment =
         handleResponse { commentService.getCommentById(id) }
 
-    suspend fun createPostComment(file: PostCommentDTO): Comment =
-        handleResponse { commentService.createPostComment(file) }
+    suspend fun createPostComment(postId: Int, file: String): Comment =
+        handleResponse { commentService.createPostComment(postId, file) }
 
     suspend fun createEventComment(id: UUID, comment: String): Comment =
         handleResponse { commentService.createEventComment(id, comment) }

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -24,9 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,14 +40,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentDialog
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.PostCommentCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.commenting.CommentViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
@@ -61,16 +69,20 @@ fun PostDetailedScreen(
     val viewModel: PostViewModel = hiltViewModel()
     val postPictureViewModel: PostPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
+    val commentViewModel: CommentViewModel = hiltViewModel()
 
     val coroutineScope = rememberCoroutineScope()
 
     val post by viewModel.post.collectAsState()
     val votes by viewModel.votes.collectAsState()
+    val comments by commentViewModel.postComments.collectAsState()
+    var commentDialogState by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getPostById(postId)
         postPictureViewModel.getPicturesByPost(postId, 0, 10)
         pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
+        commentViewModel.getCommentsByPost(postId, 0, 10)
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -167,8 +179,8 @@ fun PostDetailedScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                
                                 Row(
-
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.clickable(onClick = {
                                         coroutineScope.launch {
@@ -236,10 +248,43 @@ fun PostDetailedScreen(
                         }
                     }
                 }
+                Row(
+                    modifier = Modifier.padding(top = 4.dp)
+                ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
+                HorizontalDivider(
+                    thickness = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Row {
-
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        userScrollEnabled = true
+                    ) {
+                        items(comments.content) { comment ->
+                            key(comment.id) {
+                                PostCommentCard(
+                                    comment = comment
+                                )
+                            }
+                        }
+                    }
                 }
             }
+        }
+        if (commentDialogState) {
+            CommentDialog(
+                onDismissRequest = { commentDialogState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.createPostComment(content, post!!)
+                        commentViewModel.getCommentsByPost(postId, 0, 10)
+                    }
+                    commentDialogState = false
+                }
+            )
         }
     }
 }

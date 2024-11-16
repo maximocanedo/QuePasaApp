@@ -119,7 +119,10 @@ fun RoleUpdateRequestCardAdmin(
                     )
                 }
 
-                Row {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     if(request.status == RequestStatus.WAITING) {
                         Button(
                             modifier = Modifier

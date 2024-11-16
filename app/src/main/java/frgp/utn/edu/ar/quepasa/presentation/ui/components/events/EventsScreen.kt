@@ -43,6 +43,7 @@ fun EventsScreen(navController: NavHostController) {
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
+
     val events by viewModel.events.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
@@ -139,12 +140,6 @@ fun EventsScreen(navController: NavHostController) {
                                     eventToDelete = event.id
                                     showDialog = true
                                 },
-                                /*onRemoveClick = {
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.deleteEvent(event.id!!)
-                                        resetEvents(viewModel, category, search)
-                                    }
-                                },*/
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -156,9 +155,11 @@ fun PostDetailedScreen(
                             Text(text = post!!.description, textAlign = TextAlign.Center)
                         }
 
-                        ImagesListPreview(bitmaps = bitmaps.value)
+                        if(bitmaps.value.isNotEmpty()) {
+                            ImagesListPreview(bitmaps = bitmaps.value)
+                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         if(user.user?.role != Role.USER) {
                             Row(

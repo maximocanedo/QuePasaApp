@@ -33,22 +33,18 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
                 .background(Color.White)
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                Text(text = "Bienvenido, ${if(user.ok) user.name else "Usuario"}")
+                Text(text = "Bienvenido, ${if (user.ok) user.name else "Usuario"}")
             }
 
-            PostScreen(navController)
-
+            PostScreen(navController, selectedTag = null)
         }
+
         Column {
             val role: Role? = user.user?.role
-            if(role != null && role != Role.USER) {
+            if (role != null && role != Role.USER) {
                 Spacer(modifier = Modifier.weight(1f))
                 CreateContentDropdown(navController = navController)
             }
         }
     }
 }
-
-
-
-

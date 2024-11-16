@@ -1,5 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,17 +57,34 @@ class PostViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
 
     val isLoading: StateFlow<Boolean> get() = _isLoading
+    private val _allPosts = MutableLiveData<List<Post>>()
+    val allPosts: LiveData<List<Post>> get() = _allPosts
+
+    private val _filteredPosts = MutableLiveData<List<Post>>()
+    val filteredPosts: LiveData<List<Post>> get() = _filteredPosts
 
     init {
         viewModelScope.launch {
-            getPosts(0, 10,  true)
+            getPosts(0, 100,  true)
         }
+    }
+
+    fun filterPostsByTag(tag: String) {
+        val filtered = _posts.value.content.filter { post ->
+            post.tags?.split(",")?.contains(tag) == true
+        }
+        _filteredPosts.value = filtered
+    }
+
+    fun clearFilter() {
+        _filteredPosts.value = _posts.value.content
     }
 
     private suspend fun getPosts(page: Int, size: Int, activeOnly: Boolean) {
         try {
             val posts = repository.getPosts(page, size, activeOnly)
             _posts.value = posts
+
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -249,7 +268,7 @@ class PostViewModel @Inject constructor(
     suspend fun deletePost(id: Int) {
         try {
             repository.deletePost(id)
-            getPosts(0, 10, true)
+            getPosts(0, 100, true)
         }
         catch(e: Exception) {
             _errorMessage.value = e.message

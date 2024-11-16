@@ -105,62 +105,63 @@ fun PostCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            if(user.user?.role != Role.USER) {
                 Row(
-
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onLikeClick)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                        contentDescription = "Like",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = formatNumber(post.votes?.votes ?: 0),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable(onClick = onLikeClick)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_arrow_upward_24),
+                            contentDescription = "Like",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formatNumber(post.votes?.votes ?: 0),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onDislikeClick)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                        contentDescription = "Dislike",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable(onClick = onDislikeClick)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_arrow_downward_24),
+                            contentDescription = "Dislike",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(onClick = onCommentClick)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_comment_24),
-                        contentDescription = "Comment",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                if (post.owner?.id == user.id || user.user?.role  == Role.ADMIN) {
-                    Icon(
-                        painter = painterResource(R.drawable.edit),
-                        contentDescription = "Edit",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable { onEditClick(post.id) }
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable(onClick = onCommentClick)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_comment_24),
+                            contentDescription = "Comment",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                        Icon(
+                            painter = painterResource(R.drawable.edit),
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable { onEditClick(post.id) }
+                        )
+                    }
                 }
             }
         }

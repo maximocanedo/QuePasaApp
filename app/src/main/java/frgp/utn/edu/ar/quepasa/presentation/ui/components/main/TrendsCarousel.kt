@@ -15,13 +15,15 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.trends.TrendsViewModel
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 
 @Composable
 fun TrendsCarousel(
-    trendsViewModel: TrendsViewModel
+    trendsViewModel: TrendsViewModel,
+    onTagSelected: (String) -> Unit
 ) {
     val trends = trendsViewModel.trends.observeAsState(initial = emptyList())
-
     Row(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
@@ -34,7 +36,8 @@ fun TrendsCarousel(
                 if (trend != null) {
                     TrendItem(
                         tag = trend.tag ?: "Sin etiqueta",
-                        cantidad = trend.cantidad ?: 0
+                        cantidad = trend.cantidad ?: 0,
+                        onClick = { onTagSelected(trend.tag ?: "Sin etiqueta") }
                     )
                 } else {
                     Text(
@@ -53,3 +56,4 @@ fun TrendsCarousel(
         }
     }
 }
+

@@ -17,6 +17,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
@@ -30,13 +31,37 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         startDestination = "home"
     ) {
         composable("home") { MainPage(navController) }
-        composable("trends") { TrendsScreen() }
+
+        composable(
+            route = "posts?tag={tag}",
+            arguments = listOf(
+                navArgument("tag") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val tag = backStackEntry.arguments?.getString("tag") ?: ""
+            PostScreen(navController = navController, selectedTag = tag)
+        }
+
+
+
+        composable(
+            route = "postList/{selectedTag}",
+            arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val selectedTag = backStackEntry.arguments?.getString("selectedTag")
+            PostScreen(navController = navController, selectedTag = selectedTag)
+        }
+
         composable("userProfile") {
             val intent = Intent(context, ProfileScreen::class.java)
-            // intent.putExtra("username", "") // No agregamos nada para que nos muestre el perfil del usuario autenticado.
             context.startActivity(intent)
         }
+
         composable("postCreate") { PostCreateScreen(navController, user) }
+
         composable(
             route = "postEdit/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
@@ -46,6 +71,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 PostEditScreen(navController, user, postId)
             }
         }
+
         composable(
             route = "postDetailedScreen/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
@@ -57,6 +83,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         }
 
         composable("eventCreate") { CreateEventScreen(navController) }
+
         composable(
             route = "eventEdit/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
@@ -66,7 +93,9 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 EditEventScreen(navController, UUID.fromString(eventId))
             }
         }
+
         composable("events") { EventsScreen(navController) }
+
         composable(
             route = "eventDetailedScreen/{eventId}",
             arguments = listOf(navArgument("eventId") { type = NavType.StringType })
@@ -76,7 +105,8 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 EventDetailedScreen(navController, UUID.fromString(eventId))
             }
         }
-        composable("roleRequestUserList") { RoleUpdateUserListScreen(navController)}
+
+        composable("roleRequestUserList") { RoleUpdateUserListScreen(navController) }
         composable("roleRequestAdminList") { RoleUpdateAdminListScreen(navController) }
         composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
     }

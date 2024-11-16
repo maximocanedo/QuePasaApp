@@ -26,7 +26,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
@@ -35,13 +38,20 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val user by LocalAuth.current.collectAsState()
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
+    val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
+
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
     val event by viewModel.event.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getEventById(eventId)
+        eventPictureViewModel.getPicturesByEvent(eventId, 0, 10)
+        pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
     }
+
+    val bitmaps = pictureViewModel.pictures.collectAsState()
 
     if (event != null) {
         BaseComponent(
@@ -131,6 +141,11 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                 )
                             }
                         }
+
+                        if(bitmaps.value.isNotEmpty()) {
+                            ImagesListPreview(bitmaps = bitmaps.value)
+                        }
+
                         Row {
                             //CardButtonsBar(event!!.id!!, event!!.votes!!)
                         }

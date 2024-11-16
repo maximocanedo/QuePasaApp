@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,31 +30,36 @@ fun ImagesListPreview(bitmaps: List<Bitmap?>) {
     val bitmapsToDisplay = bitmaps.take(5)
     val expandedImageBitmap = remember { mutableStateOf<Bitmap?>(null) }
 
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(16.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
     ) {
-        items(bitmapsToDisplay) { bitmap ->
-            if(bitmap != null) {
-                Box(
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.secondary,
-                            RoundedCornerShape(8.dp)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            items(bitmapsToDisplay) { bitmap ->
+                if (bitmap != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.secondary,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clickable {
+                                expandedImageBitmap.value = bitmap
+                            }
+                    ) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Image preview",
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.Crop
                         )
-                        .clickable {
-                            expandedImageBitmap.value = bitmap
-                        }
-                ) {
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Image preview",
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Crop
-                    )
+                    }
                 }
             }
         }

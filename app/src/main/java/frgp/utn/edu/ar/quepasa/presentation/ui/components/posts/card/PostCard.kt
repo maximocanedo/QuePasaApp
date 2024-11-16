@@ -190,7 +190,7 @@ fun PostCard(
                     if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_delete_24),
-                            contentDescription = "Edit",
+                            contentDescription = "Remove",
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
                                 .size(24.dp)

@@ -19,6 +19,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -27,9 +30,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.EventCommentCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.commenting.CommentViewModel
@@ -48,6 +54,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val pictureViewModel: PictureViewModel = hiltViewModel()
     val commentViewModel: CommentViewModel = hiltViewModel()
     val comments by commentViewModel.eventComments.collectAsState()
+    var commentDialogState by remember { mutableStateOf(false) }
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
@@ -155,7 +162,17 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                             ImagesListPreview(bitmaps = bitmaps.value)
                         }
 
-                        Row {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CardButton(
+                                icon = R.drawable.baseline_add_comment_24,
+                                description = "Comentar",
+                                onClick = {
+                                    commentDialogState = true
+                                }
+                            )
                             CardButtonsBar(
                                 event = event!!,
                                 user = user.user,
@@ -189,14 +206,18 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         }
                     }
                 }
-                Row { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
+                Row(
+                    modifier = Modifier.padding(top = 4.dp)
+                ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
                 HorizontalDivider(
                     thickness = 2.dp,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Row {
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         userScrollEnabled = true
                     ) {
@@ -210,6 +231,18 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                     }
                 }
             }
+        }
+        if (commentDialogState) {
+            CommentDialog(
+                onDismissRequest = { commentDialogState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.createEventComment(content, event!!)
+                        commentViewModel.getCommentsByEvent(eventId, 0, 10)
+                    }
+                    commentDialogState = false
+                }
+            )
         }
     }
 }

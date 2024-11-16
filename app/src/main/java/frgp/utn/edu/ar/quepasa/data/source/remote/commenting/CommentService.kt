@@ -1,6 +1,5 @@
 package frgp.utn.edu.ar.quepasa.data.source.remote.commenting
 
-import frgp.utn.edu.ar.quepasa.data.dto.request.EventCommentDTO
 import frgp.utn.edu.ar.quepasa.data.dto.request.PostCommentDTO
 import frgp.utn.edu.ar.quepasa.data.model.Comment
 import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
@@ -20,8 +19,8 @@ interface CommentService {
     @POST("comments/post")
     suspend fun createPostComment(@Body file: PostCommentDTO): Response<Comment>
 
-    @POST("comments/event")
-    suspend fun createEventComment(@Body file: EventCommentDTO): Response<Comment>
+    @POST("/api/events/{id}/comments")
+    suspend fun createEventComment(@Path("id") eventId: UUID, @Body file: String): Response<Comment>
 
     @GET("/comments/posts/{id}")
     suspend fun getCommentsByPost(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostComment>>

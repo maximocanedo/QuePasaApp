@@ -75,7 +75,7 @@ class CommentViewModel @Inject constructor(
     suspend fun createEventComment(content: String, event: Event) {
         try {
             val eventCommentDTO = EventCommentDTO(content, event)
-            val comment = repository.createEventComment(eventCommentDTO)
+            val comment = event.id?.let { repository.createEventComment(it, content) }
             _comment.value = comment
         }
         catch(e: Exception) {

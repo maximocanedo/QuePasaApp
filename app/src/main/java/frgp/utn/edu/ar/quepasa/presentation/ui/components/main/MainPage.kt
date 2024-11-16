@@ -34,7 +34,7 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
                 .border(BorderStroke(2.dp, Color.LightGray))
                 .background(Color.White)
         ) {
-            if (user.user?.role == Role.USER) {
+            if (user.user?.role == Role.USER ) {
                 WarningMessage("Tu cuenta se encuentra sin verificar. Para acceder a todas las funcionalidades, verifica tu cuenta en el apartado de usuarios.")
             }
             Box(modifier = Modifier.padding(16.dp)) {

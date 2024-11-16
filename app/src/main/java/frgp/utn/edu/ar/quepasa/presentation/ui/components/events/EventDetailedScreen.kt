@@ -158,7 +158,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                             }
                         }
 
-                        if(bitmaps.value.isNotEmpty()) {
+                        if (bitmaps.value.isNotEmpty()) {
                             ImagesListPreview(bitmaps = bitmaps.value)
                         }
 
@@ -214,20 +214,24 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Row {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        userScrollEnabled = true
-                    ) {
-                        items(comments.content) { comment ->
-                            key(comment.id) {
-                                EventCommentCard(
-                                    comment = comment
-                                )
+                    if (comments.content.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            userScrollEnabled = true
+                        ) {
+                            items(comments.content) { comment ->
+                                key(comment.id) {
+                                    EventCommentCard(
+                                        comment = comment
+                                    )
+                                }
                             }
                         }
+                    } else {
+                        Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

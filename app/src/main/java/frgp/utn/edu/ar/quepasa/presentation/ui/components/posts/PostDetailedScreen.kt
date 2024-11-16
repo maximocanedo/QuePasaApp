@@ -179,7 +179,19 @@ fun PostDetailedScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable(onClick = {
+                                        commentDialogState = true
+                                    })
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_add_comment_24),
+                                        contentDescription = "Comment",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.clickable(onClick = {

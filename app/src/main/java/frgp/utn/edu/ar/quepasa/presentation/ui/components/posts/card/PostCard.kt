@@ -136,68 +136,72 @@ fun PostCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Like y Dislike juntos a la izquierda
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable(onClick = onLikeClick)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                            contentDescription = "Like",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formatNumber(post.votes?.votes ?: 0),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable(onClick = onLikeClick)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_arrow_upward_24),
+                                contentDescription = "Like",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = formatNumber(post.votes?.votes ?: 0),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp)) // Espacio entre Like y Dislike
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable(onClick = onDislikeClick)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_arrow_downward_24),
+                                contentDescription = "Dislike",
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
 
+                    // Editar y Eliminar en el centro
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable(onClick = onDislikeClick)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                            contentDescription = "Dislike",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                        if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                            Icon(
+                                painter = painterResource(R.drawable.edit),
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable { onEditClick(post.id) }
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp)) // Espacio entre Editar y Eliminar
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable(onClick = onCommentClick)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_comment_24),
-                            contentDescription = "Comment",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                        Icon(
-                            painter = painterResource(R.drawable.edit),
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable { onEditClick(post.id) }
-                        )
-                    }
-                    if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_delete_24),
-                            contentDescription = "Remove",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable { onRemoveClick(post.id) }
-                        )
+                        if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_delete_24),
+                                contentDescription = "Remove",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable { onRemoveClick(post.id) }
+                            )
+                        }
                     }
                 }
+
             }
         }
     }

@@ -32,17 +32,15 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue1
 fun CreateContentDropdown(navController: NavHostController) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.End
     ) {
         FloatingActionButton(
             onClick = { expanded = true },
+            modifier = Modifier.padding(end = 10.dp, bottom = 10.dp),
             containerColor = Blue1,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 1.dp, end = 16.dp)
         ) {
             Icon(
                 Icons.Filled.Add,

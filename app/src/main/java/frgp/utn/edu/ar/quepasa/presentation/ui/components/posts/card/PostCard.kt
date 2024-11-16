@@ -73,7 +73,7 @@ fun PostCard(
                 post.owner?.let {
                     UserHorizontalDesign(
                         user = it,
-                        modifier = Modifier
+                        modifier = Modifier,
                     )
                 }
                 Column(
@@ -175,6 +175,7 @@ fun PostCard(
 
                     // Editar y Eliminar en el centro
                     Row(
+                        modifier = Modifier.padding(horizontal = 64.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {

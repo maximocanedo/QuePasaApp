@@ -34,8 +34,10 @@ fun PostCard(
     onLikeClick: () -> Unit,
     onDislikeClick: () -> Unit,
     onCommentClick: () -> Unit,
-    onEditClick: (Int) -> Unit
-) {
+    onEditClick: (Int) -> Unit,
+    onRemoveClick: (Int) -> Unit,
+
+    ) {
     val user by LocalAuth.current.collectAsState()
 
     Card(
@@ -162,6 +164,16 @@ fun PostCard(
                                 .clickable { onEditClick(post.id) }
                         )
                     }
+                    if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_delete_24),
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable { onRemoveClick(post.id) }
+                        )
+                    }
                 }
             }
         }
@@ -202,7 +214,8 @@ fun PreviewPostCard() {
             onLikeClick = {},
             onDislikeClick = {},
             onCommentClick = {},
-            onEditClick = { postId -> {} }
+            onEditClick = { postId -> {} },
+            onRemoveClick={}
         )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TrendsScreen
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
@@ -105,7 +106,15 @@ fun PostScreen(
                             postId.let {
                                 navController.navigate("postEdit/$it")
                             }
-                        }
+                        },
+                        onRemoveClick = {
+                            postViewModel.viewModelScope.launch {
+                                postViewModel.deletePost(post.id!!)
+                               /* frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.resetPosts(
+                                    postViewModel
+                                )*/
+                            }
+                        },
                     )
                 }
             }
@@ -122,7 +131,14 @@ fun PostScreen(
         }
     }
 }
+/*
+fun resetPosts(
+    viewModel: PostViewModel) {
+    viewModel.viewModelScope.launch {
+        viewModel.getPosts()
 
 
+    }
+}
 
-
+*/

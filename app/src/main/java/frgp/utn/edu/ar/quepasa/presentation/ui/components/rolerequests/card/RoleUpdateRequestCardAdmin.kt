@@ -109,6 +109,21 @@ fun RoleUpdateRequestCardAdmin(
                         imageVector = Icons.Filled.Person,
                         contentDescription = "Role Reviewer",
                     )
+                    val requester = if(request.requester != null) request.requester.name else "No asignado"
+                    Text(
+                        text = "Solicitante: $requester",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Role Reviewer",
+                    )
                     val reviewer = if(request.reviewer != null) request.reviewer.name else "No asignado"
                     Text(
                         text = "Revisor: $reviewer",
@@ -161,7 +176,11 @@ fun RoleUpdateRequestCardAdmin(
                             openDialog.value = true
                         }
                     ) {
-                        Text("Eliminar")
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Eliminar solicitud",
+                            tint = MaterialTheme.colorScheme.primaryContainer
+                        )
                     }
                 }
             }

@@ -28,6 +28,7 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.RoleUpdateRequestCards
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.WarningMessage
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestViewModel
 
 @Composable
@@ -35,12 +36,14 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
     var enabled by remember { mutableStateOf(true) }
+    var enabledHighestRole by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.getMyRequests()
 
         val role = user.user?.role
         enabled = !viewModel.checkForRoleRequestPending() && role != Role.GOVT
+        enabledHighestRole = role != Role.GOVT
     }
 
     BaseComponent(navController, null, "Solicitudes de rol", false) {
@@ -49,6 +52,17 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
+
+            item {
+                if (!enabled) {
+                    if(enabledHighestRole) {
+                        WarningMessage("Tienes una solicitud de rol pendiente. Espera a que sea revisada antes de solicitar otra.")
+                    }
+                    else {
+                        WarningMessage("Tienes el rol solicitable más alto. No es posible solicitar otro rol por el momento.")
+                    }
+                }
+            }
 
             item {
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))

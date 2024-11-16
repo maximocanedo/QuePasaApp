@@ -32,48 +32,9 @@ fun PostScreen(
     val isLoading by postViewModel.isLoading.collectAsStateWithLifecycle()
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(1.dp),
-        ) {
-            postsState.value.content.forEach { post ->
-                PostCard(
-                    post = post,
-                    navController = navController,
-                    onLikeClick = {
-                        coroutineScope.launch {
-                            try {
-                                postViewModel.upVote(post.id)
-                                Log.d("PostCard", "like ${post.id}")
-                            } catch (e: Exception) {
-                                Log.e("PostCard", "error: ${e.message}")
-                            }
-                        }
-                    },
-                    onDislikeClick = {
-                        coroutineScope.launch {
-                            try {
-                                postViewModel.downVote(post.id)
-                                Log.d("PostCard", "dislike ${post.id}")
-                            } catch (e: Exception) {
-                                Log.e("PostCard", "error: ${e.message}")
-                            }
-                        }
-                    },
-                    onCommentClick = {
-                    },
-                    onEditClick = { postId ->
-                        postId.let {
-                            navController.navigate("postEdit/$it")
-                        }
-                    }
-                )
-            }
-        }
-        if (isLoading) {
-            Box(
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .padding(1.dp),

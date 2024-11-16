@@ -72,7 +72,7 @@ fun TagField(
             )
 
             IconButton(onClick = {
-                if(isValid && content.isNotBlank()) {
+                if(isValid && content.length >= 3 && content.length <= 15) {
                     viewModel.addTag(value)
                     content = ""
                     onAdded()

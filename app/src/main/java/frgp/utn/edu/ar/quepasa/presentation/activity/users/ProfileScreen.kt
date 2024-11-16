@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.activity.users
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -10,14 +11,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,17 +37,22 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.data.source.remote.saveAuthToken
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.FeedbackProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.AuthenticatedActivity
+import frgp.utn.edu.ar.quepasa.presentation.activity.auth.LoginActivity
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.mail.MailsCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.phone.PhonesCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.sql.Timestamp
 
 @Deprecated("")
@@ -71,7 +84,8 @@ fun ProfileScreen(navController: NavHostController, username: String? = null) {
             viewModel::onPhoneRegistrationRequest,
             viewModel::onPhoneValidationRequest,
             viewModel::onPhoneDeleteRequest,
-            viewModel::onPatchEditRequest
+            viewModel::onPatchEditRequest,
+            viewModel::onConfirmedDeleteRequest
         )
     }
 
@@ -89,9 +103,12 @@ fun ProfileScreenContent(
     onPhoneRegistration: suspend (String) -> Unit,
     onPhoneValidationRequest: suspend (Phone, String) -> Boolean,
     onPhoneDeleteRequest: suspend (Phone) -> Unit,
-    onPatchEditRequest: suspend (UserPatchEditRequest) -> Unit
+    onPatchEditRequest: suspend (UserPatchEditRequest) -> Unit,
+    onConfirmedDisableRequest: suspend () -> Unit
 ) {
     val me by LocalAuth.current.collectAsState()
+    val context = LocalContext.current
+    var showDisableDialog by remember { mutableStateOf(false) }
     val itsMe by remember {
         derivedStateOf {
             me.ok && me.username == (user.username)
@@ -134,10 +151,47 @@ fun ProfileScreenContent(
                     onPhoneDeleteRequest,
                     onPhoneValidationRequest
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { showDisableDialog = true }
+                ) {
+                    Text("Deshabilitar cuenta")
+                }
                 Spacer(modifier = Modifier.height(56.dp))
             }
         }
     }
+    if(showDisableDialog) AlertDialog(
+        onDismissRequest = { showDisableDialog = false },
+        title = {
+            Text("¿Seguro de eliminar ${if(itsMe) "tu " else ""}cuenta?")
+        },
+        text = {
+          Text("Esta acción es permanente y no se puede deshacer. ")
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    showDisableDialog = false
+                    CoroutineScope(IO).launch {
+                        onConfirmedDisableRequest()
+                        saveAuthToken(context, "")
+                        val intent = Intent(context, LoginActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                }
+            ) {
+                Text("Deshabilitar")
+            }
+            TextButton(
+                onClick = {
+                    showDisableDialog = false
+                }
+            ) {
+                Text("Volver")
+            }
+        }
+    )
 }
 
 @Preview @Composable
@@ -177,6 +231,7 @@ fun ProfileScreenContentPreview() {
         onPhoneRegistration = {  },
         onPhoneValidationRequest = { phone, code -> true },
         onPhoneDeleteRequest = {  },
-        onPatchEditRequest = {  }
+        onPatchEditRequest = {  },
+        onConfirmedDisableRequest = {  }
     )
 }

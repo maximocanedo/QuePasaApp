@@ -171,10 +171,27 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     suspend fun onPatchEditRequest(request: UserPatchEditRequest) {
-        val response = usersRepository.editAuthenticatedUser(request)
+        val itsMe = username.value == null || username.value?.isBlank() != false
+        val response = if(itsMe) usersRepository.editAuthenticatedUser(request) else usersRepository.editByUsername(username.value ?: "n", request)
         when(response) {
             is ApiResponse.Success -> {
                 updateUser(response.data)
+            }
+            is ApiResponse.ValidationError -> {
+                feedback.update { Feedback(field = response.details.field + "#userPatchEdit", message = response.details.errors.first() ) }
+            }
+            is ApiResponse.Error -> {
+                // Error
+            }
+        }
+    }
+
+    suspend fun onConfirmedDeleteRequest() {
+        val itsMe = username.value == null || username.value?.isBlank() != false
+        val response = if(itsMe) usersRepository.deleteAuthenticatedUser() else usersRepository.deleteByUsername(username.value ?: "")
+        when(response) {
+            is ApiResponse.Success -> {
+
             }
             is ApiResponse.ValidationError -> {
                 feedback.update { Feedback(field = response.details.field + "#userPatchEdit", message = response.details.errors.first() ) }

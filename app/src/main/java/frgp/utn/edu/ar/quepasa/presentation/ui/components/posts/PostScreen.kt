@@ -25,6 +25,13 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TrendsScreen
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.DialogProperties
+
+
 
 @Composable
 fun PostScreen(
@@ -35,6 +42,9 @@ fun PostScreen(
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val isLoading by postViewModel.isLoading.collectAsStateWithLifecycle()
+
+    var showDialog by remember { mutableStateOf(false) }
+    var postToDelete by remember { mutableStateOf<Int?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (!selectedTag.isNullOrEmpty()) {
@@ -108,12 +118,8 @@ fun PostScreen(
                             }
                         },
                         onRemoveClick = {
-                            postViewModel.viewModelScope.launch {
-                                postViewModel.deletePost(post.id!!)
-                               /* frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.resetPosts(
-                                    postViewModel
-                                )*/
-                            }
+                            postToDelete = post.id
+                            showDialog = true
                         },
                     )
                 }
@@ -130,15 +136,31 @@ fun PostScreen(
             }
         }
     }
-}
-/*
-fun resetPosts(
-    viewModel: PostViewModel) {
-    viewModel.viewModelScope.launch {
-        viewModel.getPosts()
 
-
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Confirmar eliminación") },
+            text = { Text(text = "¿Estás seguro de que deseas eliminar este post?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            postToDelete?.let { postViewModel.deletePost(it) }
+                            postToDelete = null
+                            showDialog = false
+                        }
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        )
     }
 }
-
-*/

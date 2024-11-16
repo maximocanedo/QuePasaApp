@@ -107,7 +107,7 @@ fun UserHorizontalButtonPreview() {
         onClick = {
 
         },
-        caption = "Hace un instante")
+        caption = "")
 }
 
 

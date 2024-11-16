@@ -28,6 +28,7 @@ import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.RoleUpdateRequestCards
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.WarningMessage
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestViewModel
 
 @Composable
@@ -49,6 +50,12 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
+
+            item {
+                if (!enabled) {
+                    WarningMessage("Tienes una solicitud de rol pendiente. Espera a que sea revisada antes de solicitar otra.")
+                }
+            }
 
             item {
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))

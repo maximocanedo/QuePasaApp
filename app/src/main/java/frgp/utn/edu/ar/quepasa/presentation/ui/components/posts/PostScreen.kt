@@ -130,6 +130,7 @@ fun PostScreen(
                             },
                         )
                     }
+                    Spacer(modifier = Modifier.height(64.dp))
                 }
                 if (isLoading) {
                     Box(

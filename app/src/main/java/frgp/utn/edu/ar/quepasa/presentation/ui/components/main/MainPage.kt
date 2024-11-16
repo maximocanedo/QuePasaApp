@@ -46,7 +46,6 @@ fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nu
         }
 
         Column {
-            Spacer(modifier = Modifier.height(56.dp))
             val role: Role? = user.user?.role
             if (role != null && role != Role.USER) {
                 Spacer(modifier = Modifier.weight(1f))

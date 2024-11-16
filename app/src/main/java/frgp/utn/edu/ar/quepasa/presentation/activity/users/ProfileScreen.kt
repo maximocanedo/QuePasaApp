@@ -21,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
@@ -40,37 +42,39 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewMod
 import kotlinx.coroutines.flow.update
 import java.sql.Timestamp
 
+@Deprecated("")
 @AndroidEntryPoint
-class ProfileScreen: AuthenticatedActivity() {
+class ProfileScreenLegacy: AuthenticatedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            val cur by super.authenticatedUser.collectAsState()
-            val viewModel: ProfileScreenViewModel = hiltViewModel()
-            val feedback by viewModel.feedback.collectAsState()
-            AuthenticationProvider(cur) {
-                FeedbackProvider(feedback) {
-                    val username: String? = intent.getStringExtra("username")
-                    viewModel.username.update { username }
-                    viewModel.updateUser()
-                    val isRefreshing by viewModel.isRefreshing.collectAsState()
-                    val user: User? by viewModel.user.collectAsState()
-                    if(user == null) return@FeedbackProvider
-                    ProfileScreenContent(
-                        user!!,
-                        viewModel::onMailRegistrationRequest,
-                        viewModel::onMailValidationRequest,
-                        viewModel::onMailDeleteRequest,
-                        isRefreshing,
-                        viewModel::updateUser,
-                        viewModel::onPhoneRegistrationRequest,
-                        viewModel::onPhoneValidationRequest,
-                        viewModel::onPhoneDeleteRequest
-                    )
-                }
-            }
-        }
     }
+}
+
+@Composable
+fun ProfileScreen(navController: NavHostController, username: String? = null) {
+    val cur by LocalAuth.current.collectAsState()
+    val viewModel: ProfileScreenViewModel = hiltViewModel()
+    val feedback by viewModel.feedback.collectAsState()
+    FeedbackProvider(feedback) {
+        viewModel.username.update { username }
+        viewModel.updateUser()
+        val isRefreshing by viewModel.isRefreshing.collectAsState()
+        val user: User? by viewModel.user.collectAsState()
+        if(user == null) return@FeedbackProvider
+        ProfileScreenContent(
+            user!!,
+            viewModel::onMailRegistrationRequest,
+            viewModel::onMailValidationRequest,
+            viewModel::onMailDeleteRequest,
+            isRefreshing,
+            viewModel::updateUser,
+            viewModel::onPhoneRegistrationRequest,
+            viewModel::onPhoneValidationRequest,
+            viewModel::onPhoneDeleteRequest,
+            viewModel::onPatchEditRequest
+        )
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +88,8 @@ fun ProfileScreenContent(
     onRefresh: () -> Unit,
     onPhoneRegistration: suspend (String) -> Unit,
     onPhoneValidationRequest: suspend (Phone, String) -> Boolean,
-    onPhoneDeleteRequest: suspend (Phone) -> Unit
+    onPhoneDeleteRequest: suspend (Phone) -> Unit,
+    onPatchEditRequest: suspend (UserPatchEditRequest) -> Unit
 ) {
     val me by LocalAuth.current.collectAsState()
     val itsMe by remember {
@@ -106,7 +111,18 @@ fun ProfileScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 UserDisplayDesign(user, Modifier.fillMaxWidth())
-                BasicUserInfoCard(user, Modifier.fillMaxWidth())
+                BasicUserInfoCard(
+                    user = user,
+                    modifier = Modifier.fillMaxWidth(),
+                    onNameUpdateRequest = {
+                        val req = UserPatchEditRequest(name = it)
+                        onPatchEditRequest(req)
+                    },
+                    onAddressUpdateRequest = {
+                        val req = UserPatchEditRequest(address = it)
+                        onPatchEditRequest(req)
+                    }
+                )
                 if(itsMe) MailsCard(
                     user.email, Modifier.fillMaxWidth(),
                     onMailRegistration, onMailDeleteRequest, onMailValidationRequest
@@ -160,6 +176,7 @@ fun ProfileScreenContentPreview() {
         onRefresh = {  },
         onPhoneRegistration = {  },
         onPhoneValidationRequest = { phone, code -> true },
-        onPhoneDeleteRequest = {  }
+        onPhoneDeleteRequest = {  },
+        onPatchEditRequest = {  }
     )
 }

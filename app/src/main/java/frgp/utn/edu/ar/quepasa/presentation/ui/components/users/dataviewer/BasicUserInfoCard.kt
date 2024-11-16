@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,17 +12,23 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.media.Picture
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NameEmergentField
 import java.sql.Timestamp
 import java.util.UUID
 
 @Composable
 fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
+    var nameChanging by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -53,7 +60,10 @@ fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
             supportingContent = { Text("Nombre") },
             colors = ListItemDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
+            ),
+            modifier = Modifier.clickable {
+                nameChanging = true
+            }
         )
         ListItem(
             headlineContent = { Text(user.role.name) },
@@ -64,6 +74,12 @@ fun BasicUserInfoCard(user: User, modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
+    if(nameChanging) NameEmergentField(
+        onDismissRequest = { nameChanging = false },
+        onRequest = {
+
+        }
+    )
 }
 
 @Preview @Composable

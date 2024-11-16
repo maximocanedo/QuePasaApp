@@ -56,8 +56,11 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         }
 
         composable("userProfile") {
-            val intent = Intent(context, ProfileScreen::class.java)
-            context.startActivity(intent)
+            ProfileScreen(navController)
+        }
+
+        composable("user/{username}") {
+            ProfileScreen(navController, it.arguments?.getString("username") ?: "")
         }
 
         composable("postCreate") { PostCreateScreen(navController, user) }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.data.model.User
@@ -40,37 +41,38 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewMod
 import kotlinx.coroutines.flow.update
 import java.sql.Timestamp
 
+@Deprecated("")
 @AndroidEntryPoint
-class ProfileScreen: AuthenticatedActivity() {
+class ProfileScreenLegacy: AuthenticatedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            val cur by super.authenticatedUser.collectAsState()
-            val viewModel: ProfileScreenViewModel = hiltViewModel()
-            val feedback by viewModel.feedback.collectAsState()
-            AuthenticationProvider(cur) {
-                FeedbackProvider(feedback) {
-                    val username: String? = intent.getStringExtra("username")
-                    viewModel.username.update { username }
-                    viewModel.updateUser()
-                    val isRefreshing by viewModel.isRefreshing.collectAsState()
-                    val user: User? by viewModel.user.collectAsState()
-                    if(user == null) return@FeedbackProvider
-                    ProfileScreenContent(
-                        user!!,
-                        viewModel::onMailRegistrationRequest,
-                        viewModel::onMailValidationRequest,
-                        viewModel::onMailDeleteRequest,
-                        isRefreshing,
-                        viewModel::updateUser,
-                        viewModel::onPhoneRegistrationRequest,
-                        viewModel::onPhoneValidationRequest,
-                        viewModel::onPhoneDeleteRequest
-                    )
-                }
-            }
-        }
     }
+}
+
+@Composable
+fun ProfileScreen(navController: NavHostController, username: String? = null) {
+    val cur by LocalAuth.current.collectAsState()
+    val viewModel: ProfileScreenViewModel = hiltViewModel()
+    val feedback by viewModel.feedback.collectAsState()
+    FeedbackProvider(feedback) {
+        viewModel.username.update { username }
+        viewModel.updateUser()
+        val isRefreshing by viewModel.isRefreshing.collectAsState()
+        val user: User? by viewModel.user.collectAsState()
+        if(user == null) return@FeedbackProvider
+        ProfileScreenContent(
+            user!!,
+            viewModel::onMailRegistrationRequest,
+            viewModel::onMailValidationRequest,
+            viewModel::onMailDeleteRequest,
+            isRefreshing,
+            viewModel::updateUser,
+            viewModel::onPhoneRegistrationRequest,
+            viewModel::onPhoneValidationRequest,
+            viewModel::onPhoneDeleteRequest
+        )
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

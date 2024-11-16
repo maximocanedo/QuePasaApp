@@ -111,7 +111,9 @@ fun ProfileScreenContent(
     }
 
     BaseComponent(navController, user, title = "Perfil", back = false) {
-        Box(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh
         ) {
             Column(
                 modifier = Modifier

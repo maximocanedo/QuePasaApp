@@ -1,7 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.comment
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,36 +10,41 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import frgp.utn.edu.ar.quepasa.R
-import frgp.utn.edu.ar.quepasa.data.model.Comment
-import frgp.utn.edu.ar.quepasa.data.model.User
-import frgp.utn.edu.ar.quepasa.data.model.enums.Role
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButton
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.UpVoteButton
+import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
-import java.sql.Timestamp
+import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 
 @Composable
-fun CommentCard(
-    comment: Comment,
-    onReplyClick: () -> Unit
+fun EventCommentCard(
+    comment: EventComment,
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
-            .padding(16.dp),
+            .height(IntrinsicSize.Max),
         shape = RoundedCornerShape(16.dp),
     ) {
-        comment.author?.let {
-            UserHorizontalDesign(
-                user = it,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            comment.author?.let {
+                UserHorizontalDesign(
+                    user = it,
+                )
+            }
+            Text(
+                text = comment.timestamp.formatTimeAgo(),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(2.dp, end = 8.dp),
             )
         }
         HorizontalDivider(
@@ -51,9 +56,10 @@ fun CommentCard(
                 .fillMaxWidth()
                 .padding(16.dp),
             style = MaterialTheme.typography.bodyMedium,
-            minLines = 2,
+            minLines = 1,
             maxLines = 4,
         )
+        /*
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.End),
@@ -74,33 +80,11 @@ fun CommentCard(
                 )
             }
         }
+         */
     }
 }
 
 @Preview
 @Composable
 fun CommentCardPreview() {
-    val user = User(
-        id = 1,
-        username = "patriciobor1",
-        name = "Patricio Bordon",
-        phone = emptySet(),
-        address = "123 Calle Falsa",
-        neighbourhood = null,
-        picture = null,
-        email = emptySet(),
-        role = Role.USER,
-        active = true
-    )
-    val comment = Comment(
-        id = 1,
-        content = "This is a comment jakbnsdjkasdjkbasjkdjbasjkdbasjkd",
-        author = user,
-        timestamp = Timestamp.valueOf("2021-10-10 10:10:10"),
-        active = true
-    )
-    CommentCard(
-        comment = comment,
-        onReplyClick = {}
-    )
 }

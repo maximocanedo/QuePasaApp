@@ -26,7 +26,7 @@ interface CommentService {
     @GET("/comments/posts/{id}")
     suspend fun getCommentsByPost(@Path("id") id: Int, @Query("page") page: Int, @Query("size") size: Int): Response<Page<PostComment>>
 
-    @GET("/comments/events/{id}")
+    @GET("/api/events/{id}/comments")
     suspend fun getCommentsByEvent(@Path("id") id: UUID, @Query("page") page: Int, @Query("size") size: Int): Response<Page<EventComment>>
 
     @GET("/comments/{id}")

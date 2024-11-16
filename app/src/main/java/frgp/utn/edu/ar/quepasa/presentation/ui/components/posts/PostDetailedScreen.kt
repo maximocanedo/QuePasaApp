@@ -237,7 +237,7 @@ fun PostDetailedScreen(
                     }
                 }
                 Row {
-                    /* TODO Comentarios */
+
                 }
             }
         }

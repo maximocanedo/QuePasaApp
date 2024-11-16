@@ -26,10 +26,10 @@ fun CardButtonsBar(
     user: User?,
     voteCount: VoteCount,
     navController: NavHostController,
-    onAssistanceClick: () -> Unit,
-    onRemoveClick: () -> Unit,
-    onUpvoteClick: () -> Unit,
-    onDownvoteClick: () -> Unit
+    onAssistanceClick: () -> Unit = {},
+    onRemoveClick: () -> Unit = {},
+    onUpvoteClick: () -> Unit = {},
+    onDownvoteClick: () -> Unit = {}
 ) {
     var assist by remember { mutableStateOf(false) }
     Row(

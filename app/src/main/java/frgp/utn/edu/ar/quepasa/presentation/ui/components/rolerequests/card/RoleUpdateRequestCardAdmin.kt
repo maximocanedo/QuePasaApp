@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -110,6 +109,21 @@ fun RoleUpdateRequestCardAdmin(
                         imageVector = Icons.Filled.Person,
                         contentDescription = "Role Reviewer",
                     )
+                    val requester = if(request.requester != null) request.requester.name else "No asignado"
+                    Text(
+                        text = "Solicitante: $requester",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Role Reviewer",
+                    )
                     val reviewer = if(request.reviewer != null) request.reviewer.name else "No asignado"
                     Text(
                         text = "Revisor: $reviewer",
@@ -165,7 +179,7 @@ fun RoleUpdateRequestCardAdmin(
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_delete_24),
                             contentDescription = "Eliminar solicitud",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 }

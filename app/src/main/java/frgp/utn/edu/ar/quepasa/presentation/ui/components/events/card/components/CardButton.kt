@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CardButton(
+    modifier: Modifier = Modifier,
     description: String,
     icon: Int,
     onClick: () -> Unit,
@@ -23,7 +24,7 @@ fun CardButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.size(40.dp),
+        modifier = modifier.size(40.dp),
         contentPadding = PaddingValues(0.dp),
         colors = colors
     ) {

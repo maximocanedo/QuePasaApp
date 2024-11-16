@@ -27,9 +27,14 @@ import java.sql.Timestamp
 import java.util.UUID
 
 @Composable
-fun UserDisplayDesign(user: User, modifier: Modifier = Modifier
-    .wrapContentHeight()
-    .padding(16.dp)) {
+fun UserDisplayDesign(
+    user: User,
+    modifier: Modifier = Modifier
+        .wrapContentHeight()
+        .padding(16.dp),
+    caption: String? = null
+) {
+    val captionOn = caption != null && caption.isNotBlank()
     val img = if(user.picture == null) null else
         "http://canedo.com.ar:8080/api/pictures/"+user.picture.id+"/view"
     Column(
@@ -63,7 +68,7 @@ fun UserDisplayDesign(user: User, modifier: Modifier = Modifier
                 .padding(start = 8.dp, end = 8.dp)
         ) {
             Text(
-                text = "@" + user.username,
+                text = "@" + user.username + if (captionOn) " · " + caption else "",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,

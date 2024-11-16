@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
 import frgp.utn.edu.ar.quepasa.data.dto.Fail
 import frgp.utn.edu.ar.quepasa.data.dto.request.CodeVerificationRequest
+import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
@@ -162,6 +163,21 @@ class ProfileScreenViewModel @Inject constructor(
             }
             is ApiResponse.ValidationError -> {
                 // Error.
+            }
+            is ApiResponse.Error -> {
+                // Error
+            }
+        }
+    }
+
+    suspend fun onPatchEditRequest(request: UserPatchEditRequest) {
+        val response = usersRepository.editAuthenticatedUser(request)
+        when(response) {
+            is ApiResponse.Success -> {
+                updateUser(response.data)
+            }
+            is ApiResponse.ValidationError -> {
+                feedback.update { Feedback(field = response.details.field + "#userPatchEdit", message = response.details.errors.first() ) }
             }
             is ApiResponse.Error -> {
                 // Error

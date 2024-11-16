@@ -43,7 +43,10 @@ import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
@@ -57,6 +60,9 @@ fun PostDetailedScreen(
     val user by LocalAuth.current.collectAsState()
 
     val viewModel: PostViewModel = hiltViewModel()
+    val postPictureViewModel: PostPictureViewModel = hiltViewModel()
+    val pictureViewModel: PictureViewModel = hiltViewModel()
+
     val coroutineScope = rememberCoroutineScope()
 
     val post by viewModel.post.collectAsState()
@@ -64,7 +70,11 @@ fun PostDetailedScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getPostById(postId)
+        postPictureViewModel.getPicturesByPost(postId, 0, 10)
+        pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
     }
+
+    val bitmaps = pictureViewModel.pictures.collectAsState()
 
     if (post != null) {
         BaseComponent(
@@ -79,7 +89,6 @@ fun PostDetailedScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(IntrinsicSize.Max)
                         .padding(horizontal = 16.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -146,6 +155,8 @@ fun PostDetailedScreen(
                         ) {
                             Text(text = post!!.description, textAlign = TextAlign.Center)
                         }
+
+                        ImagesListPreview(bitmaps = bitmaps.value)
 
                         Spacer(modifier = Modifier.height(8.dp))
 

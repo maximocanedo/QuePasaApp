@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -32,6 +35,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 @Composable
 fun EventsScreen(navController: NavHostController) {
@@ -45,6 +49,8 @@ fun EventsScreen(navController: NavHostController) {
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var eventToDelete by remember { mutableStateOf<UUID?>(null) }
 
     LaunchedEffect(Unit, events) {
         viewModel.viewModelScope.launch {
@@ -130,11 +136,15 @@ fun EventsScreen(navController: NavHostController) {
                                     }
                                 },
                                 onRemoveClick = {
+                                    eventToDelete = event.id
+                                    showDialog = true
+                                },
+                                /*onRemoveClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.deleteEvent(event.id!!)
                                         resetEvents(viewModel, category, search)
                                     }
-                                },
+                                },*/
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
@@ -154,6 +164,36 @@ fun EventsScreen(navController: NavHostController) {
             }
         }
     }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Confirmar eliminación") },
+            text = { Text(text = "¿Estás seguro de que deseas eliminar este evento?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.viewModelScope.launch {
+                            eventToDelete?.let { event ->
+                                viewModel.deleteEvent(event)
+                                resetEvents(viewModel, category, search)
+                            }
+                            eventToDelete = null
+                            showDialog = false
+                        }
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        )
+    }
+
 }
 
 fun resetEvents(

@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -37,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -144,34 +149,86 @@ class LoginActivity : ComponentActivity() {
 
 @Composable
 fun AlreadyLoggedInUser(viewModel: LoginViewModel?, modifier: Modifier, loginTab: () -> Unit) {
-    if(viewModel == null) return;
+    if (viewModel == null) return
     val user by viewModel.userLogged.collectAsState()
-    if(user == null) return
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        UserDisplayDesign(user = user!!)
-        Spacer(modifier = Modifier.height(32.dp))
-        Row {
-            Button(
-                onClick = {
-                    viewModel.updateLoggedInState(true)
-                }
+    if (user == null) return
+
+    if (!user!!.active) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                ),
+                modifier = Modifier.padding(16.dp)
             ) {
-                Text("Continuar")
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    UserDisplayDesign(user = user!!)
+                    Text(
+                        text = "Tu cuenta se encuentra inhabilitada, contacta a soporte.",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Row {
+                Button(
+                    onClick = {
+                        viewModel.updateLoggedInState(false)
+                        loginTab()
+                        viewModel.logout()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Entendido")
+                }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row {
-            TextButton(
-                onClick = {
-                    loginTab()
-                    viewModel.logout()
+    } else {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            UserDisplayDesign(user = user!!)
+            Spacer(modifier = Modifier.height(32.dp))
+            Row {
+                Button(
+                    onClick = {
+                        viewModel.updateLoggedInState(true)
+                    }
+                ) {
+                    Text("Continuar")
                 }
-            ) {
-                Text("No soy yo")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row {
+                TextButton(
+                    onClick = {
+                        loginTab()
+                        viewModel.logout()
+                    }
+                ) {
+                    Text("No soy yo")
+                }
             }
         }
     }

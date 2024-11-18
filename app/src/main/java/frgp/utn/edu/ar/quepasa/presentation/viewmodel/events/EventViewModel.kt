@@ -167,14 +167,14 @@ class EventViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getEvents(0, 5, true)
+            getEvents(0, 1000000000, true)
         }
     }
 
     /** GET **/
     suspend fun getEvents(
         page: Int = 0,
-        size: Int = 100,
+        size: Int = 1000000000,
         active: Boolean = true,
         sort: String = "title,asc"
     ) {
@@ -190,7 +190,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEvents(
         query: String,
         page: Int = 0,
-        size: Int = 10,
+        size: Int = 1000000000,
         activeOnly: Boolean = true,
         sort: String = "title,asc"
     ) {
@@ -246,7 +246,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEventsByCategory(
         category: EventCategory,
         page: Int = 0,
-        size: Int = 10,
+        size: Int = 1000000000,
         active: Boolean = true
     ) {
         try {

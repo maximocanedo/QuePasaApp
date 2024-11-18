@@ -27,6 +27,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.DialogProperties
@@ -36,6 +37,11 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.WarningMessage
 
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.derivedStateOf
+import frgp.utn.edu.ar.quepasa.data.model.Post
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
     navController: NavHostController,
@@ -45,103 +51,113 @@ fun PostScreen(
     val postViewModel: PostViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-    val isLoading by postViewModel.isLoading.collectAsStateWithLifecycle()
+    val isRefreshing by postViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     var showDialog by remember { mutableStateOf(false) }
     var postToDelete by remember { mutableStateOf<Int?>(null) }
+    var currentPage by remember { mutableStateOf(0) }
+
+    val sortedPosts = postsState.value.content
+        .filter { post -> selectedTag == null || (post.tags?.contains(selectedTag) ?: false) }
+        .sortedWith(compareByDescending<Post> { post -> post.votes?.votes }
+            .thenByDescending { post -> post.timestamp })
 
     val content: @Composable () -> Unit = {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-
-            if (!selectedTag.isNullOrEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Tendencia seleccionada: $selectedTag",
-                        modifier = Modifier.weight(1f),
-                        color = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Limpiar filtro",
-                        color = Color.Blue,
-                        modifier = Modifier
-                            .clickable {
-                                navController.navigate("posts") {
-                                    popUpTo("posts") { inclusive = true }
-                                }
-                            }
-                            .padding(8.dp)
-                            .align(Alignment.CenterVertically)
-                    )
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    postViewModel.refreshPosts()
                 }
             }
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(1.dp),
-                ) {
-                    val filteredPosts = postsState.value.content.filter { post ->
-                        selectedTag == null || (post.tags?.contains(selectedTag) ?: false)
-                    }
-
-                    TrendsScreen(navController)
-
-                    filteredPosts.forEach { post ->
-                        PostCard(
-                            post = post,
-                            navController = navController,
-                            onLikeClick = {
-                                coroutineScope.launch {
-                                    try {
-                                        postViewModel.upVote(post.id)
-                                        Log.d("PostCard", "like ${post.id}")
-                                    } catch (e: Exception) {
-                                        Log.e("PostCard", "error: ${e.message}")
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (!selectedTag.isNullOrEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Tendencia seleccionada: $selectedTag",
+                            modifier = Modifier.weight(1f),
+                            color = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Limpiar filtro",
+                            color = Color.Blue,
+                            modifier = Modifier
+                                .clickable {
+                                    navController.navigate("posts") {
+                                        popUpTo("posts") { inclusive = true }
                                     }
                                 }
-                            },
-                            onDislikeClick = {
-                                coroutineScope.launch {
-                                    try {
-                                        postViewModel.downVote(post.id)
-                                        Log.d("PostCard", "dislike ${post.id}")
-                                    } catch (e: Exception) {
-                                        Log.e("PostCard", "error: ${e.message}")
-                                    }
-                                }
-                            },
-                            onCommentClick = {},
-                            onEditClick = { postId ->
-                                postId.let {
-                                    navController.navigate("postEdit/$it")
-                                }
-                            },
-                            onRemoveClick = {
-                                postToDelete = post.id
-                                showDialog = true
-                            },
+                                .padding(8.dp)
+                                .align(Alignment.CenterVertically)
                         )
                     }
-                    Spacer(modifier = Modifier.height(64.dp))
                 }
-                if (isLoading) {
-                    Box(
+
+                TrendsScreen(navController)
+
+                sortedPosts.forEach { post ->
+                    PostCard(
+                        post = post,
+                        navController = navController,
+                        onLikeClick = {
+                            coroutineScope.launch {
+                                try {
+                                    postViewModel.upVote(post.id)
+                                } catch (e: Exception) {
+                                    Log.e("PostCard", "Error al dar like: ${e.message}")
+                                }
+                            }
+                        },
+                        onDislikeClick = {
+                            coroutineScope.launch {
+                                try {
+                                    postViewModel.downVote(post.id)
+                                } catch (e: Exception) {
+                                    Log.e("PostCard", "Error al dar dislike: ${e.message}")
+                                }
+                            }
+                        },
+                        onCommentClick = {},
+                        onEditClick = { postId ->
+                            navController.navigate("postEdit/$postId")
+                        },
+                        onRemoveClick = {
+                            postToDelete = post.id
+                            showDialog = true
+                        },
+                    )
+                }
+
+                if (currentPage < postsState.value.totalPages - 1) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                currentPage++
+                                postViewModel.getPosts(page = currentPage, size = 5, activeOnly = true)
+                            }
+                        },
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color.Black.copy(alpha = 0.5f)),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
-                        CircularProgressIndicator(color = Color.White)
+                        Text("Cargar más")
                     }
                 }
+
+                Spacer(modifier = Modifier.height(64.dp))
             }
         }
     }

@@ -65,7 +65,7 @@ class PostViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPosts(0, 100,  true)
+            getPosts(0, 5,  true)
         }
     }
 
@@ -80,16 +80,24 @@ class PostViewModel @Inject constructor(
         _filteredPosts.value = _posts.value.content
     }
 
-    private suspend fun getPosts(page: Int = 0, size: Int = 100, activeOnly: Boolean = true) {
+    suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
         try {
-            val posts = repository.getPosts(page, size, activeOnly)
-            _posts.value = posts
-
-        }
-        catch(e: Exception) {
+            val newPosts = repository.getPosts(page, size, activeOnly)
+            _posts.value = if (page == 0) {
+                newPosts
+            } else {
+                _posts.value.copy(
+                    content = _posts.value.content + newPosts.content,
+                    totalElements = newPosts.totalElements,
+                    totalPages = newPosts.totalPages,
+                    pageNumber = newPosts.pageNumber
+                )
+            }
+        } catch (e: Exception) {
             _errorMessage.value = e.message
         }
     }
+
 
     suspend fun getPosts(q: String, sort: String, page: Int, size: Int, active: Boolean) {
         try {
@@ -192,6 +200,16 @@ class PostViewModel @Inject constructor(
             _errorMessage.value = e.message
         }
     }
+    val isRefreshing = MutableStateFlow(false)
+
+    suspend fun refreshPosts() {
+        isRefreshing.value = true
+        try {
+            getPosts(page = 0, size = 5, activeOnly = true)
+        } finally {
+            isRefreshing.value = false
+        }
+    }
 
     suspend fun createPost(
         audience: String,
@@ -268,7 +286,7 @@ class PostViewModel @Inject constructor(
     suspend fun deletePost(id: Int) {
         try {
             repository.deletePost(id)
-            getPosts(0, 100, true)
+            getPosts(0, 5, true)
         }
         catch(e: Exception) {
             _errorMessage.value = e.message

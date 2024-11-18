@@ -68,6 +68,7 @@ fun PostScreen(
             onRefresh = {
                 coroutineScope.launch {
                     postViewModel.refreshPosts()
+                    currentPage=0
                 }
             }
         ) {

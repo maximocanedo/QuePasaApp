@@ -380,7 +380,10 @@ class EventViewModel @Inject constructor(
     }
 
     fun sortEventsByVotes() {
-        val events = _events.value.content.sortedByDescending { it.votes?.votes }
+        val events = _events.value.content.sortedWith(
+            compareByDescending<Event> { it.votes?.votes }
+                .thenByDescending { it.createdAt }
+        )
         _events.value.content = Page(
             content = events,
             totalElements = events.size,
@@ -388,6 +391,7 @@ class EventViewModel @Inject constructor(
             pageNumber = _events.value.pageNumber
         ).content
     }
+
 
     fun titleValidator(title: String): EventTitleValidator {
         return EventTitleValidator(title).isNotBlank().meetsLimits()

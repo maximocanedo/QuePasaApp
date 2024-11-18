@@ -56,15 +56,15 @@ fun PostCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
+            .padding(3.dp),
+        shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         onClick = {
             navController.navigate("postDetailedScreen/${post.id}")
         }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -90,7 +90,7 @@ fun PostCard(
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = neighbourhoodName,
-                                fontSize = 12.sp,
+                                fontSize = 10.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -99,7 +99,7 @@ fun PostCard(
                     }
                     Text(
                         text = post.timestamp.formatTimeAgo(),
-                        fontSize = 12.sp,
+                        fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -112,8 +112,8 @@ fun PostCard(
             )
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = 2.dp,
+                modifier = Modifier.padding(vertical = 4.dp),
+                thickness = 1.dp,
                 color = MaterialTheme.colorScheme.secondary
             )
 

@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +38,8 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewMode
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
+import androidx.compose.runtime.rememberCoroutineScope
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +57,9 @@ fun EventsScreen(navController: NavHostController) {
     var search by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var eventToDelete by remember { mutableStateOf<UUID?>(null) }
+
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.sortEventsByVotes()
@@ -84,49 +90,55 @@ fun EventsScreen(navController: NavHostController) {
         }
     }
 
-
     BaseComponent(navController, user.user, "Listado Eventos", false) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    viewModel.refreshEvents()
+                }
+            }
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    value = search,
-                    onValueChange = {
-                        search = it
-                        viewModel.viewModelScope.launch {
-                            viewModel.getEvents(search)
-                            category = ""
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = search,
+                        onValueChange = {
+                            search = it
+                            viewModel.viewModelScope.launch {
+                                viewModel.getEvents(search)
+                                category = ""
+                            }
+                        },
+                        label = {
+                            Text("Buscar")
+                        },
+                        placeholder = {
+                            Text("Curso de ...")
                         }
-                    },
-                    label = {
-                        Text("Buscar")
-                    },
-                    placeholder = {
-                        Text("Curso de ...")
-                    }
-                )
-            }
-            Row {
-                EventCategoryField(
-                    modifier = Modifier.fillMaxWidth(),
-                    category = category,
-                    onItemSelected = {
-                        category = it
-                        viewModel.viewModelScope.launch {
-                            viewModel.getEventsByCategory(EventCategory.valueOf(it))
-                            search = ""
+                    )
+                }
+                Row {
+                    EventCategoryField(
+                        modifier = Modifier.fillMaxWidth(),
+                        category = category,
+                        onItemSelected = {
+                            category = it
+                            viewModel.viewModelScope.launch {
+                                viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                search = ""
+                            }
                         }
-                    }
-                )
-            }
-            Row {
+                    )
+                }
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -168,6 +180,7 @@ fun EventsScreen(navController: NavHostController) {
             }
         }
     }
+
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -197,7 +210,6 @@ fun EventsScreen(navController: NavHostController) {
             properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
         )
     }
-
 }
 
 fun resetEvents(

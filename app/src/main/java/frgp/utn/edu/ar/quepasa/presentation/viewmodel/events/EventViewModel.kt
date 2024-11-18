@@ -31,6 +31,9 @@ class EventViewModel @Inject constructor(
 ) : ViewModel() {
     // Data fields Variables
     private val titleMutable = MutableStateFlow("")
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     fun setTitle(x: String) {
         titleMutable.value = x
     }
@@ -454,6 +457,19 @@ class EventViewModel @Inject constructor(
         endDateValidation()
         if (neighbourhoods.value.isNotEmpty()) {
             neighbourhoodIsValidMutable.value = true
+        }
+    }
+
+    fun refreshEvents() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                getEvents(page = 0, size = 5)
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 }

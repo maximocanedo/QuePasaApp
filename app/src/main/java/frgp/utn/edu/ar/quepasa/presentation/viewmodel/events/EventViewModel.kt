@@ -167,12 +167,14 @@ class EventViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getEvents(0, 5, true)
+            getEvents(page = 0, size = 10)
+            sortEventsByVotes()
         }
     }
 
     /** GET **/
     suspend fun getEvents(
+        search: String = "",
         page: Int = 0,
         size: Int = 100,
         active: Boolean = true,
@@ -180,22 +182,13 @@ class EventViewModel @Inject constructor(
     ) {
         try {
             val events =
-                repository.getEvents(page = page, size = size, active = active, sort = sort)
-            _events.value = events
-        } catch (e: Exception) {
-            _errorMessage.value = e.message
-        }
-    }
-
-    suspend fun getEvents(
-        query: String,
-        page: Int = 0,
-        size: Int = 10,
-        activeOnly: Boolean = true,
-        sort: String = "title,asc"
-    ) {
-        try {
-            val events = repository.getEvents(query, page, size, activeOnly, sort)
+                repository.getEvents(
+                    query = search,
+                    page = page,
+                    size = size,
+                    active = active,
+                    sort = sort
+                )
             _events.value = events
         } catch (e: Exception) {
             _errorMessage.value = e.message
@@ -364,6 +357,16 @@ class EventViewModel @Inject constructor(
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
+    }
+
+    fun sortEventsByVotes() {
+        val events = _events.value.content.sortedByDescending { it.votes?.votes }
+        _events.value.content = Page(
+            content = events,
+            totalElements = events.size,
+            totalPages = _events.value.totalPages,
+            pageNumber = _events.value.pageNumber
+        ).content
     }
 
     fun titleValidator(title: String): EventTitleValidator {

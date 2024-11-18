@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsScreen(navController: NavHostController) {
     val user by LocalAuth.current.collectAsState()
@@ -52,6 +54,10 @@ fun EventsScreen(navController: NavHostController) {
     var search by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var eventToDelete by remember { mutableStateOf<UUID?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.sortEventsByVotes()
+    }
 
     LaunchedEffect(Unit, events) {
         viewModel.viewModelScope.launch {
@@ -202,10 +208,13 @@ fun resetEvents(
     viewModel.viewModelScope.launch {
         if (category.isNotBlank()) {
             viewModel.getEventsByCategory(EventCategory.valueOf(category))
+            viewModel.sortEventsByVotes()
         } else if (search.isNotBlank()) {
             viewModel.getEvents(search)
+            viewModel.sortEventsByVotes()
         } else {
             viewModel.getEvents()
+            viewModel.sortEventsByVotes()
         }
     }
 }

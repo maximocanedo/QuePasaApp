@@ -1,5 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.events
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,12 +10,15 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
+import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
 import quepasa.api.exceptions.ValidationError
@@ -33,6 +38,13 @@ class EventViewModel @Inject constructor(
     private val titleMutable = MutableStateFlow("")
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+    val currentPage: MutableState<Int> = mutableStateOf(0)
+    private val pageSize = 5
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore = _isLoadingMore.asStateFlow()
+    val totalPages: MutableState<Int> = mutableStateOf(0)
+    val actualPage: MutableState<Int> = mutableStateOf(0)
+
 
     fun setTitle(x: String) {
         titleMutable.value = x
@@ -101,6 +113,7 @@ class EventViewModel @Inject constructor(
     private val _events = MutableStateFlow<Page<Event>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val events: MutableStateFlow<Page<Event>> get() = _events
 
+
     private val _event = MutableStateFlow<Event?>(null)
     val event: MutableStateFlow<Event?> get() = _event
 
@@ -112,6 +125,7 @@ class EventViewModel @Inject constructor(
 
     private val _comments = MutableStateFlow<Page<Comment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val comments: MutableStateFlow<Page<Comment>> get() = _comments
+
 
     private val _comment = MutableStateFlow<Comment?>(null)
     val comment: MutableStateFlow<Comment?> get() = _comment
@@ -170,7 +184,7 @@ class EventViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getEvents(page = 0, size = 10)
+            getEvents(page = 0, size = 5)
             sortEventsByVotes()
         }
     }
@@ -179,7 +193,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEvents(
         search: String = "",
         page: Int = 0,
-        size: Int = 1000000000,
+        size: Int = 5,
         active: Boolean = true,
         sort: String = "title,asc"
     ) {
@@ -193,6 +207,9 @@ class EventViewModel @Inject constructor(
                     sort = sort
                 )
             _events.value = events
+            totalPages.value = events.totalPages
+            actualPage.value = events.pageNumber
+
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -242,7 +259,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEventsByCategory(
         category: EventCategory,
         page: Int = 0,
-        size: Int = 1000000000,
+        size: Int = 5,
         active: Boolean = true
     ) {
         try {
@@ -465,6 +482,7 @@ class EventViewModel @Inject constructor(
             _isRefreshing.value = true
             try {
                 getEvents(page = 0, size = 5)
+                currentPage.value=0
             } catch (e: Exception) {
                 _errorMessage.value = e.message
             } finally {
@@ -472,4 +490,21 @@ class EventViewModel @Inject constructor(
             }
         }
     }
+    fun loadMoreEvents() {
+        if (currentPage.value < totalPages.value) {
+            viewModelScope.launch {
+                _isLoadingMore.value = true
+                try {
+                    val moreEvents = repository.getEvents(page = currentPage.value + 1, size = pageSize, active = true)
+                    _events.update { it.copy(content = it.content + moreEvents.content) }
+                    currentPage.value += 1
+                } catch (e: Exception) {
+                    _errorMessage.value = e.message
+                } finally {
+                    _isLoadingMore.value = false
+                }
+            }
+        }
+    }
+
 }

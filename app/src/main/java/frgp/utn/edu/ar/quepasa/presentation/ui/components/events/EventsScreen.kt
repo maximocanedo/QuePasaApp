@@ -1,26 +1,10 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -38,8 +22,8 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewMode
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
-import androidx.compose.runtime.rememberCoroutineScope
-
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +32,14 @@ fun EventsScreen(navController: NavHostController) {
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
+    val eventState = viewModel.events.collectAsStateWithLifecycle()
 
     val events by viewModel.events.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+
+    var currentPage by remember { mutableStateOf(0) }
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
@@ -60,6 +48,9 @@ fun EventsScreen(navController: NavHostController) {
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    var showSnackbar by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.sortEventsByVotes()
@@ -96,6 +87,7 @@ fun EventsScreen(navController: NavHostController) {
             onRefresh = {
                 coroutineScope.launch {
                     viewModel.refreshEvents()
+                    currentPage = 0
                 }
             }
         ) {
@@ -139,6 +131,7 @@ fun EventsScreen(navController: NavHostController) {
                         }
                     )
                 }
+
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -176,10 +169,48 @@ fun EventsScreen(navController: NavHostController) {
                             )
                         }
                     }
+
+                    if (currentPage < eventState.value.totalPages - 1) {
+                        item {
+                            if (isLoadingMore) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(16.dp)
+                                )
+                            } else {
+                                Button(
+                                    onClick = {
+                                        if (currentPage < eventState.value.totalPages - 1) {
+                                            currentPage++
+                                            viewModel.loadMoreEvents()
+                                        } else {
+                                            showSnackbar = true
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    Text("Cargar más")
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
+    LaunchedEffect(showSnackbar) {
+        if (showSnackbar) {
+            snackbarHostState.showSnackbar("Ya estás al día con los eventos.")
+            showSnackbar = false
+        }
+    }
+    SnackbarHost(
+        hostState = snackbarHostState
+    )
 
     if (showDialog) {
         AlertDialog(

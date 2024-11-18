@@ -25,7 +25,7 @@ val TIGRE = City(
     subdivision = BUENOS_AIRES_PROVINCE
 )
 val SF = City(
-    name = "San Fernando",
+    name = "Municipio de San Fernando",
     id = 35L,
     active = true,
     subdivision = BUENOS_AIRES_PROVINCE
@@ -67,8 +67,8 @@ val CitiesMDFP: Set<City> = setOf(
 val NeighbourhoodsMDFP: Set<Neighbourhood> = setOf(
     Neighbourhood(
         id = 1,
-        name = "Tigre Joven",
-        city = TIGRE,
+        name = "Canal de San Fernando",
+        city = SF,
         active = true
     ),
     Neighbourhood(

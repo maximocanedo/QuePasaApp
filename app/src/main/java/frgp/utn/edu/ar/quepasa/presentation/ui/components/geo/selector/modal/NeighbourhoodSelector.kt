@@ -252,6 +252,7 @@ fun NeighbourhoodSelectorPreview() {
     var displayedNeighbourhoods by remember { mutableStateOf(NeighbourhoodsMDFP.take(5)) }
     var showing by remember { mutableStateOf(true) }
     var selectedNeighbourhoods by remember { mutableStateOf(NeighbourhoodsMDFP.take(1).toSet()) }
+
     if(!showing) Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

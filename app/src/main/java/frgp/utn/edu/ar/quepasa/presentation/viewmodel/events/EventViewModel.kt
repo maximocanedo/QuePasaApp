@@ -167,14 +167,20 @@ class EventViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getEvents(0, 100, true)
+            getEvents(0, 5, true)
         }
     }
 
     /** GET **/
-    suspend fun getEvents(page: Int = 0, size: Int = 100, active: Boolean = true) {
+    suspend fun getEvents(
+        page: Int = 0,
+        size: Int = 100,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ) {
         try {
-            val events = repository.getEvents(page = page, size = size, active = active)
+            val events =
+                repository.getEvents(page = page, size = size, active = active, sort = sort)
             _events.value = events
         } catch (e: Exception) {
             _errorMessage.value = e.message
@@ -240,7 +246,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEventsByCategory(
         category: EventCategory,
         page: Int = 0,
-        size: Int = 100,
+        size: Int = 10,
         active: Boolean = true
     ) {
         try {

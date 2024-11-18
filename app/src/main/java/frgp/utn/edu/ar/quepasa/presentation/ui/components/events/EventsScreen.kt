@@ -56,7 +56,9 @@ fun EventsScreen(navController: NavHostController) {
     LaunchedEffect(Unit, events) {
         viewModel.viewModelScope.launch {
             events.content.forEach { event ->
-                eventPictureViewModel.setEventsPicture(event.id!!)
+                if (pictures.find { it.event?.id == event.id } == null) {
+                    eventPictureViewModel.setEventsPicture(event.id!!)
+                }
             }
         }
     }
@@ -64,14 +66,15 @@ fun EventsScreen(navController: NavHostController) {
     LaunchedEffect(pictures) {
         pictureViewModel.viewModelScope.launch {
             pictures.forEach { picture ->
-                picture.event?.id?.let {
-                    pictureViewModel.setPictureEvents(
-                        picture.id,
-                        it,
-                    )
+                picture.event?.id?.let { uuid ->
+                    if (eventPictureDTO.find { it?.eventId == picture.event?.id } == null) {
+                        pictureViewModel.setPictureEvents(
+                            picture.id,
+                            uuid,
+                        )
+                    }
                 }
             }
-            pictureViewModel.setEventPictureDTO(eventPictureDTO)
         }
     }
 

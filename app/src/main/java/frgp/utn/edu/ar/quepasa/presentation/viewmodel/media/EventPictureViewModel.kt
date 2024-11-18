@@ -71,15 +71,11 @@ class EventPictureViewModel @Inject constructor(
 
     suspend fun setEventsPicture(id: UUID) {
         try {
-            val pictures = repository.getPicturesByEvent(id, 0, 10).content
+            val pictures = repository.getPicturesByEvent(id, 0, 10).content.first()
             _eventPictures.value += pictures
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
-    }
-
-    fun clearEventPictures() {
-        _eventPictures.value = emptyList()
     }
 
     suspend fun upload(context: Context, uri: Uri, event: UUID) {

@@ -1,11 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,44 +30,29 @@ import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.geo.City
 import frgp.utn.edu.ar.quepasa.data.model.geo.Country
-import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.ARGENTINA
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.CitiesMDFP
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.CityChipContainer
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.CityList
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.CountryList
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.GeographicContextRow
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodChipContainer
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodList
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodsMDFP
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.StatesMDFP
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SubnationalDivisionList
 
-enum class NeighbourhoodSelectorScreen {
+enum class CitySelectorScreen {
     COUNTRY,
     STATE,
-    CITY,
-    NEIGHBOURHOOD
+    CITY
 }
 
-val enterTransition = slideInHorizontally(
-    initialOffsetX = { 72 },
-    animationSpec = tween(durationMillis = 500)
-) + fadeIn(
-    initialAlpha = 0f
-)
-
-val exitTransition = slideOutHorizontally(
-    targetOffsetX = { 72 },
-    animationSpec = tween(durationMillis = 500)
-) + fadeOut()
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NeighbourhoodSelector(
+fun CitySelector(
     modifier: Modifier = Modifier,
-    value: Set<Neighbourhood> = emptySet(),
+    value: Set<City> = emptySet(),
     countries: List<Country> = emptyList(),
     onCountrySelected: (Country) -> Unit = {  },
     onCountryLoadRequest: suspend () -> Unit = {  },
@@ -80,23 +60,19 @@ fun NeighbourhoodSelector(
     onStateSelected: (SubnationalDivision) -> Unit = {  },
     onStateLoadRequest: suspend () -> Unit = {  },
     cities: List<City> = emptyList(),
-    onCitySelected: (City) -> Unit,
     onCityLoadRequest: suspend () -> Unit = {  },
-    neighbourhoods: List<Neighbourhood> = emptyList(),
-    onNeighbourhoodSelect: (Neighbourhood) -> Unit = {  },
-    onNeighbourhoodUnselectRequest: (Neighbourhood) -> Unit = {  },
-    onNeighbourhoodLoadRequest: suspend () -> Unit = {  },
+    onCitySelect: (City) -> Unit = {  },
+    onCityUnselectRequest: (City) -> Unit = {  },
     onDismiss: () -> Unit = {  },
     isLoading: NeighbourhoodSelectorScreen? = null,
     limit: Int? = null,
     valid: Boolean = true,
     onContinue: () -> Unit = {  }
 ) {
-    var city by remember { mutableStateOf<City?>(if(value.isEmpty()) null else value.last().city) }
-    var state by remember { mutableStateOf<SubnationalDivision?>(if(value.isEmpty()) null else value.last().city.subdivision) }
-    var country by remember { mutableStateOf<Country?>(if(value.isEmpty()) null else value.last().city.subdivision.country) }
+    var state by remember { mutableStateOf<SubnationalDivision?>(if(value.isEmpty()) null else value.last().subdivision) }
+    var country by remember { mutableStateOf<Country?>(if(value.isEmpty()) null else value.last().subdivision.country) }
     val rowModifier: Modifier = Modifier.fillMaxWidth()
-    var tab: NeighbourhoodSelectorScreen by remember { mutableStateOf(if(value.isEmpty()) NeighbourhoodSelectorScreen.COUNTRY else NeighbourhoodSelectorScreen.NEIGHBOURHOOD) }
+    var tab: NeighbourhoodSelectorScreen by remember { mutableStateOf(if(value.isEmpty()) NeighbourhoodSelectorScreen.COUNTRY else NeighbourhoodSelectorScreen.CITY) }
 
 
     Column(
@@ -105,7 +81,7 @@ fun NeighbourhoodSelector(
         Row(rowModifier) {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = { Text(if(limit != null && limit == 1) "Seleccioná un barrio" else "Seleccionar barrios") },
+                title = { Text(if(limit != null && limit == 1) "Seleccioná una ciudad" else "Seleccionar ciudades") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
@@ -122,7 +98,7 @@ fun NeighbourhoodSelector(
             )
         }
         GeographicContextRow(
-            city = city,
+            city = null,
             state = state,
             country = country,
             tab = tab,
@@ -142,7 +118,6 @@ fun NeighbourhoodSelector(
                             onClick = {
                                 country = it
                                 state = null
-                                city = null
                                 onCountrySelected(it)
                                 tab = NeighbourhoodSelectorScreen.STATE
                             },
@@ -163,8 +138,6 @@ fun NeighbourhoodSelector(
                             showGeographicalContext = false,
                             onClick = {
                                 state = it
-                                city = null
-
                                 onStateSelected(it)
                                 tab = NeighbourhoodSelectorScreen.CITY
                             },
@@ -183,10 +156,16 @@ fun NeighbourhoodSelector(
                             modifier = Modifier.fillMaxSize(),
                             items = cities,
                             showGeographicalContext = false,
+                            selected = value.toList(),
+                            selectable = limit == null || limit > 1,
                             onClick = {
-                                city = it
-                                onCitySelected(it)
-                                tab = NeighbourhoodSelectorScreen.NEIGHBOURHOOD
+                                onCitySelect(it)
+                            },
+                            onCheckedChange = { city, value ->
+                                if (value) {
+                                    onCitySelect(city)
+                                }
+                                else onCityUnselectRequest(city)
                             },
                             isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.CITY,
                             onNextRequest = onCityLoadRequest
@@ -194,30 +173,7 @@ fun NeighbourhoodSelector(
                     }
                 }
                 NeighbourhoodSelectorScreen.NEIGHBOURHOOD -> {
-                    AnimatedVisibility(
-                        visible = tab == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
-                        enter = enterTransition,
-                        exit = exitTransition
-                    ) {
-                        NeighbourhoodList(
-                            modifier = Modifier.fillMaxSize(),
-                            items = neighbourhoods,
-                            selectable = limit == null || limit > 1,
-                            selected = value.toList(),
-                            onCheckedChange = { neighbourhood, value ->
-                                if (value) {
-                                    onNeighbourhoodSelect(neighbourhood)
-                                }
-                                else onNeighbourhoodUnselectRequest(neighbourhood)
-                            },
-                            showGeographicalContext = false,
-                            onClick = {
-                                onNeighbourhoodSelect(it)
-                            },
-                            isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
-                            onNextRequest = onNeighbourhoodLoadRequest
-                        )
-                    }
+                    tab = NeighbourhoodSelectorScreen.CITY
                 }
             }
         }
@@ -226,12 +182,12 @@ fun NeighbourhoodSelector(
             Column(modifier = Modifier.weight(1f)) {
                 if (value.isNotEmpty()) {
                     Text(
-                        text = if(value.size == 1) "Barrio seleccionado" else "Barrios seleccionados",
+                        text = if(value.size == 1) "Ciudad seleccionada" else "Ciudades seleccionadas",
                         modifier = Modifier.padding(start = 8.dp, top = 4.dp))
                 }
-                NeighbourhoodChipContainer(
+                CityChipContainer(
                     data = value,
-                    onUnselectRequest = onNeighbourhoodUnselectRequest
+                    onUnselectRequest = onCityUnselectRequest
                 )
             }
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
@@ -245,14 +201,12 @@ fun NeighbourhoodSelector(
 
 @Preview
 @Composable
-fun NeighbourhoodSelectorPreview() {
-    // Estados para controlar la cantidad de elementos cargados
+fun CitySelectorPreview() {
     var displayedCountries by remember { mutableStateOf(listOf(ARGENTINA)) }
     var displayedStates by remember { mutableStateOf(StatesMDFP.take(5)) }
     var displayedCities by remember { mutableStateOf(CitiesMDFP.take(5)) }
-    var displayedNeighbourhoods by remember { mutableStateOf(NeighbourhoodsMDFP.take(5)) }
     var showing by remember { mutableStateOf(true) }
-    var selectedNeighbourhoods by remember { mutableStateOf(NeighbourhoodsMDFP.take(1).toSet()) }
+    var selectedCities by remember { mutableStateOf(CitiesMDFP.take(1).toSet()) }
     if(!showing) Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -262,9 +216,9 @@ fun NeighbourhoodSelectorPreview() {
             Text("Mostrar selector")
         }
     }
-    if(showing) NeighbourhoodSelector(
+    if(showing) CitySelector(
         modifier = Modifier.fillMaxSize(),
-        value = selectedNeighbourhoods,
+        value = selectedCities,
         countries = displayedCountries,
         onCountrySelected = { selectedCountry ->
             println("País seleccionado: ${selectedCountry.label}")
@@ -280,30 +234,22 @@ fun NeighbourhoodSelectorPreview() {
             displayedStates = StatesMDFP.take(displayedStates.size + 5)
         },
         cities = displayedCities,
-        onCitySelected = { selectedCity ->
-            println("Ciudad seleccionada: ${selectedCity.name}")
-        },
         onCityLoadRequest = {
             displayedCities = CitiesMDFP.take(displayedCities.size + 5)
         },
-        neighbourhoods = displayedNeighbourhoods,
-        onNeighbourhoodSelect = { selectedNeighbourhood ->
-            // selectedNeighbourhoods = selectedNeighbourhoods + selectedNeighbourhood // Selección múltiple.
-            selectedNeighbourhoods = setOf(selectedNeighbourhood) // Selección individual
+        onCitySelect = { selectedCity ->
+            // selectedCities = selectedCities + selectedCity // Selección múltiple.
+            selectedCities = setOf(selectedCity) // Selección individual
 
-            println("Barrio seleccionado: ${selectedNeighbourhood.name}")
+            println("Ciudad seleccionada: ${selectedCity.name}")
         },
-        onNeighbourhoodUnselectRequest = { unselectedNeighbourhood ->
-            // Quita el barrio del conjunto
-            selectedNeighbourhoods = selectedNeighbourhoods - unselectedNeighbourhood
+        onCityUnselectRequest = { unselectedNeighbourhood ->
+            selectedCities = selectedCities - unselectedNeighbourhood
             println("Barrio deseleccionado: ${unselectedNeighbourhood.name}")
-        },
-        onNeighbourhoodLoadRequest = {
-            displayedNeighbourhoods = NeighbourhoodsMDFP.take(displayedNeighbourhoods.size + 5)
         },
         onDismiss = { showing = false },
         limit = 1,
-        valid = selectedNeighbourhoods.isNotEmpty(),
+        valid = selectedCities.isNotEmpty(),
         onContinue = {  }
     )
 }

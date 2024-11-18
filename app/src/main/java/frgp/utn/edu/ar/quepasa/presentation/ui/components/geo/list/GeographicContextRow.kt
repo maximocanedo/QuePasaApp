@@ -26,7 +26,7 @@ import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.geo.City
 import frgp.utn.edu.ar.quepasa.data.model.geo.Country
 import frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector.NeighbourhoodSelectorScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector.modal.NeighbourhoodSelectorScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

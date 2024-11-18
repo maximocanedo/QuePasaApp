@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector.modal
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -29,19 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.geo.Country
-import frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.ARGENTINA
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.CountryList
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.GeoChipContainer
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.GeographicContextRow
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.StatesMDFP
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SubnationalDivisionList
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeoSelector(
+fun GeographicModalSelector(
     modifier: Modifier = Modifier,
     value: Set<Country> = emptySet(),
     countries: List<Country> = emptyList(),
@@ -141,7 +136,7 @@ fun CountrySelectorPreview() {
             Text("Mostrar selector")
         }
     }
-    if(showing) GeoSelector(
+    if(showing) GeographicModalSelector(
         modifier = Modifier.fillMaxSize(),
         value = selected,
         countries = displayedCountries,

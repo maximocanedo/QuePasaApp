@@ -1,8 +1,12 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,7 +29,7 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.presentation.ui.theme.Blue1
 
 @Composable
-fun CreateContentDropdown(navController : NavHostController) {
+fun CreateContentDropdown(navController: NavHostController) {
     var expanded by remember { mutableStateOf(false) }
 
     Row(
@@ -35,12 +39,12 @@ fun CreateContentDropdown(navController : NavHostController) {
     ) {
         FloatingActionButton(
             onClick = { expanded = true },
-            modifier = Modifier.padding(end = 60.dp, bottom = 10.dp),
+            modifier = Modifier.padding(end = 10.dp, bottom = 10.dp),
             containerColor = Blue1,
         ) {
             Icon(
                 Icons.Filled.Add,
-                "Post/Event Create",
+                contentDescription = "Post/Event Create",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -48,7 +52,7 @@ fun CreateContentDropdown(navController : NavHostController) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            offset = DpOffset(x = (-40).dp, y = (-10).dp)
+            offset = DpOffset(x = (-20).dp, y = 48.dp)
         ) {
             DropdownMenuItem(
                 text = { Text("Publicación") },

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,14 +56,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.sql.Timestamp
 
-@Deprecated("")
-@AndroidEntryPoint
-class ProfileScreenLegacy: AuthenticatedActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-}
-
 @Composable
 fun ProfileScreen(navController: NavHostController, username: String? = null) {
     val cur by LocalAuth.current.collectAsState()
@@ -85,7 +78,8 @@ fun ProfileScreen(navController: NavHostController, username: String? = null) {
             viewModel::onPhoneValidationRequest,
             viewModel::onPhoneDeleteRequest,
             viewModel::onPatchEditRequest,
-            viewModel::onConfirmedDeleteRequest
+            viewModel::onConfirmedDeleteRequest,
+            navController
         )
     }
 
@@ -104,7 +98,8 @@ fun ProfileScreenContent(
     onPhoneValidationRequest: suspend (Phone, String) -> Boolean,
     onPhoneDeleteRequest: suspend (Phone) -> Unit,
     onPatchEditRequest: suspend (UserPatchEditRequest) -> Unit,
-    onConfirmedDisableRequest: suspend () -> Unit
+    onConfirmedDisableRequest: suspend () -> Unit,
+    navController: NavHostController
 ) {
     val me by LocalAuth.current.collectAsState()
     val context = LocalContext.current
@@ -114,7 +109,7 @@ fun ProfileScreenContent(
             me.ok && me.username == (user.username)
         }
     }
-    val navController = rememberNavController()
+
     BaseComponent(navController, user, title = "Perfil", back = false) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -161,13 +156,14 @@ fun ProfileScreenContent(
             }
         }
     }
+
     if(showDisableDialog) AlertDialog(
         onDismissRequest = { showDisableDialog = false },
         title = {
             Text("¿Seguro de eliminar ${if(itsMe) "tu " else ""}cuenta?")
         },
         text = {
-          Text("Esta acción es permanente y no se puede deshacer. ")
+            Text("Esta acción es permanente y no se puede deshacer. ")
         },
         confirmButton = {
             TextButton(
@@ -194,44 +190,3 @@ fun ProfileScreenContent(
     )
 }
 
-@Preview @Composable
-fun ProfileScreenContentPreview() {
-    ProfileScreenContent(User(
-        id = 1,
-        username = "root",
-        name = "Root",
-        phone = emptySet(),
-        address = "",
-        neighbourhood = null,
-        picture = null,
-        email = setOf(
-            Mail(
-                mail= "parravicini@gmail.com",
-                user = null,
-                requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
-                verified = true,
-                verifiedAt = Timestamp(System.currentTimeMillis())
-            ),
-            Mail(
-                mail= "abc@gmail.com",
-                user = null,
-                requestedAt = Timestamp(System.currentTimeMillis() - 102410241024),
-                verified = false,
-                verifiedAt = Timestamp(System.currentTimeMillis())
-            )
-        ),
-        role = Role.ADMIN,
-        active = true
-    ),
-        { mailAddress ->  },
-        { mail, code -> true },
-        { mail ->  },
-        isRefreshing = false,
-        onRefresh = {  },
-        onPhoneRegistration = {  },
-        onPhoneValidationRequest = { phone, code -> true },
-        onPhoneDeleteRequest = {  },
-        onPatchEditRequest = {  },
-        onConfirmedDisableRequest = {  }
-    )
-}

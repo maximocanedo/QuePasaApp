@@ -181,25 +181,25 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event!!.id!!)
-                                        viewModel.getEventById(event!!.id!!)
+                                        viewModel.getEventById(eventId)
                                     }
                                 },
                                 onRemoveClick = {
                                     viewModel.viewModelScope.launch {
-                                        viewModel.rsvpEvent(event!!.id!!)
                                         viewModel.deleteEvent(event!!.id!!)
+                                        viewModel.getEventById(eventId)
                                     }
                                 },
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
-                                        viewModel.rsvpEvent(event!!.id!!)
                                         viewModel.upVote(event!!.id!!)
+                                        viewModel.getEventById(eventId)
                                     }
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {
-                                        viewModel.rsvpEvent(event!!.id!!)
                                         viewModel.downVote(event!!.id!!)
+                                        viewModel.getEventById(eventId)
                                     }
                                 }
                             )

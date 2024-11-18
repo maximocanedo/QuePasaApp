@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -70,153 +71,161 @@ fun CreateEventScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row {
-                TitleField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = title,
-                    validator = viewModel::titleValidator,
-                    onChange = { value, valid ->
-                            viewModel.setTitle(value)
-                            viewModel.setTitleIsValid(valid)
-                    }
-                )
-            }
-            Row {
-                DescriptionField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = description,
-                    validator = viewModel::descriptionValidator,
-                    onChange = { value, valid ->
-                            viewModel.setDescription(value)
-                            viewModel.setDescriptionIsValid(valid)
-                    }
-                )
-            }
-            Row {
-                AddressField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = address,
-                    validator = viewModel::addressValidator,
-                    onChange = { value, valid ->
-                            viewModel.setAddress(value)
-                            viewModel.setAddressIsValid(valid)
-                    }
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            androidx.compose.foundation.rememberScrollState().let { scrollState ->
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(scrollState)
                 ) {
-                    DateField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = start,
-                        validator = { viewModel.startValidator(it) },
-                        onChange = { value, valid ->
-                                viewModel.setStart(value)
-                                viewModel.setStartDateIsValid(valid)
-                            viewModel.endDateValidation()
-                        },
-                        label = "Fecha de inicio",
-                        isError = !viewModel.startDateIsValid.collectAsState().value,
-                        errorMessage = viewModel.startDateErrorMessage,
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    DateField(
-                        modifier = Modifier.widthIn(120.dp, 240.dp),
-                        value = end,
-                        validator = { viewModel.endValidator(it) },
-                        onChange = { value, valid ->
-                                viewModel.setEnd(value)
-                                viewModel.setEndDateIsValid(valid)
-                            viewModel.startDateValidation()
-                        },
-                        label = "Fecha de fin",
-                        isError = !viewModel.endDateIsValid.collectAsState().value,
-                        errorMessage = viewModel.endDateErrorMessage,
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    EventAudienceField(
-                        modifier = Modifier
-                            .padding(bottom = 8.dp),
-                        audience = audience,
-                        onItemSelected = {
-                            viewModel.setAudience(it)
-                        }
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    EventCategoryField(
-                        modifier = Modifier
-                            .padding(bottom = 8.dp),
-                        category = category,
-                        onItemSelected = {
-                            viewModel.setCategory(it)
-                        }
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(0.7f)
-                ) {
-                    OutlinedTextField(
-                        value = neighbourhoodsNames.joinToString(", "),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Barrios") },
-                        modifier = Modifier.fillMaxWidth(),
-                        isError = !viewModel.neighbourhoodIsValid.collectAsState().value,
-                        supportingText = {
-                            if (!viewModel.neighbourhoodIsValid.collectAsState().value) {
-                                Text("Debe seleccionar al menos un barrio")
+                    Row {
+                        TitleField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = title,
+                            validator = viewModel::titleValidator,
+                            onChange = { value, valid ->
+                                viewModel.setTitle(value)
+                                viewModel.setTitleIsValid(valid)
                             }
-                        },
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(0.3f)
-                ) {
-                    Button(
-                        onClick = {
-                            openNeighbourhoodDialog.value = true
-                        },
-                        shape = MaterialTheme.shapes.medium
+                        )
+                    }
+                    Row {
+                        DescriptionField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = description,
+                            validator = viewModel::descriptionValidator,
+                            onChange = { value, valid ->
+                                viewModel.setDescription(value)
+                                viewModel.setDescriptionIsValid(valid)
+                            }
+                        )
+                    }
+                    Row {
+                        AddressField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = address,
+                            validator = viewModel::addressValidator,
+                            onChange = { value, valid ->
+                                viewModel.setAddress(value)
+                                viewModel.setAddressIsValid(valid)
+                            }
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("Agregar Barrios")
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            DateField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = start,
+                                validator = { viewModel.startValidator(it) },
+                                onChange = { value, valid ->
+                                    viewModel.setStart(value)
+                                    viewModel.setStartDateIsValid(valid)
+                                    viewModel.endDateValidation()
+                                },
+                                label = "Fecha de inicio",
+                                isError = !viewModel.startDateIsValid.collectAsState().value,
+                                errorMessage = viewModel.startDateErrorMessage,
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            DateField(
+                                modifier = Modifier.widthIn(120.dp, 240.dp),
+                                value = end,
+                                validator = { viewModel.endValidator(it) },
+                                onChange = { value, valid ->
+                                    viewModel.setEnd(value)
+                                    viewModel.setEndDateIsValid(valid)
+                                    viewModel.startDateValidation()
+                                },
+                                label = "Fecha de fin",
+                                isError = !viewModel.endDateIsValid.collectAsState().value,
+                                errorMessage = viewModel.endDateErrorMessage,
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            EventAudienceField(
+                                modifier = Modifier
+                                    .padding(bottom = 8.dp),
+                                audience = audience,
+                                onItemSelected = {
+                                    viewModel.setAudience(it)
+                                }
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            EventCategoryField(
+                                modifier = Modifier
+                                    .padding(bottom = 8.dp),
+                                category = category,
+                                onItemSelected = {
+                                    viewModel.setCategory(it)
+                                }
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(0.7f)
+                        ) {
+                            OutlinedTextField(
+                                value = neighbourhoodsNames.joinToString(", "),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Barrios") },
+                                modifier = Modifier.fillMaxWidth(),
+                                isError = !viewModel.neighbourhoodIsValid.collectAsState().value,
+                                supportingText = {
+                                    if (!viewModel.neighbourhoodIsValid.collectAsState().value) {
+                                        Text("Debe seleccionar al menos un barrio")
+                                    }
+                                },
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.weight(0.3f)
+                        ) {
+                            Button(
+                                onClick = {
+                                    openNeighbourhoodDialog.value = true
+                                },
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Text("Agregar Barrios")
+                            }
+                        }
+                    }
+                    Row {
+                        EventCreateImagesPreview(
+                            modifier = Modifier,
+                            imageViewModel.selectedUris,
+                            imageViewModel::clearImage
+                        )
+                        EventImageField(
+                            modifier = Modifier.fillMaxWidth(),
+                            imageViewModel::addImages
+                        )
                     }
                 }
-            }
-            Row {
-                EventCreateImagesPreview(
-                    modifier = Modifier,
-                    imageViewModel.selectedUris,
-                    imageViewModel::clearImage
-                )
-                EventImageField(
-                    modifier = Modifier.fillMaxWidth(),
-                    imageViewModel::addImages
-                )
             }
             Row {
                 Button(

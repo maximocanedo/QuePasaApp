@@ -21,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,7 +57,6 @@ fun EventsScreen(navController: NavHostController) {
     val eventRvsps by viewModel.eventRvsps.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
-    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
@@ -67,7 +65,8 @@ fun EventsScreen(navController: NavHostController) {
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    var currentPage by remember { mutableIntStateOf(0) }
+    val actualElements by viewModel.actualElements.collectAsState()
+    val totalElements by viewModel.totalElements.collectAsState()
 
     var showSnackbar by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -104,8 +103,6 @@ fun EventsScreen(navController: NavHostController) {
             onRefresh = {
                 coroutineScope.launch {
                     viewModel.refreshEvents()
-                    viewModel.getRvspsByUser()
-                    currentPage = 0
                 }
             }
         ) {
@@ -166,8 +163,7 @@ fun EventsScreen(navController: NavHostController) {
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
-                                        resetEvents(viewModel, category, search)
-                                        viewModel.getRvspsByUser()
+                                        resetEvents(viewModel, actualElements, category, search)
                                     }
                                 },
                                 onRemoveClick = {
@@ -177,35 +173,31 @@ fun EventsScreen(navController: NavHostController) {
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
-                                        resetEvents(viewModel, category, search)
+                                        resetEvents(viewModel, actualElements, category, search)
                                     }
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.downVote(event.id!!)
-                                        resetEvents(viewModel, category, search)
+                                        resetEvents(viewModel, actualElements, category, search)
                                     }
                                 }
                             )
                         }
                     }
-
-                    if (currentPage < eventState.value.totalPages - 1) {
-                        item {
-                            if (isLoadingMore) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(16.dp)
-                                )
-                            } else {
+                    item {
+                        if (isRefreshing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(16.dp)
+                            )
+                        } else {
+                            if (actualElements < totalElements) {
                                 Button(
                                     onClick = {
-                                        if (currentPage < eventState.value.totalPages - 1) {
-                                            currentPage++
+                                        viewModel.viewModelScope.launch {
                                             viewModel.loadMoreEvents()
-                                        } else {
-                                            showSnackbar = true
                                         }
                                     },
                                     modifier = Modifier
@@ -214,6 +206,8 @@ fun EventsScreen(navController: NavHostController) {
                                 ) {
                                     Text("Cargar más")
                                 }
+                            } else {
+                                showSnackbar = true
                             }
                         }
                     }
@@ -243,7 +237,7 @@ fun EventsScreen(navController: NavHostController) {
                         viewModel.viewModelScope.launch {
                             eventToDelete?.let { event ->
                                 viewModel.deleteEvent(event)
-                                resetEvents(viewModel, category, search)
+                                resetEvents(viewModel, actualElements, category, search)
                             }
                             eventToDelete = null
                             showDialog = false
@@ -265,6 +259,7 @@ fun EventsScreen(navController: NavHostController) {
 
 fun resetEvents(
     viewModel: EventViewModel,
+    actualElements: Int,
     category: String,
     search: String
 ) {

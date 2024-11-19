@@ -31,6 +31,10 @@ fun PostCommentCard(
     comment: PostComment,
     voteCount: VoteCount?,
     user: User,
+    onUpvoteClick: () -> Unit,
+    onDownvoteClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier

@@ -56,6 +56,9 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
 
     val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
+    var commentEditState by remember { mutableStateOf(false) }
+    var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
+    var commentEditText by remember { mutableStateOf("") }
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
@@ -230,6 +233,31 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                             comment = comment,
                                             voteCount = comment.votes,
                                             user = it,
+                                            onUpvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.upVoteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onDownvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.downVoteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onDeleteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.deleteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onEditClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentEditUUID = comment.id
+                                                    commentEditText = comment.content
+                                                    commentEditState = true
+                                                }
+                                            }
                                         )
                                     }
                                 }
@@ -250,6 +278,20 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         viewModel.getComments(eventId, 0, 10)
                     }
                     commentDialogState = false
+                }
+            )
+        }
+        if (commentEditState) {
+            CommentDialog(
+                content = commentEditText,
+                onDismissRequest = { commentEditState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.updateComment(commentEditUUID, content)
+                        viewModel.getComments(eventId, 0, 10)
+                    }
+                    commentEditText = ""
+                    commentEditState = false
                 }
             )
         }

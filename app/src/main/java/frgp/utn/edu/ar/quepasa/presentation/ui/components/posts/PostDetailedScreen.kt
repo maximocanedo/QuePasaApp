@@ -58,6 +58,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 @Composable
 fun PostDetailedScreen(
@@ -77,6 +78,9 @@ fun PostDetailedScreen(
     val votes by viewModel.votes.collectAsState()
     val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
+    var commentEditState by remember { mutableStateOf(false) }
+    var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
+    var commentEditText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.getPostById(postId)
@@ -283,6 +287,29 @@ fun PostDetailedScreen(
                                             comment = comment,
                                             voteCount = comment.votes,
                                             user = it,
+                                            onUpvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.upVoteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onDownvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.downVoteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onDeleteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.deleteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onEditClick = {
+                                                commentEditUUID = comment.id
+                                                commentEditText = comment.content
+                                                commentEditState = true
+                                            }
                                         )
                                     }
                                 }
@@ -303,6 +330,20 @@ fun PostDetailedScreen(
                         viewModel.getComments(postId)
                     }
                     commentDialogState = false
+                }
+            )
+        }
+        if (commentEditState) {
+            CommentDialog(
+                content = commentEditText,
+                onDismissRequest = { commentEditState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.updateComment(commentEditUUID, content)
+                        viewModel.getComments(postId)
+                    }
+                    commentEditText = ""
+                    commentEditState = false
                 }
             )
         }

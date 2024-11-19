@@ -32,6 +32,10 @@ fun EventCommentCard(
     comment: EventComment,
     voteCount: VoteCount?,
     user: User,
+    onUpvoteClick: () -> Unit,
+    onDownvoteClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier

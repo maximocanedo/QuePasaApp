@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.DialogProperties
@@ -76,6 +77,10 @@ fun PostScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(6.dp)
+
+
             ) {
                 if (!selectedTag.isNullOrEmpty()) {
                     Row(

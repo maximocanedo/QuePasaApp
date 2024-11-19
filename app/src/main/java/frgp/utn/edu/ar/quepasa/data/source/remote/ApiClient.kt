@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import frgp.utn.edu.ar.quepasa.data.AuthInterceptor
 import frgp.utn.edu.ar.quepasa.data.model.utils.LocalDateTimeDeserializer
 import frgp.utn.edu.ar.quepasa.data.source.remote.commenting.CommentService
+import frgp.utn.edu.ar.quepasa.data.source.remote.geo.GeoService
 import frgp.utn.edu.ar.quepasa.data.source.remote.geo.NeighbourhoodService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.EventPictureService
 import frgp.utn.edu.ar.quepasa.data.source.remote.media.PictureService
@@ -82,6 +83,13 @@ object ApiClient {
     fun provideNeighbourhoodService(retrofit: Retrofit): NeighbourhoodService {
         return retrofit
             .create(NeighbourhoodService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeoService(retrofit: Retrofit): GeoService {
+        return retrofit
+            .create(GeoService::class.java)
     }
 
     @Provides

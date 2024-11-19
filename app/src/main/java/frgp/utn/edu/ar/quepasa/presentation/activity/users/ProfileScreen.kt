@@ -110,7 +110,7 @@ fun ProfileScreenContent(
         }
     }
 
-    BaseComponent(navController, user, title = "Perfil", back = false) {
+    BaseComponent(navController, title = "Perfil", back = false) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = onRefresh
@@ -132,6 +132,10 @@ fun ProfileScreenContent(
                     },
                     onAddressUpdateRequest = {
                         val req = UserPatchEditRequest(address = it)
+                        onPatchEditRequest(req)
+                    },
+                    onNeighbourhoodUpdateRequest = {
+                        val req = UserPatchEditRequest(neighbourhood = it)
                         onPatchEditRequest(req)
                     }
                 )

@@ -8,10 +8,13 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.NavigationMainDrawer
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopBackBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopMainBar
@@ -19,15 +22,16 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopMainBar
 @Composable
 fun BaseComponent(
     navController: NavHostController,
-    user: User?,
     title: String,
     back: Boolean,
     backRoute: String = "home",
     content: @Composable () -> Unit
 ) {
+    val user by LocalAuth.current.collectAsState()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user) }) {
+
+    ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user.user) }) {
         Scaffold(
             topBar = { if(back) TopBackBar(title, navController, backRoute) else TopMainBar(title, scope, drawerState) }
         ) { paddingValues ->

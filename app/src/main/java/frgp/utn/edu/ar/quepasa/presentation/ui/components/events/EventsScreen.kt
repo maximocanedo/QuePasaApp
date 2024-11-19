@@ -97,7 +97,7 @@ fun EventsScreen(navController: NavHostController) {
         }
     }
 
-    BaseComponent(navController, user.user, "Listado Eventos", false) {
+    BaseComponent(navController, "Listado Eventos", false) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {

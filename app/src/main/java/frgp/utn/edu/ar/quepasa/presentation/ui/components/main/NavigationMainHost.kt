@@ -32,6 +32,14 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
     ) {
         composable("home") { MainPage(navController) }
 
+        composable("userProfile") {
+            ProfileScreen(navController)
+        }
+
+        composable("user/{username}") {
+            ProfileScreen(navController, it.arguments?.getString("username") ?: "")
+        }
+
         composable(
             route = "posts?tag={tag}",
             arguments = listOf(
@@ -45,21 +53,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             PostScreen(navController = navController, selectedTag = tag, wrapInBaseComponent = true)
         }
 
-
-        
-
-        composable("userProfile") {
-            ProfileScreen(navController)
-        }
-
-        composable("user/{username}") {
-            ProfileScreen(navController, it.arguments?.getString("username") ?: "")
-        }
-            composable("events") {
-                EventsScreen(navController)
-            }
-
-
         composable(
             route = "postList/{selectedTag}",
             arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
@@ -68,7 +61,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             PostScreen(navController = navController, selectedTag = selectedTag)
         }
 
-       
         composable("postCreate") { PostCreateScreen(navController, user) }
 
         composable(

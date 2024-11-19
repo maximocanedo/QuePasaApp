@@ -64,7 +64,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
     val imageViewModel = ImageViewModel()
     val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
-    BaseComponent(navController, user, "Crear publicación", true) {
+    BaseComponent(navController, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("PUBLIC") }
         var description by remember { mutableStateOf("") }

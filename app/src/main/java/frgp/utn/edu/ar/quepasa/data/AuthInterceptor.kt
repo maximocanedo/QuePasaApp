@@ -24,7 +24,11 @@ class AuthInterceptor(private val context: Context) : Interceptor {
         return setOf(
             Endpoint(Method.ALL,"/api/login"),
             Endpoint(Method.ALL, "/api/signup"),
-            Endpoint(Method.HEAD, "/api/users/*")
+            Endpoint(Method.HEAD, "/api/users/*"),
+            Endpoint(Method.GET, "/api/countries/*"),
+            Endpoint(Method.GET, "/api/countries/*"),
+            Endpoint(Method.GET, "/api/cities/*"),
+            Endpoint(Method.GET, "/api/neighbourhoods/*"),
         )
     }
 

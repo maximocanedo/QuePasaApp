@@ -41,14 +41,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         }
 
         composable(
-            route = "postList/{selectedTag}",
-            arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val selectedTag = backStackEntry.arguments?.getString("selectedTag")
-            PostScreen(navController = navController, selectedTag = selectedTag)
-        }
-
-        composable(
             route = "posts?tag={tag}",
             arguments = listOf(
                 navArgument("tag") {
@@ -59,6 +51,14 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         ) { backStackEntry ->
             val tag = backStackEntry.arguments?.getString("tag") ?: ""
             PostScreen(navController = navController, selectedTag = tag, wrapInBaseComponent = true)
+        }
+
+        composable(
+            route = "postList/{selectedTag}",
+            arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val selectedTag = backStackEntry.arguments?.getString("selectedTag")
+            PostScreen(navController = navController, selectedTag = selectedTag)
         }
 
         composable("postCreate") { PostCreateScreen(navController, user) }

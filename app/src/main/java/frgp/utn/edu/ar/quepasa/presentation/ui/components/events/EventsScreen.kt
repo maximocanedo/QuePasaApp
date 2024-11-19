@@ -9,21 +9,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -37,26 +45,40 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsScreen(navController: NavHostController) {
     val user by LocalAuth.current.collectAsState()
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
+    val eventState = viewModel.events.collectAsStateWithLifecycle()
 
     val events by viewModel.events.collectAsState()
+    val eventRvsps by viewModel.eventRvsps.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var eventToDelete by remember { mutableStateOf<UUID?>(null) }
 
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var currentPage by remember { mutableIntStateOf(0) }
+
+    var showSnackbar by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(Unit, events) {
+        viewModel.getRvspsByUser()
         viewModel.viewModelScope.launch {
             events.content.forEach { event ->
-                eventPictureViewModel.setEventsPicture(event.id!!)
+                if (pictures.find { it.event?.id == event.id } == null) {
+                    eventPictureViewModel.setEventsPicture(event.id!!)
+                }
             }
         }
     }
@@ -64,60 +86,70 @@ fun EventsScreen(navController: NavHostController) {
     LaunchedEffect(pictures) {
         pictureViewModel.viewModelScope.launch {
             pictures.forEach { picture ->
-                picture.event?.id?.let {
-                    pictureViewModel.setPictureEvents(
-                        picture.id,
-                        it,
-                    )
+                picture.event?.id?.let { uuid ->
+                    if (eventPictureDTO.find { it?.eventId == picture.event?.id } == null) {
+                        pictureViewModel.setPictureEvents(
+                            picture.id,
+                            uuid,
+                        )
+                    }
                 }
             }
-            pictureViewModel.setEventPictureDTO(eventPictureDTO)
         }
     }
 
-
     BaseComponent(navController, user.user, "Listado Eventos", false) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    viewModel.refreshEvents()
+                    viewModel.getRvspsByUser()
+                    currentPage = 0
+                }
+            }
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    value = search,
-                    onValueChange = {
-                        search = it
-                        viewModel.viewModelScope.launch {
-                            viewModel.getEvents(search)
-                            category = ""
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = search,
+                        onValueChange = {
+                            search = it
+                            viewModel.viewModelScope.launch {
+                                viewModel.getEvents(search)
+                                category = ""
+                            }
+                        },
+                        label = {
+                            Text("Buscar")
+                        },
+                        placeholder = {
+                            Text("Curso de ...")
                         }
-                    },
-                    label = {
-                        Text("Buscar")
-                    },
-                    placeholder = {
-                        Text("Curso de ...")
-                    }
-                )
-            }
-            Row {
-                EventCategoryField(
-                    modifier = Modifier.fillMaxWidth(),
-                    category = category,
-                    onItemSelected = {
-                        category = it
-                        viewModel.viewModelScope.launch {
-                            viewModel.getEventsByCategory(EventCategory.valueOf(it))
-                            search = ""
+                    )
+                }
+                Row {
+                    EventCategoryField(
+                        modifier = Modifier.fillMaxWidth(),
+                        category = category,
+                        onItemSelected = {
+                            category = it
+                            viewModel.viewModelScope.launch {
+                                viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                search = ""
+                            }
                         }
-                    }
-                )
-            }
-            Row {
+                    )
+                }
+
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -130,10 +162,12 @@ fun EventsScreen(navController: NavHostController) {
                                 navController,
                                 event,
                                 user.user,
+                                assists = eventRvsps.find { it.event?.id == event.id } != null,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
                                         resetEvents(viewModel, category, search)
+                                        viewModel.getRvspsByUser()
                                     }
                                 },
                                 onRemoveClick = {
@@ -155,10 +189,49 @@ fun EventsScreen(navController: NavHostController) {
                             )
                         }
                     }
+
+                    if (currentPage < eventState.value.totalPages - 1) {
+                        item {
+                            if (isLoadingMore) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(16.dp)
+                                )
+                            } else {
+                                Button(
+                                    onClick = {
+                                        if (currentPage < eventState.value.totalPages - 1) {
+                                            currentPage++
+                                            viewModel.loadMoreEvents()
+                                        } else {
+                                            showSnackbar = true
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    Text("Cargar más")
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
+    LaunchedEffect(showSnackbar) {
+        if (showSnackbar) {
+            snackbarHostState.showSnackbar("Ya estás al día con los eventos.")
+            showSnackbar = false
+        }
+    }
+    SnackbarHost(
+        hostState = snackbarHostState
+    )
+
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -188,7 +261,6 @@ fun EventsScreen(navController: NavHostController) {
             properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
         )
     }
-
 }
 
 fun resetEvents(
@@ -199,10 +271,13 @@ fun resetEvents(
     viewModel.viewModelScope.launch {
         if (category.isNotBlank()) {
             viewModel.getEventsByCategory(EventCategory.valueOf(category))
+            viewModel.sortEventsByVotes()
         } else if (search.isNotBlank()) {
             viewModel.getEvents(search)
+            viewModel.sortEventsByVotes()
         } else {
             viewModel.getEvents()
+            viewModel.sortEventsByVotes()
         }
     }
 }

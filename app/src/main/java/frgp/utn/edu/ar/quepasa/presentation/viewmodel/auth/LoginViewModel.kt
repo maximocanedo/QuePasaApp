@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,6 +35,19 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val userLoggedMutable = MutableStateFlow<User?>(null)
+    private val _userActive = MutableStateFlow(true)
+    val userActive: StateFlow<Boolean> get() = _userActive
+
+    private val _loginError = MutableStateFlow("")
+    val loginError: StateFlow<String> get() = _loginError
+
+    fun setLoginError(message: String) {
+        _loginError.value = message
+    }
+
+    fun clearLoginError() {
+        _loginError.value = ""
+    }
     suspend fun checkLoggedInUser() {
         userLoggedMutable.value = (userRepository.getAuthenticatedUser())
     }
@@ -202,31 +216,46 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
     suspend fun login() {
+
         val req = LoginRequest(loginUsername.value, loginPassword.value)
-        val res = if(!requiresTOTPMutable.value) {
+
+        val res = if (!requiresTOTPMutable.value) {
             Log.d("LOGIN ACTIVITY", "Iniciar sesión. ")
             authRepository.login(req)
-        }
-        else {
+
+        } else {
             Log.d("LOGIN ACTIVITY", "Iniciar sesión con TOTP. ")
             authRepository.loginUsingTotp(totpCode.value)
         }
-        when(res) {
+
+        when (res) {
             is ApiResponse.Success -> {
+                val user = userRepository.getAuthenticatedUser()
+                if (user == null) {
+                    snackMutable.emit("Usuario no encontrado o hubo un error.")
+                    return
+                }
+                if (!user.active) {
+                    snackMutable.emit("Tu cuenta no está activa. Contacta al soporte.")
+                    return
+                }
                 requiresTOTPMutable.value = res.data?.totpRequired ?: false
-                if(!requiresTOTPMutable.value) {
+                if (!requiresTOTPMutable.value) {
                     updateLoggedInState(true)
                 }
             }
             is ApiResponse.ValidationError -> {
-                if(!requiresTOTPMutable.value) snackMutable.emit("Error de validación: ${res.details.errors.joinToString()}")
+                if (!requiresTOTPMutable.value) {
+                    snackMutable.emit("Error de validación: ${res.details.errors.joinToString()}")
+                }
             }
             is ApiResponse.Error -> {
-                if(requiresTOTPMutable.value) {
+                if (requiresTOTPMutable.value) {
                     invalidateTotp()
-                } else snackMutable.emit("Error: ${res.exception.message}")
+                } else {
+                    snackMutable.emit("Error: ${res.exception.message}")
+                }
             }
         }
     }

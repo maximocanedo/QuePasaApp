@@ -24,10 +24,11 @@ import androidx.compose.ui.window.Dialog
 
 @Composable
 fun CommentDialog(
+    content: String = "",
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(content) }
 
     Dialog(
         onDismissRequest = { onDismissRequest() }

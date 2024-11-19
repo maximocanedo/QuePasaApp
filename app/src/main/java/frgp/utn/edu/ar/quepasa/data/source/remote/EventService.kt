@@ -5,10 +5,10 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
+import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
-import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -60,6 +60,9 @@ interface EventService {
     @POST("events/{eventId}/rsvp")
     suspend fun rsvpEvent(@Path("eventId") eventId: UUID): Response<EventRvsp>
 
+    @GET("events/rsvp/user/me")
+    suspend fun getRsvpsByUser(@Query("confirmed") confirmed: Boolean = true): Response<List<EventRvsp>>
+
     @POST("events/{eventId}/neighbourhood/{neighbourhoodId}")
     suspend fun addNeighbourhoodToEvent(
         @Path("eventId") eventId: UUID,
@@ -90,7 +93,14 @@ interface EventService {
 
     /** SECCION COMENTARIOS **/
     @GET("events/{eventId}/comments")
-    suspend fun getComments(@Path("eventId") eventId: UUID, @Query("page") page: Int, @Query("size") size: Int): Response<Page<Comment>>
+    suspend fun getComments(
+        @Path("eventId") eventId: UUID,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<Page<EventComment>>
     @POST("events/{eventId}/comments")
-    suspend fun comment(@Path("eventId") eventId: UUID, @Body content: String): Response<Comment>
+    suspend fun comment(
+        @Path("eventId") eventId: UUID,
+        @Body content: String
+    ): Response<EventComment>
 }

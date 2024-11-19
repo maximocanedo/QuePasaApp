@@ -1,10 +1,8 @@
 package frgp.utn.edu.ar.quepasa.domain.repository.commenting
 
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Comment
-import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
-import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.source.remote.commenting.CommentService
-import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -21,20 +19,14 @@ class CommentRepository @Inject constructor(
         }
     }
 
-    suspend fun getCommentsByPost(id: Int, page: Int, size: Int): Page<PostComment> =
-        handleResponse { commentService.getCommentsByPost(id, page, size) }
+    suspend fun upVoteComment(id: UUID): VoteCount =
+        handleResponse { commentService.upVoteComment(id) }
 
-    suspend fun getCommentsByEvent(id: UUID, page: Int, size: Int): Page<EventComment> =
-        handleResponse { commentService.getCommentsByEvent(id, page, size) }
+    suspend fun downVoteComment(id: UUID): VoteCount =
+        handleResponse { commentService.downVoteComment(id) }
 
     suspend fun getCommentById(id: UUID): Comment =
         handleResponse { commentService.getCommentById(id) }
-
-    suspend fun createPostComment(postId: Int, file: String): Comment =
-        handleResponse { commentService.createPostComment(postId, file) }
-
-    suspend fun createEventComment(id: UUID, comment: String): Comment =
-        handleResponse { commentService.createEventComment(id, comment) }
 
     suspend fun updateComment(id: UUID, content: String): Comment =
         handleResponse { commentService.updateComment(id, content) }

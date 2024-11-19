@@ -10,6 +10,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostDTO
+import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.domain.repository.PostRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.w3c.dom.Comment
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,11 +36,18 @@ class PostViewModel @Inject constructor(
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: StateFlow<VoteCount?> get() = _votes
 
-    private val _comments = MutableStateFlow<Page<Comment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
-    val comments: StateFlow<Page<Comment>> get() = _comments
+    private val _comments = MutableStateFlow<Page<PostComment>>(
+        Page(
+            content = emptyList(),
+            totalElements = 0,
+            totalPages = 0,
+            pageNumber = 0
+        )
+    )
+    val comments: StateFlow<Page<PostComment>> get() = _comments
 
-    private val _comment = MutableStateFlow<Comment?>(null)
-    val comment: StateFlow<Comment?> get() = _comment
+    private val _comment = MutableStateFlow<PostComment?>(null)
+    val comment: StateFlow<PostComment?> get() = _comment
 
     private val _tags = MutableStateFlow<List<String>>(emptyList())
     val tags: StateFlow<List<String>> get() = _tags
@@ -65,7 +72,7 @@ class PostViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPosts(0, 100,  true)
+            getPosts(0, 5,  true)
         }
     }
 
@@ -80,16 +87,24 @@ class PostViewModel @Inject constructor(
         _filteredPosts.value = _posts.value.content
     }
 
-    private suspend fun getPosts(page: Int = 0, size: Int = 100, activeOnly: Boolean = true) {
+    suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
         try {
-            val posts = repository.getPosts(page, size, activeOnly)
-            _posts.value = posts
-
-        }
-        catch(e: Exception) {
+            val newPosts = repository.getPosts(page, size, activeOnly)
+            _posts.value = if (page == 0) {
+                newPosts
+            } else {
+                _posts.value.copy(
+                    content = _posts.value.content + newPosts.content,
+                    totalElements = newPosts.totalElements,
+                    totalPages = newPosts.totalPages,
+                    pageNumber = newPosts.pageNumber
+                )
+            }
+        } catch (e: Exception) {
             _errorMessage.value = e.message
         }
     }
+
 
     suspend fun getPosts(q: String, sort: String, page: Int, size: Int, active: Boolean) {
         try {
@@ -192,6 +207,16 @@ class PostViewModel @Inject constructor(
             _errorMessage.value = e.message
         }
     }
+    val isRefreshing = MutableStateFlow(false)
+
+    suspend fun refreshPosts() {
+        isRefreshing.value = true
+        try {
+            getPosts(page = 0, size = 5, activeOnly = true)
+        } finally {
+            isRefreshing.value = false
+        }
+    }
 
     suspend fun createPost(
         audience: String,
@@ -268,7 +293,7 @@ class PostViewModel @Inject constructor(
     suspend fun deletePost(id: Int) {
         try {
             repository.deletePost(id)
-            getPosts(0, 100, true)
+            getPosts(0, 5, true)
         }
         catch(e: Exception) {
             _errorMessage.value = e.message

@@ -1,19 +1,14 @@
 package frgp.utn.edu.ar.quepasa.data.model
 
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import java.sql.Timestamp
-
-/*
-private UUID id;
-    private String content;
-    private User author;
-    private Timestamp timestamp;
-    private boolean active;
- */
+import java.util.UUID
 
 data class Comment(
-    var id: Int,
+    var id: UUID,
     var content: String,
     var author: User? = null,
     var timestamp: Timestamp,
-    var active: Boolean = true
+    var active: Boolean = true,
+    var votes: VoteCount? = null
 )

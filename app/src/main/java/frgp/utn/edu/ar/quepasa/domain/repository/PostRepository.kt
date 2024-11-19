@@ -5,10 +5,10 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostDTO
+import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.source.remote.PostService
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
-import org.w3c.dom.Comment
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -76,10 +76,10 @@ class PostRepository @Inject constructor(
     suspend fun downVote(id: Int): VoteCount =
         handleResponse { postService.downVote(id) }
 
-    suspend fun getComments(id: Int): Page<Comment> =
+    suspend fun getComments(id: Int): Page<PostComment> =
         handleResponse { postService.getComments(id) }
 
-    suspend fun comment(id: Int, content: String): Comment =
+    suspend fun comment(id: Int, content: String): PostComment =
         handleResponse { postService.comment(id, content) }
 
     suspend fun findPosts(userId: Int, userNeighbourhood: Int, page: Int, size: Int): Page<PostDTO> {

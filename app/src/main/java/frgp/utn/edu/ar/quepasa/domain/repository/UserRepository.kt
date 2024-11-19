@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.domain.repository
 
+import android.util.Log
 import androidx.compose.foundation.content.MediaType
 import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
 import frgp.utn.edu.ar.quepasa.data.dto.request.CodeVerificationRequest
@@ -29,6 +30,19 @@ open class UserRepository @Inject constructor(
 
     suspend fun findByUsername(username: String): ApiResponse<User?> =
         handler.getResponse(userService.findByUsername(username))
+
+    suspend fun checkUserStatus(username: String): User? {
+        val response = handler.getResponse(userService.findByUsername(username))
+        return when (response) {
+            is ApiResponse.Success -> response.data
+            is ApiResponse.ValidationError -> {
+                null
+            }
+            is ApiResponse.Error -> {
+                null
+            }
+        }
+    }
 
     suspend fun editByUsername(username: String, request: UserPatchEditRequest): ApiResponse<User?> =
         handler.getResponse(userService.editByUsername(username, request))

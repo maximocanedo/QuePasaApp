@@ -1,5 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.events
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,14 +10,15 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
+import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.w3c.dom.Comment
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventAddressValidator
 import quepasa.api.validators.events.EventDateValidator
@@ -31,6 +34,16 @@ class EventViewModel @Inject constructor(
 ) : ViewModel() {
     // Data fields Variables
     private val titleMutable = MutableStateFlow("")
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+    val currentPage: MutableState<Int> = mutableStateOf(0)
+    private val pageSize = 5
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore = _isLoadingMore.asStateFlow()
+    val totalPages: MutableState<Int> = mutableStateOf(0)
+    val actualPage: MutableState<Int> = mutableStateOf(0)
+
+
     fun setTitle(x: String) {
         titleMutable.value = x
     }
@@ -98,20 +111,32 @@ class EventViewModel @Inject constructor(
     private val _events = MutableStateFlow<Page<Event>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val events: MutableStateFlow<Page<Event>> get() = _events
 
+
     private val _event = MutableStateFlow<Event?>(null)
     val event: MutableStateFlow<Event?> get() = _event
 
     private val _eventRvsp = MutableStateFlow<EventRvsp?>(null)
     val eventRvsp: MutableStateFlow<EventRvsp?> get() = _eventRvsp
 
+    private val _eventRvsps = MutableStateFlow<List<EventRvsp>>(emptyList())
+    val eventRvsps: MutableStateFlow<List<EventRvsp>> get() = _eventRvsps
+
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: MutableStateFlow<VoteCount?> get() = _votes
 
-    private val _comments = MutableStateFlow<Page<Comment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
-    val comments: MutableStateFlow<Page<Comment>> get() = _comments
+    private val _comments = MutableStateFlow<Page<EventComment>>(
+        Page(
+            content = emptyList(),
+            totalElements = 0,
+            totalPages = 0,
+            pageNumber = 0
+        )
+    )
+    val comments: MutableStateFlow<Page<EventComment>> get() = _comments
 
-    private val _comment = MutableStateFlow<Comment?>(null)
-    val comment: MutableStateFlow<Comment?> get() = _comment
+
+    private val _comment = MutableStateFlow<EventComment?>(null)
+    val comment: MutableStateFlow<EventComment?> get() = _comment
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: MutableStateFlow<String?> get() = _errorMessage
@@ -167,30 +192,32 @@ class EventViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getEvents(0, 100, true)
+            getEvents(page = 0, size = 5)
+            sortEventsByVotes()
         }
     }
 
     /** GET **/
-    suspend fun getEvents(page: Int = 0, size: Int = 100, active: Boolean = true) {
-        try {
-            val events = repository.getEvents(page = page, size = size, active = active)
-            _events.value = events
-        } catch (e: Exception) {
-            _errorMessage.value = e.message
-        }
-    }
-
     suspend fun getEvents(
-        query: String,
+        search: String = "",
         page: Int = 0,
-        size: Int = 10,
-        activeOnly: Boolean = true,
+        size: Int = 5,
+        active: Boolean = true,
         sort: String = "title,asc"
     ) {
         try {
-            val events = repository.getEvents(query, page, size, activeOnly, sort)
+            val events =
+                repository.getEvents(
+                    query = search,
+                    page = page,
+                    size = size,
+                    active = active,
+                    sort = sort
+                )
             _events.value = events
+            totalPages.value = events.totalPages
+            actualPage.value = events.pageNumber
+
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -240,7 +267,7 @@ class EventViewModel @Inject constructor(
     suspend fun getEventsByCategory(
         category: EventCategory,
         page: Int = 0,
-        size: Int = 100,
+        size: Int = 5,
         active: Boolean = true
     ) {
         try {
@@ -268,6 +295,15 @@ class EventViewModel @Inject constructor(
         try {
             val event = repository.rvspEvent(eventId)
             _eventRvsp.value = event
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun getRvspsByUser(confirmed: Boolean = true) {
+        try {
+            val rvsps = repository.getRvspsByUser(confirmed)
+            _eventRvsps.value = rvsps
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -360,6 +396,20 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    fun sortEventsByVotes() {
+        val events = _events.value.content.sortedWith(
+            compareByDescending<Event> { it.votes?.votes }
+                .thenByDescending { it.createdAt }
+        )
+        _events.value.content = Page(
+            content = events,
+            totalElements = events.size,
+            totalPages = _events.value.totalPages,
+            pageNumber = _events.value.pageNumber
+        ).content
+    }
+
+
     fun titleValidator(title: String): EventTitleValidator {
         return EventTitleValidator(title).isNotBlank().meetsLimits()
     }
@@ -447,4 +497,38 @@ class EventViewModel @Inject constructor(
             neighbourhoodIsValidMutable.value = true
         }
     }
+
+    fun refreshEvents() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                getEvents(page = 0, size = 5)
+                currentPage.value=0
+                sortEventsByVotes()
+                getRvspsByUser()
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isRefreshing.value = false
+            }
+        }
+    }
+    fun loadMoreEvents() {
+        if (currentPage.value < totalPages.value) {
+            viewModelScope.launch {
+                _isLoadingMore.value = true
+                try {
+                    val moreEvents = repository.getEvents(page = currentPage.value + 1, size = pageSize, active = true)
+                    _events.update { it.copy(content = it.content + moreEvents.content) }
+                    sortEventsByVotes()
+                    currentPage.value += 1
+                } catch (e: Exception) {
+                    _errorMessage.value = e.message
+                } finally {
+                    _isLoadingMore.value = false
+                }
+            }
+        }
+    }
+
 }

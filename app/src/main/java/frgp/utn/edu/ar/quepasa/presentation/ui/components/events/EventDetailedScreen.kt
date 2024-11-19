@@ -53,8 +53,13 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
     val commentViewModel: CommentViewModel = hiltViewModel()
-    val comments by commentViewModel.eventComments.collectAsState()
+
+    val comments by viewModel.comments.collectAsState()
+    val eventRvsp by viewModel.eventRvsps.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
+    var commentEditState by remember { mutableStateOf(false) }
+    var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
+    var commentEditText by remember { mutableStateOf("") }
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
@@ -64,7 +69,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
         viewModel.getEventById(eventId)
         eventPictureViewModel.getPicturesByEvent(eventId, 0, 10)
         pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
-        commentViewModel.getCommentsByEvent(eventId, 0, 10)
+        viewModel.getComments(eventId, 0, 10)
+        viewModel.getRvspsByUser()
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -86,9 +92,6 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         modifier = Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row {
-
-                        }
                         Row {
                             event!!.title?.let { Text(text = it, fontSize = 24.sp) }
                         }
@@ -178,6 +181,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                 user = user.user,
                                 navController = navController,
                                 voteCount = event!!.votes!!,
+                                assists = eventRvsp.find { it.event?.id == event!!.id }?.confirmed
+                                    ?: false,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event!!.id!!)
@@ -224,9 +229,38 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         ) {
                             items(comments.content) { comment ->
                                 key(comment.id) {
-                                    EventCommentCard(
-                                        comment = comment
-                                    )
+                                    user.user?.let {
+                                        EventCommentCard(
+                                            comment = comment,
+                                            voteCount = comment.votes,
+                                            user = it,
+                                            onUpvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.upVoteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onDownvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.downVoteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onDeleteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.deleteComment(comment.id)
+                                                    viewModel.getComments(eventId, 0, 10)
+                                                }
+                                            },
+                                            onEditClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentEditUUID = comment.id
+                                                    commentEditText = comment.content
+                                                    commentEditState = true
+                                                }
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -241,10 +275,24 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                 onDismissRequest = { commentDialogState = false },
                 onConfirm = { content ->
                     viewModel.viewModelScope.launch {
-                        commentViewModel.createEventComment(content, event!!)
-                        commentViewModel.getCommentsByEvent(eventId, 0, 10)
+                        viewModel.comment(eventId, content)
+                        viewModel.getComments(eventId, 0, 10)
                     }
                     commentDialogState = false
+                }
+            )
+        }
+        if (commentEditState) {
+            CommentDialog(
+                content = commentEditText,
+                onDismissRequest = { commentEditState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.updateComment(commentEditUUID, content)
+                        viewModel.getComments(eventId, 0, 10)
+                    }
+                    commentEditText = ""
+                    commentEditState = false
                 }
             )
         }

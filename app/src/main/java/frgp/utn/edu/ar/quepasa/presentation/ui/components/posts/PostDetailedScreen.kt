@@ -58,6 +58,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 @Composable
 fun PostDetailedScreen(
@@ -75,14 +76,17 @@ fun PostDetailedScreen(
 
     val post by viewModel.post.collectAsState()
     val votes by viewModel.votes.collectAsState()
-    val comments by commentViewModel.postComments.collectAsState()
+    val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
+    var commentEditState by remember { mutableStateOf(false) }
+    var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
+    var commentEditText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.getPostById(postId)
         postPictureViewModel.getPicturesByPost(postId, 0, 10)
         pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
-        commentViewModel.getCommentsByPost(postId, 0, 10)
+        viewModel.getComments(postId)
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -278,9 +282,36 @@ fun PostDetailedScreen(
                         ) {
                             items(comments.content) { comment ->
                                 key(comment.id) {
-                                    PostCommentCard(
-                                        comment = comment
-                                    )
+                                    user.user?.let {
+                                        PostCommentCard(
+                                            comment = comment,
+                                            voteCount = comment.votes,
+                                            user = it,
+                                            onUpvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.upVoteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onDownvoteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.downVoteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onDeleteClick = {
+                                                viewModel.viewModelScope.launch {
+                                                    commentViewModel.deleteComment(comment.id)
+                                                    viewModel.getComments(postId)
+                                                }
+                                            },
+                                            onEditClick = {
+                                                commentEditUUID = comment.id
+                                                commentEditText = comment.content
+                                                commentEditState = true
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -295,10 +326,24 @@ fun PostDetailedScreen(
                 onDismissRequest = { commentDialogState = false },
                 onConfirm = { content ->
                     viewModel.viewModelScope.launch {
-                        commentViewModel.createPostComment(content, post!!)
-                        commentViewModel.getCommentsByPost(postId, 0, 10)
+                        viewModel.comment(postId, content)
+                        viewModel.getComments(postId)
                     }
                     commentDialogState = false
+                }
+            )
+        }
+        if (commentEditState) {
+            CommentDialog(
+                content = commentEditText,
+                onDismissRequest = { commentEditState = false },
+                onConfirm = { content ->
+                    viewModel.viewModelScope.launch {
+                        commentViewModel.updateComment(commentEditUUID, content)
+                        viewModel.getComments(postId)
+                    }
+                    commentEditText = ""
+                    commentEditState = false
                 }
             )
         }

@@ -98,5 +98,6 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.1")
     implementation("io.coil-kt.coil3:coil-network-ktor3:3.0.1")
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.17")
+    implementation ("com.valentinilk.shimmer:compose-shimmer:1.0.3")
 
 }

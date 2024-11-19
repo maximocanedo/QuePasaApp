@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,12 +25,13 @@ fun CardButtonsBar(
     user: User?,
     voteCount: VoteCount,
     navController: NavHostController,
+    assists: Boolean,
     onAssistanceClick: () -> Unit = {},
     onRemoveClick: () -> Unit = {},
     onUpvoteClick: () -> Unit = {},
     onDownvoteClick: () -> Unit = {}
 ) {
-    var assist by remember { mutableStateOf(false) }
+    val assist by remember { mutableStateOf(assists) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,7 +45,6 @@ fun CardButtonsBar(
                 icon = R.drawable.baseline_back_hand_24,
                 onClick = {
                     onAssistanceClick()
-                    assist = !assist
                 },
                 tint = if (assist) {
                     MaterialTheme.colorScheme.inversePrimary

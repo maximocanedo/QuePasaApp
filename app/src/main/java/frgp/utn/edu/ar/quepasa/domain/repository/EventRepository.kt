@@ -5,11 +5,11 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
+import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.data.source.remote.EventService
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
-import org.w3c.dom.Comment
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -55,6 +55,8 @@ class EventRepository @Inject constructor(
         handleResponse { eventService.createEvent(event) }
     suspend fun rvspEvent(eventId: UUID): EventRvsp =
         handleResponse { eventService.rsvpEvent(eventId) }
+    suspend fun getRvspsByUser(confirmed: Boolean = true): List<EventRvsp> =
+        handleResponse { eventService.getRsvpsByUser(confirmed) }
 
     suspend fun addNeighbourhoodToEvent(eventId: UUID, neighbourhoodId: Int): Event =
         handleResponse { eventService.addNeighbourhoodToEvent(eventId, neighbourhoodId) }
@@ -81,8 +83,9 @@ class EventRepository @Inject constructor(
         handleResponse { eventService.downVote(eventId) }
 
     /** COMMENTS **/
-    suspend fun getComments(eventId: UUID, page: Int, size: Int): Page<Comment> =
+    suspend fun getComments(eventId: UUID, page: Int, size: Int): Page<EventComment> =
         handleResponse { eventService.getComments(eventId, page, size) }
-    suspend fun comment(eventId: UUID, content: String): Comment =
+
+    suspend fun comment(eventId: UUID, content: String): EventComment =
         handleResponse { eventService.comment(eventId, content) }
 }

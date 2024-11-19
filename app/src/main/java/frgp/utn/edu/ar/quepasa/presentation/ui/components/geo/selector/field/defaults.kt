@@ -9,20 +9,20 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector.modal.Nei
 interface GeoFieldCountryDataEvents {
     val countries: List<Country>
     val onCountrySelected: (Country) -> Unit
-    val onCountryLoadRequest: suspend () -> Unit
+    val onCountryLoadRequest: suspend (Boolean) -> Unit
 }
 
 interface GeoFieldStateDataEvents {
     val states: List<SubnationalDivision>
     val onStateSelected: (SubnationalDivision) -> Unit
-    val onStateLoadRequest: suspend () -> Unit
+    val onStateLoadRequest: suspend (Boolean) -> Unit
 }
 
 
 interface GeoFieldCityDataEvents {
     val cities: List<City>
     val onCitySelected: (City) -> Unit
-    val onCityLoadRequest: suspend () -> Unit
+    val onCityLoadRequest: suspend (Boolean) -> Unit
 }
 
 interface GeoFieldEditable<T> {
@@ -31,63 +31,53 @@ interface GeoFieldEditable<T> {
 }
 
 interface NeighbourhoodFieldLoadEvents: GeoFieldCityDataEvents, GeoFieldStateDataEvents, GeoFieldCountryDataEvents {
-    val neighbourhoods: List<Neighbourhood>
-    val onNeighbourhoodSelect: (Neighbourhood) -> Unit
-    val onNeighbourhoodUnselect: (Neighbourhood) -> Unit
-    val onNeighbourhoodLoadRequest: suspend () -> Unit
+    val onNeighbourhoodLoadRequest: suspend (Boolean) -> Unit
     val isLoading: NeighbourhoodSelectorScreen?
+    val neighbourhoods: List<Neighbourhood>
 }
 
 
 object NeighbourhoodFieldDefaults: NeighbourhoodFieldLoadEvents {
     override val neighbourhoods: List<Neighbourhood>
         get() = emptyList()
-    override val onNeighbourhoodSelect: (Neighbourhood) -> Unit
-        get() = {  }
-    override val onNeighbourhoodUnselect: (Neighbourhood) -> Unit
-        get() = {  }
-    override val onNeighbourhoodLoadRequest: suspend () -> Unit
+    override val onNeighbourhoodLoadRequest: suspend (Boolean) -> Unit
         get() = {  }
     override val cities: List<City>
         get() = emptyList()
     override val onCitySelected: (City) -> Unit
         get() = {  }
-    override val onCityLoadRequest: suspend () -> Unit
+    override val onCityLoadRequest: suspend (Boolean) -> Unit
         get() = {  }
     override val states: List<SubnationalDivision>
         get() = emptyList()
     override val onStateSelected: (SubnationalDivision) -> Unit
         get() = {  }
-    override val onStateLoadRequest: suspend () -> Unit
+    override val onStateLoadRequest: suspend (Boolean) -> Unit
         get() = {  }
     override val countries: List<Country>
         get() = emptyList()
     override val onCountrySelected: (Country) -> Unit
         get() = {  }
-    override val onCountryLoadRequest: suspend () -> Unit
+    override val onCountryLoadRequest: suspend (Boolean) -> Unit
         get() = {  }
     override val isLoading: NeighbourhoodSelectorScreen?
         get() = null
     fun copy(
-        neighbourhoods: List<Neighbourhood> = this.neighbourhoods,
-        onNeighbourhoodSelect: (Neighbourhood) -> Unit = this.onNeighbourhoodSelect,
-        onNeighbourhoodUnselect: (Neighbourhood) -> Unit = this.onNeighbourhoodUnselect,
-        onNeighbourhoodLoadRequest: suspend () -> Unit = this.onNeighbourhoodLoadRequest,
+        neighbourhoods: List<Neighbourhood> = emptyList(),
+        onNeighbourhoodLoadRequest: suspend (Boolean) -> Unit = this.onNeighbourhoodLoadRequest,
         cities: List<City> = this.cities,
         onCitySelected: (City) -> Unit = this.onCitySelected,
-        onCityLoadRequest: suspend () -> Unit = this.onCityLoadRequest,
+        onCityLoadRequest: suspend (Boolean) -> Unit = this.onCityLoadRequest,
         states: List<SubnationalDivision> = this.states,
         onStateSelected: (SubnationalDivision) -> Unit = this.onStateSelected,
-        onStateLoadRequest: suspend () -> Unit = this.onStateLoadRequest,
+        onStateLoadRequest: suspend (Boolean) -> Unit = this.onStateLoadRequest,
         countries: List<Country> = this.countries,
         onCountrySelected: (Country) -> Unit = this.onCountrySelected,
-        onCountryLoadRequest: suspend () -> Unit = this.onCountryLoadRequest,
+        onCountryLoadRequest: suspend (Boolean) -> Unit = this.onCountryLoadRequest,
         isLoading: NeighbourhoodSelectorScreen? = this.isLoading
     ): NeighbourhoodFieldLoadEvents {
         return object : NeighbourhoodFieldLoadEvents {
-            override val neighbourhoods = neighbourhoods
-            override val onNeighbourhoodSelect = onNeighbourhoodSelect
-            override val onNeighbourhoodUnselect = onNeighbourhoodUnselect
+            override val neighbourhoods: List<Neighbourhood> = neighbourhoods
             override val onNeighbourhoodLoadRequest = onNeighbourhoodLoadRequest
             override val cities = cities
             override val onCitySelected = onCitySelected

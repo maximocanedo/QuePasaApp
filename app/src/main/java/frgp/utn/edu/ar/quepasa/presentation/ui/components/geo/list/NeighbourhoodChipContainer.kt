@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NeighbourhoodChipContainer(
+    modifier: Modifier = Modifier,
     data: Set<Neighbourhood>,
     onUnselectRequest: (Neighbourhood) -> Unit,
     maxVisibleItems: Int? = 2,
@@ -35,11 +38,15 @@ fun NeighbourhoodChipContainer(
     val visibleItems = if(data.size > (maxVisibleItems ?: 2)) (maxFullyVisibleItems ?: 1) else data.size
     val totalItemsCount = data.size
     val hiddenItemsCount = totalItemsCount - visibleItems
-    LazyRow(state = lazyListState) {
+    LazyRow(
+        modifier = modifier,
+        state = lazyListState,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
         items(items = data.take(visibleItems), key = { it.id }) { neighbourhood ->
             InputChip(
                 selected = true,
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                modifier = Modifier.padding(vertical = 3.dp),
                 onClick = { onUnselectRequest(neighbourhood) },
                 label = { Text(neighbourhood.name) }
             )

@@ -16,6 +16,7 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodChipContainer
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodsMDFP
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +44,7 @@ fun GeoMiniField(
     val defColor = MaterialTheme.colorScheme.onSurfaceVariant
     val errColor = MaterialTheme.colorScheme.error
     val styleSelected = true
-    val contentColor by remember { mutableStateOf(if(feedback != null) errColor else defColor) }
+    val contentColor by remember { derivedStateOf { if (feedback != null) errColor else defColor } }
     Column(modifier = modifier, verticalArrangement = Center) {
         Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
             Column(modifier = Modifier.weight(1f)) {
@@ -52,7 +54,12 @@ fun GeoMiniField(
                     style = MaterialTheme.typography.bodySmall,
                     color = contentColor
                 )
-                LazyRow(
+                if(value.isNotEmpty()) NeighbourhoodChipContainer(
+                    modifier = Modifier.padding(start = 0.dp),
+                    data = value,
+                    onUnselectRequest = onUnselect
+                )
+                else LazyRow(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -60,7 +67,7 @@ fun GeoMiniField(
                     if(value.isEmpty()) item() {
                         InputChip(
                             selected = false,
-                            onClick = { /*TODO*/ },
+                            onClick = { onEditRequest() },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(R.drawable.add),
@@ -70,22 +77,25 @@ fun GeoMiniField(
                             label = { Text("Seleccionar") }
                         )
                     }
-                    if(value.isNotEmpty()) item(value.first().id) {
-                        InputChip(
-                            selected = styleSelected,
-                            onClick = { onUnselect(value.first()) },
-                            label = { Text(value.first().name) }
-                        )
-                    }
-                    if(value.size > 1) {
-                        item(value.elementAt(1).id) {
-                            InputChip(
-                                selected = styleSelected,
-                                onClick = { /*TODO*/ },
-                                label = { Text("+${value.size}") }
-                            )
-                        }
-                    }
+
+                    /**
+                     * item(value.first().id) {
+                     *                         InputChip(
+                     *                             selected = styleSelected,
+                     *                             onClick = { onUnselect(value.first()) },
+                     *                             label = { Text(value.first().name) }
+                     *                         )
+                     *                     }
+                     *                     if(value.size > 1) {
+                     *                         item(value.elementAt(1).id) {
+                     *                             InputChip(
+                     *                                 selected = styleSelected,
+                     *                                 onClick = { /*TODO*/ },
+                     *                                 label = { Text("+${value.size}") }
+                     *                             )
+                     *                         }
+                     *                     }
+                     */
                 }
             }
             Column(
@@ -119,7 +129,7 @@ fun GeoMiniField(
 @Composable @Preview
 fun GeoMiniFieldPreview() {
     GeoMiniField(
-        value = NeighbourhoodsMDFP.take(2).toSet(),
+        value = NeighbourhoodsMDFP.take(3).toSet(),
         onEditRequest = {  },
         onUnselect = {  }
     )

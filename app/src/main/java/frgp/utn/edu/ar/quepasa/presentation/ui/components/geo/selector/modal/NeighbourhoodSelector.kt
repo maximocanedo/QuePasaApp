@@ -22,10 +22,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +51,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.Neighbourhood
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodsMDFP
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.StatesMDFP
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SubnationalDivisionList
+import kotlinx.coroutines.launch
 
 enum class NeighbourhoodSelectorScreen {
     COUNTRY,
@@ -75,17 +80,17 @@ fun GeographicModalSelector(
     value: Set<Neighbourhood> = emptySet(),
     countries: List<Country> = emptyList(),
     onCountrySelected: (Country) -> Unit = {  },
-    onCountryLoadRequest: suspend () -> Unit = {  },
+    onCountryLoadRequest: suspend (Boolean) -> Unit = {  },
     states: List<SubnationalDivision> = emptyList(),
     onStateSelected: (SubnationalDivision) -> Unit = {  },
-    onStateLoadRequest: suspend () -> Unit = {  },
+    onStateLoadRequest: suspend (Boolean) -> Unit = {  },
     cities: List<City> = emptyList(),
     onCitySelected: (City) -> Unit,
-    onCityLoadRequest: suspend () -> Unit = {  },
+    onCityLoadRequest: suspend (Boolean) -> Unit = {  },
     neighbourhoods: List<Neighbourhood> = emptyList(),
     onNeighbourhoodSelect: (Neighbourhood) -> Unit = {  },
     onNeighbourhoodUnselectRequest: (Neighbourhood) -> Unit = {  },
-    onNeighbourhoodLoadRequest: suspend () -> Unit = {  },
+    onNeighbourhoodLoadRequest: suspend (Boolean) -> Unit = {  },
     onDismiss: () -> Unit = {  },
     isLoading: NeighbourhoodSelectorScreen? = null,
     limit: Int? = null,
@@ -98,6 +103,19 @@ fun GeographicModalSelector(
     val rowModifier: Modifier = Modifier.fillMaxWidth()
     var tab: NeighbourhoodSelectorScreen by remember { mutableStateOf(if(value.isEmpty()) NeighbourhoodSelectorScreen.COUNTRY else NeighbourhoodSelectorScreen.NEIGHBOURHOOD) }
 
+    LaunchedEffect(1) {
+        onCountryLoadRequest(true)
+    }
+    LaunchedEffect(country) {
+        onStateLoadRequest(true)
+    }
+    LaunchedEffect(state) {
+        onCityLoadRequest(true)
+    }
+    LaunchedEffect(city) {
+        onNeighbourhoodLoadRequest(true)
+    }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = modifier.background(color = MaterialTheme.colorScheme.surfaceContainer)
@@ -136,19 +154,24 @@ fun GeographicModalSelector(
                         enter = enterTransition,
                         exit = exitTransition
                     ) {
-                        CountryList(
-                            modifier = Modifier.fillMaxSize(),
-                            items = countries,
-                            onClick = {
-                                country = it
-                                state = null
-                                city = null
-                                onCountrySelected(it)
-                                tab = NeighbourhoodSelectorScreen.STATE
-                            },
-                            isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.COUNTRY,
-                            onNextRequest = onCountryLoadRequest
-                        )
+                        PullToRefreshBox(
+                            state = rememberPullToRefreshState(),
+                            isRefreshing = isLoading == NeighbourhoodSelectorScreen.COUNTRY,
+                            onRefresh = { scope.launch { onCountryLoadRequest(true) } }) {
+                            CountryList(
+                                modifier = Modifier.fillMaxSize(),
+                                items = countries,
+                                onClick = {
+                                    country = it
+                                    state = null
+                                    city = null
+                                    onCountrySelected(it)
+                                    tab = NeighbourhoodSelectorScreen.STATE
+                                },
+                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.COUNTRY,
+                                onNextRequest = { onCountryLoadRequest(false) }
+                            )
+                        }
                     }
                 }
                 NeighbourhoodSelectorScreen.STATE -> {
@@ -157,20 +180,26 @@ fun GeographicModalSelector(
                         enter = enterTransition,
                         exit = exitTransition
                     ) {
-                        SubnationalDivisionList(
-                            modifier = Modifier.fillMaxSize(),
-                            items = states,
-                            showGeographicalContext = false,
-                            onClick = {
-                                state = it
-                                city = null
+                        PullToRefreshBox(
+                            state = rememberPullToRefreshState(),
+                            isRefreshing = isLoading == NeighbourhoodSelectorScreen.STATE,
+                            onRefresh = { scope.launch { onStateLoadRequest(true) } })
+                        {
+                            SubnationalDivisionList(
+                                modifier = Modifier.fillMaxSize(),
+                                items = states,
+                                showGeographicalContext = false,
+                                onClick = {
+                                    state = it
+                                    city = null
 
-                                onStateSelected(it)
-                                tab = NeighbourhoodSelectorScreen.CITY
-                            },
-                            isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.STATE,
-                            onNextRequest = onStateLoadRequest
-                        )
+                                    onStateSelected(it)
+                                    tab = NeighbourhoodSelectorScreen.CITY
+                                },
+                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.STATE,
+                                onNextRequest = { onStateLoadRequest(false) }
+                            )
+                        }
                     }
                 }
                 NeighbourhoodSelectorScreen.CITY -> {
@@ -179,18 +208,24 @@ fun GeographicModalSelector(
                         enter = enterTransition,
                         exit = exitTransition
                     ) {
-                        CityList(
-                            modifier = Modifier.fillMaxSize(),
-                            items = cities,
-                            showGeographicalContext = false,
-                            onClick = {
-                                city = it
-                                onCitySelected(it)
-                                tab = NeighbourhoodSelectorScreen.NEIGHBOURHOOD
-                            },
-                            isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.CITY,
-                            onNextRequest = onCityLoadRequest
-                        )
+                        PullToRefreshBox(
+                            state = rememberPullToRefreshState(),
+                            isRefreshing = isLoading == NeighbourhoodSelectorScreen.CITY,
+                            onRefresh = { scope.launch { onCityLoadRequest(true) } })
+                        {
+                            CityList(
+                                modifier = Modifier.fillMaxSize(),
+                                items = cities,
+                                showGeographicalContext = false,
+                                onClick = {
+                                    city = it
+                                    onCitySelected(it)
+                                    tab = NeighbourhoodSelectorScreen.NEIGHBOURHOOD
+                                },
+                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.CITY,
+                                onNextRequest = { onCityLoadRequest(false) }
+                            )
+                        }
                     }
                 }
                 NeighbourhoodSelectorScreen.NEIGHBOURHOOD -> {
@@ -199,24 +234,29 @@ fun GeographicModalSelector(
                         enter = enterTransition,
                         exit = exitTransition
                     ) {
-                        NeighbourhoodList(
-                            modifier = Modifier.fillMaxSize(),
-                            items = neighbourhoods,
-                            selectable = limit == null || limit > 1,
-                            selected = value.toList(),
-                            onCheckedChange = { neighbourhood, value ->
-                                if (value) {
-                                    onNeighbourhoodSelect(neighbourhood)
-                                }
-                                else onNeighbourhoodUnselectRequest(neighbourhood)
-                            },
-                            showGeographicalContext = false,
-                            onClick = {
-                                onNeighbourhoodSelect(it)
-                            },
-                            isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
-                            onNextRequest = onNeighbourhoodLoadRequest
-                        )
+                        PullToRefreshBox(
+                            state = rememberPullToRefreshState(),
+                            isRefreshing = isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
+                            onRefresh = { scope.launch { onNeighbourhoodLoadRequest(true) } })
+                        {
+                            NeighbourhoodList(
+                                modifier = Modifier.fillMaxSize(),
+                                items = neighbourhoods,
+                                selectable = limit == null || limit > 1,
+                                selected = value.toList(),
+                                onCheckedChange = { neighbourhood, value ->
+                                    if (value) {
+                                        onNeighbourhoodSelect(neighbourhood)
+                                    } else onNeighbourhoodUnselectRequest(neighbourhood)
+                                },
+                                showGeographicalContext = false,
+                                onClick = {
+                                    onNeighbourhoodSelect(it)
+                                },
+                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
+                                onNextRequest = { onNeighbourhoodLoadRequest(false) }
+                            )
+                        }
                     }
                 }
             }
@@ -267,7 +307,7 @@ fun NeighbourhoodSelectorPreview() {
         value = selectedNeighbourhoods,
         countries = displayedCountries,
         onCountrySelected = { selectedCountry ->
-            println("País seleccionado: ${selectedCountry.label}")
+            println("País seleccionado:  ${selectedCountry.label}")
         },
         onCountryLoadRequest = {
             displayedCountries = listOf(ARGENTINA)

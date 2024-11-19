@@ -10,6 +10,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostDTO
+import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.domain.repository.PostRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.w3c.dom.Comment
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,11 +36,18 @@ class PostViewModel @Inject constructor(
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: StateFlow<VoteCount?> get() = _votes
 
-    private val _comments = MutableStateFlow<Page<Comment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
-    val comments: StateFlow<Page<Comment>> get() = _comments
+    private val _comments = MutableStateFlow<Page<PostComment>>(
+        Page(
+            content = emptyList(),
+            totalElements = 0,
+            totalPages = 0,
+            pageNumber = 0
+        )
+    )
+    val comments: StateFlow<Page<PostComment>> get() = _comments
 
-    private val _comment = MutableStateFlow<Comment?>(null)
-    val comment: StateFlow<Comment?> get() = _comment
+    private val _comment = MutableStateFlow<PostComment?>(null)
+    val comment: StateFlow<PostComment?> get() = _comment
 
     private val _tags = MutableStateFlow<List<String>>(emptyList())
     val tags: StateFlow<List<String>> get() = _tags

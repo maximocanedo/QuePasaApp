@@ -10,17 +10,15 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Event
 import frgp.utn.edu.ar.quepasa.data.model.EventRvsp
-import frgp.utn.edu.ar.quepasa.data.model.Post
+import frgp.utn.edu.ar.quepasa.data.model.commenting.EventComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.w3c.dom.Comment
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventAddressValidator
 import quepasa.api.validators.events.EventDateValidator
@@ -123,12 +121,19 @@ class EventViewModel @Inject constructor(
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: MutableStateFlow<VoteCount?> get() = _votes
 
-    private val _comments = MutableStateFlow<Page<Comment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
-    val comments: MutableStateFlow<Page<Comment>> get() = _comments
+    private val _comments = MutableStateFlow<Page<EventComment>>(
+        Page(
+            content = emptyList(),
+            totalElements = 0,
+            totalPages = 0,
+            pageNumber = 0
+        )
+    )
+    val comments: MutableStateFlow<Page<EventComment>> get() = _comments
 
 
-    private val _comment = MutableStateFlow<Comment?>(null)
-    val comment: MutableStateFlow<Comment?> get() = _comment
+    private val _comment = MutableStateFlow<EventComment?>(null)
+    val comment: MutableStateFlow<EventComment?> get() = _comment
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: MutableStateFlow<String?> get() = _errorMessage

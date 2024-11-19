@@ -75,14 +75,14 @@ fun PostDetailedScreen(
 
     val post by viewModel.post.collectAsState()
     val votes by viewModel.votes.collectAsState()
-    val comments by commentViewModel.postComments.collectAsState()
+    val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getPostById(postId)
         postPictureViewModel.getPicturesByPost(postId, 0, 10)
         pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
-        commentViewModel.getCommentsByPost(postId, 0, 10)
+        viewModel.getComments(postId)
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -295,8 +295,8 @@ fun PostDetailedScreen(
                 onDismissRequest = { commentDialogState = false },
                 onConfirm = { content ->
                     viewModel.viewModelScope.launch {
-                        commentViewModel.createPostComment(content, post!!)
-                        commentViewModel.getCommentsByPost(postId, 0, 10)
+                        viewModel.comment(postId, content)
+                        viewModel.getComments(postId)
                     }
                     commentDialogState = false
                 }

@@ -53,7 +53,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
     val commentViewModel: CommentViewModel = hiltViewModel()
-    val comments by commentViewModel.eventComments.collectAsState()
+
+    val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
@@ -64,7 +65,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
         viewModel.getEventById(eventId)
         eventPictureViewModel.getPicturesByEvent(eventId, 0, 10)
         pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
-        commentViewModel.getCommentsByEvent(eventId, 0, 10)
+        viewModel.getComments(eventId, 0, 10)
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -241,8 +242,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                 onDismissRequest = { commentDialogState = false },
                 onConfirm = { content ->
                     viewModel.viewModelScope.launch {
-                        commentViewModel.createEventComment(content, event!!)
-                        commentViewModel.getCommentsByEvent(eventId, 0, 10)
+                        viewModel.comment(eventId, content)
+                        viewModel.getComments(eventId, 0, 10)
                     }
                     commentDialogState = false
                 }

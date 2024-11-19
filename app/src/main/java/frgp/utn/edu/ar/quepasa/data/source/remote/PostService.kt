@@ -5,9 +5,9 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostDTO
+import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
-import org.w3c.dom.Comment
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -73,10 +73,10 @@ interface PostService {
 
     /** Comienza sección de COMENTARIOS **/
     @GET("posts/{id}/comments")
-    suspend fun getComments(@Path("id") id: Int): Response<Page<Comment>>
+    suspend fun getComments(@Path("id") id: Int): Response<Page<PostComment>>
 
     @POST("posts/{id}/comments")
-    suspend fun comment(@Path("id") id: Int, @Body content: String): Response<Comment>
+    suspend fun comment(@Path("id") id: Int, @Body content: String): Response<PostComment>
     /** Termina sección de COMENTARIOS **/
 
     /** Algoritmo de post **/

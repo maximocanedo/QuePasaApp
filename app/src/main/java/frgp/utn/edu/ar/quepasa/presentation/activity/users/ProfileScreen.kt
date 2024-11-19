@@ -110,7 +110,7 @@ fun ProfileScreenContent(
         }
     }
 
-    BaseComponent(navController, user, title = "Perfil", back = false) {
+    BaseComponent(navController, title = "Perfil", back = false) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = onRefresh

@@ -27,7 +27,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.Wa
 fun MainPage(navController: NavHostController) { // TODO: Change to User (non-nullable) after login is implemented
     val user by LocalAuth.current.collectAsState()
 
-    BaseComponent(navController, user.user, "¿Qué pasa?", false) {
+    BaseComponent(navController, "¿Qué pasa?", false) {
         Column(
             modifier = Modifier
         ) {

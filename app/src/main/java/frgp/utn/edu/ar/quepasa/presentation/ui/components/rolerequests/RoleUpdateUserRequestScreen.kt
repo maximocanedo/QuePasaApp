@@ -43,7 +43,7 @@ fun RoleUpdateUserRequestScreen(navController: NavHostController) {
     var dni by remember { mutableStateOf("") }
     var role by remember { mutableStateOf("") }
 
-    BaseComponent(navController, null, "Solicitud de rol", true, "roleRequestUserList") {
+    BaseComponent(navController, "Solicitud de rol", true, "roleRequestUserList") {
         Column(
             modifier = Modifier
                 .padding(32.dp)

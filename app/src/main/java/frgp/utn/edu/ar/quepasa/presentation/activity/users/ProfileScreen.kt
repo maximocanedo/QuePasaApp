@@ -133,6 +133,10 @@ fun ProfileScreenContent(
                     onAddressUpdateRequest = {
                         val req = UserPatchEditRequest(address = it)
                         onPatchEditRequest(req)
+                    },
+                    onNeighbourhoodUpdateRequest = {
+                        val req = UserPatchEditRequest(neighbourhood = it)
+                        onPatchEditRequest(req)
                     }
                 )
                 if(itsMe) MailsCard(

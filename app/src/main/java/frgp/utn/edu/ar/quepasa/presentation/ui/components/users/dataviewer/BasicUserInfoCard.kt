@@ -22,9 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.data.model.media.Picture
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.AddressEmergentField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NameEmergentField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NeighbourhoodEmergentField
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -33,10 +35,12 @@ fun BasicUserInfoCard(
     user: User,
     modifier: Modifier = Modifier,
     onNameUpdateRequest: suspend (String) -> Unit,
-    onAddressUpdateRequest: suspend (String) -> Unit
+    onAddressUpdateRequest: suspend (String) -> Unit,
+    onNeighbourhoodUpdateRequest: suspend (Neighbourhood) -> Unit
 ) {
     var nameChanging by remember { mutableStateOf(false) }
     var addressChanging by remember { mutableStateOf(false) }
+    var neighbourhoodChanging by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -90,6 +94,20 @@ fun BasicUserInfoCard(
                 addressChanging = true
             }
         )
+        ListItem(
+            headlineContent = { Text(
+                if(user.neighbourhood != null)
+                    "${user.neighbourhood.name}, ${user.neighbourhood.city.name}"
+                else ""
+            ) },
+            supportingContent = { Text("Barrio asociado") },
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+            ),
+            modifier = Modifier.clickable {
+                neighbourhoodChanging = true
+            }
+        )
         Spacer(modifier = Modifier.height(8.dp))
     }
     if(nameChanging) NameEmergentField(
@@ -101,6 +119,11 @@ fun BasicUserInfoCard(
         placeholder = user.address,
         onDismissRequest = { addressChanging = false },
         onRequest = onAddressUpdateRequest
+    )
+    if(neighbourhoodChanging) NeighbourhoodEmergentField(
+        placeholder = user.neighbourhood,
+        onDismissRequest = { neighbourhoodChanging = false },
+        onRequest = onNeighbourhoodUpdateRequest
     )
 }
 
@@ -124,5 +147,10 @@ fun BasicUserInfoCardPreview() {
         email = emptySet(),
         phone = emptySet()
     )
-    BasicUserInfoCard(user, modifier = Modifier, onNameUpdateRequest = {}, onAddressUpdateRequest = {})
+    BasicUserInfoCard(
+        user,
+        modifier = Modifier,
+        onNameUpdateRequest = {  },
+        onAddressUpdateRequest = {  },
+        onNeighbourhoodUpdateRequest = {  })
 }

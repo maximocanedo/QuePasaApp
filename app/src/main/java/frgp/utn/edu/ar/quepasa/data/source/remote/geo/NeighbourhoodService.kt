@@ -29,7 +29,8 @@ interface NeighbourhoodService {
     suspend fun getNeighbourhoodsByName(
         @Query("name") name: String,
         @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("size") size: Int,
+        @Query("city") city: Int = -1
     ): Response<Page<Neighbourhood>>
 
     @PUT("neighbourhoods/{id}")

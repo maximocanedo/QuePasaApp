@@ -7,6 +7,10 @@ import quepasa.api.exceptions.ValidationError
 import retrofit2.Response
 import java.io.IOException
 
+fun <T> Response<T>.process(ifNull: () -> Unit = {  }): ApiResponse<T?> {
+    return ApiResponseHandler().getResponse(this)
+}
+
 class ApiResponseHandler {
 
     fun <T> getResponse(response: Response<T>): ApiResponse<T?> {

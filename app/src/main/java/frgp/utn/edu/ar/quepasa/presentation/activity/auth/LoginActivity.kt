@@ -51,6 +51,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import frgp.utn.edu.ar.quepasa.MainActivity
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.selector.field.NeighbourhoodField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.NameField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.OtpTextField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.PasswordField
@@ -239,7 +240,7 @@ fun AlreadyLoggedInUser(viewModel: LoginViewModel?, modifier: Modifier, loginTab
 fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
     if(viewModel == null) return
     val user by viewModel.userLogged.collectAsState()
-    var tab by remember { mutableStateOf(0) } // (2) } //
+    var tab by remember { mutableStateOf(1) } // (2) } //
     if(user != null) tab = 2
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -332,10 +333,12 @@ fun SignUpTabContent(viewModel: LoginViewModel?, loginTab: () -> Unit) {
     val name by viewModel.signupName.collectAsState()
     val password by viewModel.signupPassword.collectAsState()
     val repeatablePassword = viewModel.signupPasswordRepeatable.collectAsState()
+    val neighbourhood by viewModel.signupNeighbourhood.collectAsState()
 
     val nameIsValid by viewModel.nameIsValid.collectAsState()
     val usernameIsValid by viewModel.usernameIsValid.collectAsState()
     val passwordIsValid by viewModel.passwordIsValid.collectAsState()
+    val neighbourhoodIsValid by viewModel.neighbourhoodIsValid.collectAsState()
     val repeatablePasswordIsValid by viewModel.passwordRepeatableIsValid.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -368,6 +371,17 @@ fun SignUpTabContent(viewModel: LoginViewModel?, loginTab: () -> Unit) {
                 onChange = viewModel::setSignupUsername,
                 serverError = if(field == "username") feedback else null,
                 clearServerError = viewModel::clearFeedback
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row() {
+            NeighbourhoodField(
+                useViewModel = true,
+                value = setOfNotNull(neighbourhood),
+                onSelect = viewModel::updateNeighbourhood,
+                onUnselect = { viewModel.updateNeighbourhood(null) },
+                onContinue = {  },
+                allowMultipleSelection = false
             )
         }
         Spacer(modifier = Modifier.height(4.dp))

@@ -2,29 +2,26 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth
 
 import android.app.Application
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
+import frgp.utn.edu.ar.quepasa.data.dto.handle
 import frgp.utn.edu.ar.quepasa.data.dto.request.LoginRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.SignUpRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.data.source.remote.saveAuthToken
 import frgp.utn.edu.ar.quepasa.domain.repository.AuthRepository
 import frgp.utn.edu.ar.quepasa.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import quepasa.api.validators.commons.StringValidator
-import quepasa.api.validators.users.NameValidator
 import quepasa.api.validators.users.PasswordValidator
 import quepasa.api.validators.users.UsernameValidator
 import javax.inject.Inject
@@ -89,6 +86,14 @@ class LoginViewModel @Inject constructor(
     private val nameIsValidMutable = MutableStateFlow(false)
     val nameIsValid = nameIsValidMutable.asStateFlow()
     fun setNameValidity(x: Boolean) { nameIsValidMutable.value = x }
+
+    private val signUpNeighbourhoodMutable = MutableStateFlow<Neighbourhood?>(null)
+    val signupNeighbourhood = signUpNeighbourhoodMutable.asStateFlow()
+    val neighbourhoodIsValid = MutableStateFlow(false)
+    fun updateNeighbourhood(x: Neighbourhood?) {
+        signUpNeighbourhoodMutable.update { x }
+        neighbourhoodIsValid.update { signupNeighbourhood.value != null }
+    }
 
     val serverFeedback = MutableStateFlow("")
     fun setServerFeedback(x: String) { serverFeedback.value = x }
@@ -176,10 +181,11 @@ class LoginViewModel @Inject constructor(
 
 
     suspend fun signUp() {
-        val signUpValidators = listOf(nameIsValid.value, usernameIsValid.value, passwordIsValid.value, passwordRepeatableIsValid.value)
+        val signUpValidators = listOf(nameIsValid.value, usernameIsValid.value, passwordIsValid.value, passwordRepeatableIsValid.value, neighbourhoodIsValid.value)
         if(signUpValidators.contains(false)) return
-        val req = SignUpRequest(signupName.value, signupUsername.value, signupPassword.value)
-        val res = authRepository.signUp(req)
+        val req = SignUpRequest(signupName.value, signupUsername.value, signupPassword.value, signupNeighbourhood.value!!.id)
+        val res = authRepository
+            .signUp(req)
         when(res) {
             is ApiResponse.Success -> {
                 snackMutable.emit("¡Bienvenido!")

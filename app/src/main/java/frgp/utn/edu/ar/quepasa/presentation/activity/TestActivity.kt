@@ -25,7 +25,8 @@ class TestActivity : ComponentActivity() {
                 onSelect = { n = n.plus(it) },
                 onUnselect = { n = n.minus(it) },
                 onContinue = {  },
-                useViewModel = true
+                useViewModel = true,
+                allowMultipleSelection = false
             )
         }
     }

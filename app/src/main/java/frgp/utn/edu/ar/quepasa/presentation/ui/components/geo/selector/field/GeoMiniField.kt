@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -45,8 +47,8 @@ fun GeoMiniField(
     val errColor = MaterialTheme.colorScheme.error
     val styleSelected = true
     val contentColor by remember { derivedStateOf { if (feedback != null) errColor else defColor } }
-    Column(modifier = modifier, verticalArrangement = Center) {
-        Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+    Column(modifier = Modifier.width(OutlinedTextFieldDefaults.MinWidth).then(modifier), verticalArrangement = Center) {
+        Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -116,7 +118,7 @@ fun GeoMiniField(
                 }
             }
         }
-        if(feedback != null) Row(modifier = Modifier.padding(top = 0.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)) {
+        if(feedback != null) Row(modifier = Modifier.padding(top = 0.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)) {
             Text(
                 text = feedback,
                 color = contentColor,

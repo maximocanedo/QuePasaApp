@@ -168,7 +168,7 @@ fun GeographicModalSelector(
                                     onCountrySelected(it)
                                     tab = NeighbourhoodSelectorScreen.STATE
                                 },
-                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.COUNTRY,
+                                isLoading = isLoading == NeighbourhoodSelectorScreen.COUNTRY,
                                 onNextRequest = { onCountryLoadRequest(false) }
                             )
                         }
@@ -196,7 +196,7 @@ fun GeographicModalSelector(
                                     onStateSelected(it)
                                     tab = NeighbourhoodSelectorScreen.CITY
                                 },
-                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.STATE,
+                                isLoading = isLoading == NeighbourhoodSelectorScreen.STATE,
                                 onNextRequest = { onStateLoadRequest(false) }
                             )
                         }
@@ -253,7 +253,7 @@ fun GeographicModalSelector(
                                 onClick = {
                                     onNeighbourhoodSelect(it)
                                 },
-                                isLoading = isLoading != null && isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
+                                isLoading = isLoading == NeighbourhoodSelectorScreen.NEIGHBOURHOOD,
                                 onNextRequest = { onNeighbourhoodLoadRequest(false) }
                             )
                         }
@@ -270,6 +270,7 @@ fun GeographicModalSelector(
                         modifier = Modifier.padding(start = 8.dp, top = 4.dp))
                 }
                 NeighbourhoodChipContainer(
+                    modifier = Modifier.padding(horizontal = 6.dp),
                     data = value,
                     onUnselectRequest = onNeighbourhoodUnselectRequest
                 )

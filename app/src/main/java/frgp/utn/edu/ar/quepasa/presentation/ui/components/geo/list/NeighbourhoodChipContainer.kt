@@ -46,7 +46,7 @@ fun NeighbourhoodChipContainer(
         items(items = data.take(visibleItems), key = { it.id }) { neighbourhood ->
             InputChip(
                 selected = true,
-                modifier = Modifier.padding(vertical = 3.dp),
+                modifier = Modifier.padding(vertical = 0.dp),
                 onClick = { onUnselectRequest(neighbourhood) },
                 label = { Text(neighbourhood.name) }
             )
@@ -56,7 +56,7 @@ fun NeighbourhoodChipContainer(
             item {
                 InputChip(
                     selected = false,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 0.dp),
                     onClick = { showingModal = true },
                     label = { Text("+ $hiddenItemsCount") }
                 )

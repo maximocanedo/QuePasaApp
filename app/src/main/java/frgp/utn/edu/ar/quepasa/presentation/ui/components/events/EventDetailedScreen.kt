@@ -225,9 +225,13 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         ) {
                             items(comments.content) { comment ->
                                 key(comment.id) {
-                                    EventCommentCard(
-                                        comment = comment
-                                    )
+                                    user.user?.let {
+                                        EventCommentCard(
+                                            comment = comment,
+                                            voteCount = comment.votes,
+                                            user = it,
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -1,6 +1,7 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.comment
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import frgp.utn.edu.ar.quepasa.R
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
+import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButton
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.UpVoteButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
@@ -23,6 +29,8 @@ import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 @Composable
 fun PostCommentCard(
     comment: PostComment,
+    voteCount: VoteCount?,
+    user: User,
 ) {
     Card(
         modifier = Modifier
@@ -58,27 +66,44 @@ fun PostCommentCard(
             minLines = 1,
             maxLines = 4,
         )
-        /*
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, bottom = 4.dp, end = 8.dp, start = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.End),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 UpVoteButton(
-                    onClick = {},
-                    text = "1",//Contador de likes
+                    onClick = {
+
+                    },
+                    text = "1",
                 )
             }
             Column {
                 CardButton(
-                    modifier = Modifier.padding(end = 8.dp),
                     description = "",
                     icon = R.drawable.baseline_arrow_downward_24,
                     onClick = {}
                 )
             }
+            if (user.id == comment.author?.id) {
+                Column {
+                    CardButton(
+                        description = "",
+                        icon = R.drawable.baseline_delete_24,
+                        onClick = {}
+                    )
+                }
+                Column {
+                    CardButton(
+                        description = "",
+                        icon = R.drawable.baseline_edit_document_24,
+                        onClick = {}
+                    )
+                }
+            }
         }
-         */
     }
 }

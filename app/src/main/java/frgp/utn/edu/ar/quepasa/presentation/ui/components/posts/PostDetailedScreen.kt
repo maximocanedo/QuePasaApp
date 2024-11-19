@@ -278,9 +278,13 @@ fun PostDetailedScreen(
                         ) {
                             items(comments.content) { comment ->
                                 key(comment.id) {
-                                    PostCommentCard(
-                                        comment = comment
-                                    )
+                                    user.user?.let {
+                                        PostCommentCard(
+                                            comment = comment,
+                                            voteCount = comment.votes,
+                                            user = it,
+                                        )
+                                    }
                                 }
                             }
                         }

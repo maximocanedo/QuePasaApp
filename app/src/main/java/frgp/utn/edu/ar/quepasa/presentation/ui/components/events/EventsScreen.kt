@@ -104,6 +104,7 @@ fun EventsScreen(navController: NavHostController) {
             onRefresh = {
                 coroutineScope.launch {
                     viewModel.refreshEvents()
+                    viewModel.getRvspsByUser()
                     currentPage = 0
                 }
             }
@@ -161,11 +162,12 @@ fun EventsScreen(navController: NavHostController) {
                                 navController,
                                 event,
                                 user.user,
-                                eventRvsps.find { it.event?.id == event.id } != null,
+                                assists = eventRvsps.find { it.event?.id == event.id } != null,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
                                         resetEvents(viewModel, category, search)
+                                        viewModel.getRvspsByUser()
                                     }
                                 },
                                 onRemoveClick = {

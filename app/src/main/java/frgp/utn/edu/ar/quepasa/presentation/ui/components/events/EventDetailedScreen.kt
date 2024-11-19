@@ -70,14 +70,12 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
         eventPictureViewModel.getPicturesByEvent(eventId, 0, 10)
         pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
         viewModel.getComments(eventId, 0, 10)
+        viewModel.getRvspsByUser()
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
 
     if (event != null) {
-        LaunchedEffect(event) {
-            viewModel.getRvspsByUser()
-        }
         BaseComponent(
             navController = navController,
             user = user.user,
@@ -183,12 +181,12 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                 user = user.user,
                                 navController = navController,
                                 voteCount = event!!.votes!!,
-                                assists = eventRvsp.find { it.event?.id == event?.id } != null,
+                                assists = eventRvsp.find { it.event?.id == event!!.id }?.confirmed
+                                    ?: false,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event!!.id!!)
                                         viewModel.getEventById(eventId)
-                                        viewModel.getRvspsByUser()
                                     }
                                 },
                                 onRemoveClick = {

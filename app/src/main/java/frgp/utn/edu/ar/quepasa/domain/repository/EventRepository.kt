@@ -55,6 +55,8 @@ class EventRepository @Inject constructor(
         handleResponse { eventService.createEvent(event) }
     suspend fun rvspEvent(eventId: UUID): EventRvsp =
         handleResponse { eventService.rsvpEvent(eventId) }
+    suspend fun getRvspsByUser(confirmed: Boolean = true): List<EventRvsp> =
+        handleResponse { eventService.getRsvpsByUser(confirmed) }
 
     suspend fun addNeighbourhoodToEvent(eventId: UUID, neighbourhoodId: Int): Event =
         handleResponse { eventService.addNeighbourhoodToEvent(eventId, neighbourhoodId) }

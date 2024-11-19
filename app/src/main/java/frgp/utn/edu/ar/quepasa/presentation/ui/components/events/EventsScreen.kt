@@ -1,15 +1,37 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -22,8 +44,6 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewMode
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
 import java.util.UUID
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,11 +55,10 @@ fun EventsScreen(navController: NavHostController) {
     val eventState = viewModel.events.collectAsStateWithLifecycle()
 
     val events by viewModel.events.collectAsState()
+    val eventRvsps by viewModel.eventRvsps.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
-
-    var currentPage by remember { mutableStateOf(0) }
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
@@ -48,15 +67,13 @@ fun EventsScreen(navController: NavHostController) {
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    var currentPage by remember { mutableIntStateOf(0) }
 
     var showSnackbar by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        viewModel.sortEventsByVotes()
-    }
-
     LaunchedEffect(Unit, events) {
+        viewModel.getRvspsByUser()
         viewModel.viewModelScope.launch {
             events.content.forEach { event ->
                 if (pictures.find { it.event?.id == event.id } == null) {
@@ -144,6 +161,7 @@ fun EventsScreen(navController: NavHostController) {
                                 navController,
                                 event,
                                 user.user,
+                                eventRvsps.find { it.event?.id == event.id } != null,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)

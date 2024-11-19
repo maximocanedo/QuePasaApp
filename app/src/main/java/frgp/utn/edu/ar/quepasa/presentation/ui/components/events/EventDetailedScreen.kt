@@ -55,6 +55,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val commentViewModel: CommentViewModel = hiltViewModel()
 
     val comments by viewModel.comments.collectAsState()
+    val eventRvsp by viewModel.eventRvsps.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
     var commentEditState by remember { mutableStateOf(false) }
     var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
@@ -74,6 +75,9 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     val bitmaps = pictureViewModel.pictures.collectAsState()
 
     if (event != null) {
+        LaunchedEffect(event) {
+            viewModel.getRvspsByUser()
+        }
         BaseComponent(
             navController = navController,
             user = user.user,
@@ -90,9 +94,6 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         modifier = Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row {
-
-                        }
                         Row {
                             event!!.title?.let { Text(text = it, fontSize = 24.sp) }
                         }
@@ -182,10 +183,12 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                 user = user.user,
                                 navController = navController,
                                 voteCount = event!!.votes!!,
+                                assists = eventRvsp.find { it.event?.id == event?.id } != null,
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event!!.id!!)
                                         viewModel.getEventById(eventId)
+                                        viewModel.getRvspsByUser()
                                     }
                                 },
                                 onRemoveClick = {

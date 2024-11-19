@@ -60,6 +60,9 @@ interface EventService {
     @POST("events/{eventId}/rsvp")
     suspend fun rsvpEvent(@Path("eventId") eventId: UUID): Response<EventRvsp>
 
+    @GET("events/rsvp/user/me")
+    suspend fun getRsvpsByUser(@Query("confirmed") confirmed: Boolean = true): Response<List<EventRvsp>>
+
     @POST("events/{eventId}/neighbourhood/{neighbourhoodId}")
     suspend fun addNeighbourhoodToEvent(
         @Path("eventId") eventId: UUID,

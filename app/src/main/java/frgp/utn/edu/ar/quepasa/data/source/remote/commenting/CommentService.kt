@@ -12,21 +12,21 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface CommentService {
-    @POST("/comments/{commentId}/votes/up")
+    @POST("comments/{commentId}/votes/up")
     suspend fun upVoteComment(@Path("commentId") commentId: UUID): Response<VoteCount>
 
-    @POST("/comments/{commentId}/votes/down")
+    @POST("comments/{commentId}/votes/down")
     suspend fun downVoteComment(@Path("commentId") commentId: UUID): Response<VoteCount>
 
-    @GET("/comments/{commentId}")
+    @GET("comments/{commentId}")
     suspend fun getCommentById(@Path("commentId") commentId: UUID): Response<Comment>
 
-    @PATCH("/comments/{commentId}")
+    @PATCH("comments/{commentId}")
     suspend fun updateComment(
         @Path("commentId") commentId: UUID,
         @Body content: String
     ): Response<Comment>
 
-    @DELETE("/comments/{commentId}")
+    @DELETE("comments/{commentId}")
     suspend fun deleteComment(@Path("commentId") commentId: UUID): Response<Void>
 }

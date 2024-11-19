@@ -118,6 +118,9 @@ class EventViewModel @Inject constructor(
     private val _eventRvsp = MutableStateFlow<EventRvsp?>(null)
     val eventRvsp: MutableStateFlow<EventRvsp?> get() = _eventRvsp
 
+    private val _eventRvsps = MutableStateFlow<List<EventRvsp>>(emptyList())
+    val eventRvsps: MutableStateFlow<List<EventRvsp>> get() = _eventRvsps
+
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: MutableStateFlow<VoteCount?> get() = _votes
 
@@ -292,6 +295,15 @@ class EventViewModel @Inject constructor(
         try {
             val event = repository.rvspEvent(eventId)
             _eventRvsp.value = event
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun getRvspsByUser(confirmed: Boolean = true) {
+        try {
+            val rvsps = repository.getRvspsByUser(confirmed)
+            _eventRvsps.value = rvsps
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -492,6 +504,8 @@ class EventViewModel @Inject constructor(
             try {
                 getEvents(page = 0, size = 5)
                 currentPage.value=0
+                sortEventsByVotes()
+                getRvspsByUser()
             } catch (e: Exception) {
                 _errorMessage.value = e.message
             } finally {
@@ -506,6 +520,7 @@ class EventViewModel @Inject constructor(
                 try {
                     val moreEvents = repository.getEvents(page = currentPage.value + 1, size = pageSize, active = true)
                     _events.update { it.copy(content = it.content + moreEvents.content) }
+                    sortEventsByVotes()
                     currentPage.value += 1
                 } catch (e: Exception) {
                     _errorMessage.value = e.message

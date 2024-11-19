@@ -59,7 +59,7 @@ fun PostCard(
             .padding(3.dp),
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = {
             navController.navigate("postDetailedScreen/${post.id}")
         }
@@ -108,8 +108,10 @@ fun PostCard(
 
             Text(
                 text = post.title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground
             )
+
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -150,12 +152,23 @@ fun PostCard(
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
+
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = formatNumber(post.votes?.votes ?: 0),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
+                            if(post.votes?.votes!! < 0)
+                            {
+                                Text(
+                                    text = formatNumber(post.votes?.votes ?: 0),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }else{
+                                Text(
+                                    text = formatNumber(post.votes?.votes ?: 0),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+
                         }
 
                         Spacer(modifier = Modifier.width(16.dp)) // Espacio entre Like y Dislike

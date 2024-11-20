@@ -267,6 +267,54 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    suspend fun getEventsByNeighbourhood(
+        neighbourhoodId: Long,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ) {
+        try {
+            val events = repository.getEventsByNeighbourhood(
+                neighbourhoodId,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
+            _events.value = events
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun getEventsByNeighbourhoodAndCategory(
+        neighbourhoodId: Long,
+        category: EventCategory,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ) {
+        try {
+            val events = repository.getEventsByNeighbourhoodAndCategory(
+                neighbourhoodId,
+                category,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
+            _events.value = events
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
     /** POST **/
     suspend fun createEvent(event: EventCreateRequest): Boolean {
         try {

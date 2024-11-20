@@ -53,6 +53,27 @@ interface EventService {
         @Query("active") active: Boolean
     ): Response<Page<Event>>
 
+    @GET("events/eventNeighbourhood/{neighbourhoodId}")
+    suspend fun getEventsByNeighbourhood(
+        @Path("neighbourhoodId") neighbourhoodId: Long,
+        @Query("q") q: String = "",
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("active") active: Boolean = true,
+        @Query("sort") sort: String = "title,asc"
+    ): Response<Page<Event>>
+
+    @GET("events/eventNeighbourhood/{neighbourhoodId}/eventCategory/{category}")
+    suspend fun getEventsByNeighbourhoodAndCategory(
+        @Path("neighbourhoodId") neighbourhoodId: Long,
+        @Path("category") category: EventCategory,
+        @Query("q") q: String = "",
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10,
+        @Query("active") active: Boolean = true,
+        @Query("sort") sort: String = "title,asc"
+    ): Response<Page<Event>>
+
     /** SECCION POSTs **/
     @POST("events")
     suspend fun createEvent(@Body event: EventCreateRequest): Response<Event>

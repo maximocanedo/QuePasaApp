@@ -50,6 +50,46 @@ class EventRepository @Inject constructor(
     ): Page<Event> =
         handleResponse { eventService.getEventsByCategory(category, page, size, active) }
 
+    suspend fun getEventsByNeighbourhood(
+        neighbourhoodId: Long,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ): Page<Event> =
+        handleResponse {
+            eventService.getEventsByNeighbourhood(
+                neighbourhoodId,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
+        }
+
+    suspend fun getEventsByNeighbourhoodAndCategory(
+        neighbourhoodId: Long,
+        category: EventCategory,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ): Page<Event> =
+        handleResponse {
+            eventService.getEventsByNeighbourhoodAndCategory(
+                neighbourhoodId,
+                category,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
+        }
+
     /** POSTs **/
     suspend fun createEvent(event: EventCreateRequest): Event =
         handleResponse { eventService.createEvent(event) }

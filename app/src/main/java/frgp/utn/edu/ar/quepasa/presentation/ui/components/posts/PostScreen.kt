@@ -7,20 +7,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TrendsScreen
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostViewModel
@@ -29,26 +25,25 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.DialogProperties
-import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.WarningMessage
 
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.derivedStateOf
 import frgp.utn.edu.ar.quepasa.data.model.Post
+import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
     navController: NavHostController,
     selectedTag: String?,
+    user: AuthenticationContext,
     wrapInBaseComponent: Boolean = false
-) {
+
+    ) {
     val postViewModel: PostViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
@@ -109,7 +104,7 @@ fun PostScreen(
                     }
                 }
 
-                TrendsScreen(navController)
+                TrendsScreen(navController, user)
 
                 sortedPosts.forEach { post ->
                     PostCard(

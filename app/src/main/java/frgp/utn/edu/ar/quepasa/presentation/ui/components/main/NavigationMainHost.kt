@@ -1,7 +1,8 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -9,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import frgp.utn.edu.ar.quepasa.data.model.User
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
@@ -26,6 +28,8 @@ import java.util.UUID
 @Composable
 fun NavigationMainHost(navController: NavHostController, user: User?) {
     val context = LocalContext.current
+    val user by LocalAuth.current.collectAsState()
+
     NavHost(
         navController = navController,
         startDestination = "home"
@@ -50,7 +54,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             )
         ) { backStackEntry ->
             val tag = backStackEntry.arguments?.getString("tag") ?: ""
-            PostScreen(navController = navController, selectedTag = tag, wrapInBaseComponent = true)
+            PostScreen(navController = navController, selectedTag = tag,user=user, wrapInBaseComponent = true)
         }
 
         composable(
@@ -58,10 +62,11 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
         ) { backStackEntry ->
             val selectedTag = backStackEntry.arguments?.getString("selectedTag")
-            PostScreen(navController = navController, selectedTag = selectedTag)
+            PostScreen(navController = navController, selectedTag = selectedTag, user)
         }
 
-        composable("postCreate") { PostCreateScreen(navController, user) }
+       
+        composable("postCreate") { PostCreateScreen(navController, user.user) }
 
         composable(
             route = "postEdit/{postId}",
@@ -69,7 +74,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: -1
             if (postId != -1) {
-                PostEditScreen(navController, user, postId)
+                PostEditScreen(navController, user.user, postId)
             }
         }
 

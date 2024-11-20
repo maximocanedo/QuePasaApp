@@ -30,6 +30,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
@@ -66,12 +67,15 @@ fun EventsScreen(navController: NavHostController) {
     val totalElements by viewModel.totalElements.collectAsState()
     // Listado por barrios para usuario NEIGHBOUR
 
-    LaunchedEffect(Unit, events) {
-        if (user.isNeighbour) {
-            //viewModel.getEventsByNeighbour(user.user?.username!!)
-        } else {
+    LaunchedEffect(Unit) {
+        if (user.isAdmin) {
             viewModel.getEvents()
+        } else {
+            viewModel.getEventsByNeighbourhood(user.user?.neighbourhood?.id!!)
         }
+    }
+
+    LaunchedEffect(Unit, events) {
         viewModel.getRvspsByUser()
         viewModel.sortEventsByVotes()
         viewModel.viewModelScope.launch {
@@ -103,7 +107,7 @@ fun EventsScreen(navController: NavHostController) {
             isRefreshing = isRefreshing,
             onRefresh = {
                 coroutineScope.launch {
-                    viewModel.refreshEvents()
+                    user.user?.neighbourhood?.id?.let { viewModel.refreshEvents(user.isAdmin, it) }
                 }
             }
         ) {
@@ -122,7 +126,13 @@ fun EventsScreen(navController: NavHostController) {
                         onValueChange = {
                             search = it
                             viewModel.viewModelScope.launch {
-                                viewModel.getEvents(search)
+                                if (user.isAdmin) {
+                                    viewModel.getEvents(it)
+                                } else {
+                                    user.user?.neighbourhood?.id?.let { id ->
+                                        viewModel.getEventsByNeighbourhood(id, it)
+                                    }
+                                }
                                 category = ""
                             }
                         },
@@ -141,7 +151,16 @@ fun EventsScreen(navController: NavHostController) {
                         onItemSelected = {
                             category = it
                             viewModel.viewModelScope.launch {
-                                viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                if (user.isAdmin) {
+                                    viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                } else {
+                                    user.user?.neighbourhood?.id?.let { id ->
+                                        viewModel.getEventsByNeighbourhoodAndCategory(
+                                            id,
+                                            EventCategory.valueOf(it)
+                                        )
+                                    }
+                                }
                                 search = ""
                             }
                         }
@@ -165,7 +184,15 @@ fun EventsScreen(navController: NavHostController) {
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
-                                        resetEvents(viewModel, actualElements, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                     }
                                 },
                                 onRemoveClick = {
@@ -175,13 +202,29 @@ fun EventsScreen(navController: NavHostController) {
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
-                                        resetEvents(viewModel, actualElements, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                     }
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.downVote(event.id!!)
-                                        resetEvents(viewModel, actualElements, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                     }
                                 }
                             )
@@ -198,7 +241,12 @@ fun EventsScreen(navController: NavHostController) {
                                 Button(
                                     onClick = {
                                         viewModel.viewModelScope.launch {
-                                            viewModel.loadMoreEvents()
+                                            user.user?.neighbourhood?.let {
+                                                viewModel.loadMoreEvents(
+                                                    user.isAdmin,
+                                                    it.id
+                                                )
+                                            }
                                         }
                                     },
                                     modifier = Modifier
@@ -226,7 +274,15 @@ fun EventsScreen(navController: NavHostController) {
                         viewModel.viewModelScope.launch {
                             eventToDelete?.let { event ->
                                 viewModel.deleteEvent(event)
-                                resetEvents(viewModel, actualElements, category, search)
+                                user.user?.let {
+                                    resetEvents(
+                                        it,
+                                        viewModel,
+                                        actualElements,
+                                        category,
+                                        search
+                                    )
+                                }
                             }
                             eventToDelete = null
                             showDialog = false
@@ -247,18 +303,39 @@ fun EventsScreen(navController: NavHostController) {
 }
 
 fun resetEvents(
+    user: User,
     viewModel: EventViewModel,
     actualElements: Int,
     category: String,
     search: String
 ) {
     viewModel.viewModelScope.launch {
-        if (category.isNotBlank()) {
-            viewModel.getEventsByCategory(EventCategory.valueOf(category), size = actualElements)
-        } else if (search.isNotBlank()) {
-            viewModel.getEvents(search, size = actualElements)
+        if (user.role.toString() == "ADMIN") {
+            if (category.isNotBlank()) {
+                viewModel.getEventsByCategory(
+                    EventCategory.valueOf(category),
+                    size = actualElements
+                )
+            } else if (search.isNotBlank()) {
+                viewModel.getEvents(search, size = actualElements)
+            } else {
+                viewModel.getEvents(size = actualElements)
+            }
         } else {
-            viewModel.getEvents(size = actualElements)
+            if (category.isNotBlank()) {
+                //viewModel.getEventsByNeighbourhoodAndCategory()
+            } else if (search.isNotBlank()) {
+                user.neighbourhood?.let {
+                    viewModel.getEventsByNeighbourhood(
+                        it.id,
+                        search,
+                        size = actualElements
+                    )
+                }
+            } else {
+                viewModel.getEventsByNeighbourhood(user.neighbourhood?.id!!, size = actualElements)
+            }
         }
+
     }
 }

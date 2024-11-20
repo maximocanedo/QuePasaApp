@@ -548,12 +548,16 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    fun refreshEvents() {
+    fun refreshEvents(isAdmin: Boolean, neighbourhoodId: Long) {
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
                 _actualElements.value = 5
-                getEvents(size = actualElements.value)
+                if (isAdmin) {
+                    getEvents(size = actualElements.value)
+                } else {
+                    getEventsByNeighbourhood(neighbourhoodId, size = actualElements.value)
+                }
                 sortEventsByVotes()
                 getRvspsByUser()
             } catch (e: Exception) {
@@ -564,12 +568,16 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    suspend fun loadMoreEvents() {
+    suspend fun loadMoreEvents(isAdmin: Boolean, neighbourhoodId: Long) {
         if (actualElements.value < totalElements.value) {
             _actualElements.value += 5
             _isLoadingMore.value = true
             try {
-                getEvents(size = actualElements.value, active = true)
+                if (isAdmin) {
+                    getEvents(size = actualElements.value)
+                } else {
+                    getEventsByNeighbourhood(neighbourhoodId, size = actualElements.value)
+                }
                 sortEventsByVotes()
             } catch (e: Exception) {
                 _errorMessage.value = e.message

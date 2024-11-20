@@ -94,7 +94,6 @@ fun PostDetailedScreen(
     if (post != null) {
         BaseComponent(
             navController = navController,
-            user = user.user,
             title = "Publicación",
             back = true
         ) {

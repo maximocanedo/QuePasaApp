@@ -78,7 +78,6 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     if (event != null) {
         BaseComponent(
             navController = navController,
-            user = user.user,
             title = "Detalle Evento",
             back = true
         ) {

@@ -36,6 +36,14 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
     ) {
         composable("home") { MainPage(navController) }
 
+        composable("userProfile") {
+            ProfileScreen(navController)
+        }
+
+        composable("user/{username}") {
+            ProfileScreen(navController, it.arguments?.getString("username") ?: "")
+        }
+
         composable(
             route = "posts?tag={tag}",
             arguments = listOf(
@@ -48,21 +56,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             val tag = backStackEntry.arguments?.getString("tag") ?: ""
             PostScreen(navController = navController, selectedTag = tag,user=user, wrapInBaseComponent = true)
         }
-
-
-        
-
-        composable("userProfile") {
-            ProfileScreen(navController)
-        }
-
-        composable("user/{username}") {
-            ProfileScreen(navController, it.arguments?.getString("username") ?: "")
-        }
-            composable("events") {
-                EventsScreen(navController)
-            }
-
 
         composable(
             route = "postList/{selectedTag}",

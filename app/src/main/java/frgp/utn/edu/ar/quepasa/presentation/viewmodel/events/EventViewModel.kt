@@ -1,7 +1,5 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.events
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +15,6 @@ import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventAddressValidator
@@ -36,12 +33,10 @@ class EventViewModel @Inject constructor(
     private val titleMutable = MutableStateFlow("")
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
-    val currentPage: MutableState<Int> = mutableStateOf(0)
-    private val pageSize = 5
-    private val _isLoadingMore = MutableStateFlow(false)
-    val isLoadingMore = _isLoadingMore.asStateFlow()
-    val totalPages: MutableState<Int> = mutableStateOf(0)
-    val actualPage: MutableState<Int> = mutableStateOf(0)
+    private val _actualElements = MutableStateFlow(5)
+    val actualElements = _actualElements.asStateFlow()
+    private val _totalElements = MutableStateFlow(10)
+    val totalElements = _totalElements.asStateFlow()
 
 
     fun setTitle(x: String) {
@@ -215,8 +210,7 @@ class EventViewModel @Inject constructor(
                     sort = sort
                 )
             _events.value = events
-            totalPages.value = events.totalPages
-            actualPage.value = events.pageNumber
+            _totalElements.value = events.totalElements
 
         } catch (e: Exception) {
             _errorMessage.value = e.message
@@ -502,8 +496,8 @@ class EventViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                getEvents(page = 0, size = 5)
-                currentPage.value=0
+                _actualElements.value = 5
+                getEvents(size = actualElements.value)
                 sortEventsByVotes()
                 getRvspsByUser()
             } catch (e: Exception) {
@@ -513,20 +507,18 @@ class EventViewModel @Inject constructor(
             }
         }
     }
-    fun loadMoreEvents() {
-        if (currentPage.value < totalPages.value) {
-            viewModelScope.launch {
-                _isLoadingMore.value = true
-                try {
-                    val moreEvents = repository.getEvents(page = currentPage.value + 1, size = pageSize, active = true)
-                    _events.update { it.copy(content = it.content + moreEvents.content) }
-                    sortEventsByVotes()
-                    currentPage.value += 1
-                } catch (e: Exception) {
-                    _errorMessage.value = e.message
-                } finally {
-                    _isLoadingMore.value = false
-                }
+
+    suspend fun loadMoreEvents() {
+        if (actualElements.value < totalElements.value) {
+            _actualElements.value += 5
+            _isRefreshing.value = true
+            try {
+                getEvents(size = actualElements.value, active = true)
+                sortEventsByVotes()
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }

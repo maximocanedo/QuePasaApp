@@ -33,6 +33,8 @@ class EventViewModel @Inject constructor(
     private val titleMutable = MutableStateFlow("")
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore = _isLoadingMore.asStateFlow()
     private val _actualElements = MutableStateFlow(5)
     val actualElements = _actualElements.asStateFlow()
     private val _totalElements = MutableStateFlow(10)
@@ -511,14 +513,14 @@ class EventViewModel @Inject constructor(
     suspend fun loadMoreEvents() {
         if (actualElements.value < totalElements.value) {
             _actualElements.value += 5
-            _isRefreshing.value = true
+            _isLoadingMore.value = true
             try {
                 getEvents(size = actualElements.value, active = true)
                 sortEventsByVotes()
             } catch (e: Exception) {
                 _errorMessage.value = e.message
             } finally {
-                _isRefreshing.value = false
+                _isLoadingMore.value = false
             }
         }
     }

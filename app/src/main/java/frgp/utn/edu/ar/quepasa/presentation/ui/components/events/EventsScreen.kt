@@ -12,8 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -30,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
@@ -51,7 +48,6 @@ fun EventsScreen(navController: NavHostController) {
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
-    val eventState = viewModel.events.collectAsStateWithLifecycle()
 
     val events by viewModel.events.collectAsState()
     val eventRvsps by viewModel.eventRvsps.collectAsState()
@@ -64,15 +60,15 @@ fun EventsScreen(navController: NavHostController) {
     var eventToDelete by remember { mutableStateOf<UUID?>(null) }
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val actualElements by viewModel.actualElements.collectAsState()
     val totalElements by viewModel.totalElements.collectAsState()
-
-    var showSnackbar by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
+    // Listado por barrios para usuario NEIGHBOUR
 
     LaunchedEffect(Unit, events) {
         viewModel.getRvspsByUser()
+        viewModel.sortEventsByVotes()
         viewModel.viewModelScope.launch {
             events.content.forEach { event ->
                 if (pictures.find { it.event?.id == event.id } == null) {
@@ -150,6 +146,7 @@ fun EventsScreen(navController: NavHostController) {
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     userScrollEnabled = true,
                 ) {
                     items(events.content) { event ->
@@ -186,10 +183,9 @@ fun EventsScreen(navController: NavHostController) {
                         }
                     }
                     item {
-                        if (isRefreshing) {
+                        if (isLoadingMore) {
                             CircularProgressIndicator(
                                 modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
                                     .padding(16.dp)
                             )
                         } else {
@@ -206,8 +202,6 @@ fun EventsScreen(navController: NavHostController) {
                                 ) {
                                     Text("Cargar más")
                                 }
-                            } else {
-                                showSnackbar = true
                             }
                         }
                     }
@@ -215,16 +209,6 @@ fun EventsScreen(navController: NavHostController) {
             }
         }
     }
-
-    LaunchedEffect(showSnackbar) {
-        if (showSnackbar) {
-            snackbarHostState.showSnackbar("Ya estás al día con los eventos.")
-            showSnackbar = false
-        }
-    }
-    SnackbarHost(
-        hostState = snackbarHostState
-    )
 
     if (showDialog) {
         AlertDialog(
@@ -265,14 +249,11 @@ fun resetEvents(
 ) {
     viewModel.viewModelScope.launch {
         if (category.isNotBlank()) {
-            viewModel.getEventsByCategory(EventCategory.valueOf(category))
-            viewModel.sortEventsByVotes()
+            viewModel.getEventsByCategory(EventCategory.valueOf(category), size = actualElements)
         } else if (search.isNotBlank()) {
-            viewModel.getEvents(search)
-            viewModel.sortEventsByVotes()
+            viewModel.getEvents(search, size = actualElements)
         } else {
-            viewModel.getEvents()
-            viewModel.sortEventsByVotes()
+            viewModel.getEvents(size = actualElements)
         }
     }
 }

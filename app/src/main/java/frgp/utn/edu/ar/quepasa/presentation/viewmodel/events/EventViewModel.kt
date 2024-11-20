@@ -187,13 +187,6 @@ class EventViewModel @Inject constructor(
         neighbourhoodIsValidMutable.value = x
     }
 
-    init {
-        viewModelScope.launch {
-            getEvents(page = 0, size = 5)
-            sortEventsByVotes()
-        }
-    }
-
     /** GET **/
     suspend fun getEvents(
         search: String = "",

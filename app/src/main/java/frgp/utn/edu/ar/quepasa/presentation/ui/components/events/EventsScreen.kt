@@ -67,6 +67,11 @@ fun EventsScreen(navController: NavHostController) {
     // Listado por barrios para usuario NEIGHBOUR
 
     LaunchedEffect(Unit, events) {
+        if (user.isNeighbour) {
+            //viewModel.getEventsByNeighbour(user.user?.username!!)
+        } else {
+            viewModel.getEvents()
+        }
         viewModel.getRvspsByUser()
         viewModel.sortEventsByVotes()
         viewModel.viewModelScope.launch {

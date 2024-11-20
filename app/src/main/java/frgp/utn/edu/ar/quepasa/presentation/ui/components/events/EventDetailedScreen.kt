@@ -237,18 +237,21 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.upVoteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onDownvoteClick = {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.downVoteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onDeleteClick = {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.deleteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onEditClick = {

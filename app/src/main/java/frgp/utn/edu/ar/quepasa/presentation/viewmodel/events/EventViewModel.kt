@@ -405,6 +405,19 @@ class EventViewModel @Inject constructor(
         ).content
     }
 
+    fun sortCommentsByVotes() {
+        val comments = _comments.value.content.sortedWith(
+            compareByDescending<EventComment> { it.votes?.votes }
+                .thenByDescending { it.timestamp }
+        )
+        _comments.value.content = Page(
+            content = comments,
+            totalElements = comments.size,
+            totalPages = _comments.value.totalPages,
+            pageNumber = _comments.value.pageNumber
+        ).content
+    }
+
 
     fun titleValidator(title: String): EventTitleValidator {
         return EventTitleValidator(title).isNotBlank().meetsLimits()

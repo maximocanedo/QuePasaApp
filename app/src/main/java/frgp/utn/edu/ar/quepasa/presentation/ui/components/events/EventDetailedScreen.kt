@@ -79,7 +79,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
         BaseComponent(
             navController = navController,
             title = "Detalle Evento",
-            back = true
+            back = true,
+            backRoute = "events"
         ) {
             Column(
                 modifier = Modifier.padding(12.dp)

@@ -72,6 +72,7 @@ fun EventsScreen(navController: NavHostController) {
         } else {
             viewModel.getEventsByNeighbourhood(user.user?.neighbourhood?.id!!)
         }
+        viewModel.sortEventsByVotes()
     }
 
     LaunchedEffect(Unit, events) {
@@ -192,6 +193,7 @@ fun EventsScreen(navController: NavHostController) {
                                                 search
                                             )
                                         }
+                                        viewModel.getRvspsByUser()
                                     }
                                 },
                                 onRemoveClick = {
@@ -282,6 +284,7 @@ fun EventsScreen(navController: NavHostController) {
                                         search
                                     )
                                 }
+                                viewModel.sortEventsByVotes()
                             }
                             eventToDelete = null
                             showDialog = false

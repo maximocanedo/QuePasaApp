@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
@@ -40,13 +43,6 @@ fun PhonesCard(
 ) {
     var addPhoneDialogState by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        modifier = modifier
-            .wrapContentHeight()
-    ) {
         Text(
             text = "Números de teléfono",
             style = MaterialTheme.typography.labelSmall,
@@ -57,9 +53,6 @@ fun PhonesCard(
             ListItem(
                 headlineContent = { Text(it.phone) },
                 supportingContent = { if(!it.verified) Text("Sin verificar") },
-                colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                ),
                 modifier = Modifier.clickable { showDialog = true }
             )
             if(showDialog) PhoneDialog(
@@ -69,15 +62,18 @@ fun PhonesCard(
                 onValidateRequest = onPhoneValidationRequest
             )
         }
-        OutlinedButton(
-            onClick = {
-                addPhoneDialogState = true
-            },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text("Registrar nuevo número de teléfono")
+    ListItem(
+        headlineContent = { Text("Agregar número de teléfono") },
+        leadingContent = {
+            Icon(
+                painter = painterResource(id = R.drawable.add),
+                contentDescription = "Agregar número de teléfono"
+            )
+        },
+        modifier = Modifier.clickable {
+            addPhoneDialogState = true
         }
-    }
+    )
     if(addPhoneDialogState) AddPhoneDialog(
         onRequest = onPhoneRegistration,
         onDismiss = { addPhoneDialogState = false }

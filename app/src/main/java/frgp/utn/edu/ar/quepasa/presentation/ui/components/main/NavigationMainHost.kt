@@ -22,6 +22,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.AdvancedUserSettingsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.TotpSettingsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.UpdatePasswordScreen
 import java.util.UUID
@@ -49,6 +50,12 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             }
             composable("userProfile") {
                 ProfileScreen(navController)
+            }
+            composable("advancedProfileSettings") {
+                AdvancedUserSettingsScreen(navController)
+            }
+            composable("advancedProfileSettings/{username}") {
+                AdvancedUserSettingsScreen(navController, it.arguments?.getString("username") ?: "")
             }
             composable("totpSettings") {
                 TotpSettingsScreen(navController)

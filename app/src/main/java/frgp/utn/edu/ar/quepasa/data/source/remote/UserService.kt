@@ -5,6 +5,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
+import frgp.utn.edu.ar.quepasa.data.model.auth.TotpDetails
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -51,15 +52,23 @@ interface UserService {
     @GET("users/me")
     suspend fun getAuthenticatedUser(): Response<User>
 
-    /**
-     * Solucionar endpoints de TOTP.
-     */
+    @GET("users/me/totp")
+    suspend fun getTotpDetails(): Response<TotpDetails>
+
+    @POST("users/me/totp")
+    suspend fun enableTotp(): Response<TotpDetails>
+
+    @DELETE("users/me/totp")
+    suspend fun disableTotp(): Response<Void>
 
     @PATCH("users/me")
     suspend fun editAuthenticatedUser(@Body request: UserPatchEditRequest): Response<User>
 
     @DELETE("users/me")
     suspend fun deleteAuthenticatedUser(): Response<Void>
+
+    @POST("users/me/password")
+    suspend fun updateMyPassword(@Body newPassword: RequestBody): Response<Void>
 
 
 

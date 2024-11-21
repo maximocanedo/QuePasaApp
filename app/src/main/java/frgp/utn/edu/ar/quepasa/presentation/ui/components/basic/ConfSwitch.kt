@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -25,13 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ConfSwitch(
     modifier: Modifier,
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    loading: Boolean = false
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (checked)
@@ -50,7 +56,7 @@ fun ConfSwitch(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) { onCheckedChange(!checked) }
+            ) { if(!loading) onCheckedChange(!checked) }
     ) {
         Row(
             modifier = Modifier
@@ -65,7 +71,8 @@ fun ConfSwitch(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f) 
             )
-            Switch(
+            if(loading) CircularProgressIndicator()
+            else Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange
             )
@@ -77,10 +84,19 @@ fun ConfSwitch(
 @Preview @Composable
 fun ConfSwitchPreview() {
     var x by remember { mutableStateOf(false) }
+    var l by remember { mutableStateOf(false) }
     ConfSwitch(
         Modifier,
         "Habilitar configuración",
         x,
-        { x = it }
+        {
+            CoroutineScope(IO).launch {
+                l = true
+                delay(3000)
+                l = false
+                x = it
+            }
+        },
+        l
     )
 }

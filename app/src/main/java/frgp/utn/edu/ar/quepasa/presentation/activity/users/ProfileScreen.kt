@@ -157,6 +157,17 @@ fun ProfileScreenContent(
                     Text("Deshabilitar cuenta")
                 }
                 Spacer(modifier = Modifier.height(56.dp))
+                Button(
+                    onClick = { navController.navigate("totpSettings") }
+                ) {
+                    Text("Configurar TOTP")
+                }
+                Spacer(modifier = Modifier.height(56.dp))
+                Button(
+                    onClick = { navController.navigate("updatePassword") }
+                ) {
+                    Text("Clave")
+                }
             }
         }
     }

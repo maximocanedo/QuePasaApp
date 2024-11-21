@@ -18,6 +18,5 @@ data class User(
     val picture: Picture?,
     val email: Set<Mail>,
     val role: Role,
-    val active: Boolean,
-    val totp: Boolean = false
+    val active: Boolean
 )

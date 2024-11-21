@@ -8,8 +8,10 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.auth.Mail
 import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
+import frgp.utn.edu.ar.quepasa.data.model.auth.TotpDetails
 import frgp.utn.edu.ar.quepasa.data.source.remote.UserService
 import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import quepasa.api.verifiers.UserVerifier
 import javax.inject.Inject
@@ -44,6 +46,15 @@ open class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun enableTotp(): ApiResponse<TotpDetails?> =
+        handler.getResponse(userService.enableTotp())
+
+    suspend fun getTotpDetails(): ApiResponse<TotpDetails?> =
+        handler.getResponse(userService.getTotpDetails())
+
+    suspend fun disableTotp(): ApiResponse<Void?> =
+        handler.getResponse(userService.disableTotp())
+
     suspend fun editByUsername(username: String, request: UserPatchEditRequest): ApiResponse<User?> =
         handler.getResponse(userService.editByUsername(username, request))
 
@@ -73,5 +84,13 @@ open class UserRepository @Inject constructor(
 
     suspend fun deleteAuthenticatedUser(): ApiResponse<Void?> =
         handler.getResponse(userService.deleteAuthenticatedUser())
+
+    suspend fun updateMyPassword(newPassword: String): ApiResponse<Void?> =
+        handler.getResponse(
+            userService
+                .updateMyPassword(
+                    newPassword.toRequestBody("text/plain".toMediaType())
+                )
+        )
 
 }

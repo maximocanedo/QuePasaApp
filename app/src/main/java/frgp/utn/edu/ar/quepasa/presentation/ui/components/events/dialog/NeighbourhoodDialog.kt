@@ -83,9 +83,10 @@ fun NeighbourhoodDialog(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
+                    .height(260.dp)
                     .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
                 userScrollEnabled = true,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(displayNeighbourhoods.content) { neighbourhood ->
                     Row(
@@ -123,20 +124,24 @@ fun NeighbourhoodDialog(
                         }
                     }
                 }
-            }
-            Button(
-                onClick = {
-                    neighbourhoodSize += 3
-                    viewModel.viewModelScope.launch {
-                        viewModel.getNeighbourhoodsByName(
-                            searchedNeighbourhood.value,
-                            size = neighbourhoodSize
-                        )
+                item(
+                    key = "loadMore"
+                ) {
+                    Button(
+                        onClick = {
+                            neighbourhoodSize += 3
+                            viewModel.viewModelScope.launch {
+                                viewModel.getNeighbourhoodsByName(
+                                    searchedNeighbourhood.value,
+                                    size = neighbourhoodSize
+                                )
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("Cargar más")
                     }
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("Cargar más")
+                }
             }
         }
     }

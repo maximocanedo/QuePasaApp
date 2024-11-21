@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +37,10 @@ fun PostTagSection(viewModel: PostFormViewModel) {
     )
 
     if(tags.isNotEmpty()) {
-        FlowRow(modifier = Modifier.fillMaxWidth()) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
             tags.forEachIndexed { index, tag ->
                 frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.tags.TagValue(
                     modifier = Modifier,

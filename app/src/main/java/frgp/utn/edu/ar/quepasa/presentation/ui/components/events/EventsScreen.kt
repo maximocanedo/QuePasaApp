@@ -284,7 +284,6 @@ fun EventsScreen(navController: NavHostController) {
                                         search
                                     )
                                 }
-                                viewModel.sortEventsByVotes()
                             }
                             eventToDelete = null
                             showDialog = false
@@ -342,6 +341,6 @@ fun resetEvents(
                 viewModel.getEventsByNeighbourhood(user.neighbourhood?.id!!, size = actualElements)
             }
         }
-
+        viewModel.sortEventsByVotes()
     }
 }

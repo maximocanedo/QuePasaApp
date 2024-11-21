@@ -31,12 +31,8 @@ import java.util.UUID
 
 @Composable
 fun NavigationMainHost(navController: NavHostController, user: User?) {
-
-    val context = LocalContext.current
     val user by LocalAuth.current.collectAsState()
-
     SnackProvider {
-        val context = LocalContext.current
         NavHost(
             navController = navController,
             startDestination = "home"
@@ -80,25 +76,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             composable("events") {
                 EventsScreen(navController)
             }
-
-            composable(
-                route = "posts?tag={tag}",
-                arguments = listOf(
-                    navArgument("tag") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            ) { backStackEntry ->
-                val tag = backStackEntry.arguments?.getString("tag") ?: ""
-                PostScreen(
-                    navController = navController,
-                    selectedTag = tag,
-                    user = user,
-                    wrapInBaseComponent = true
-                )
-            }
-
             composable(
                 route = "postList/{selectedTag}",
                 arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
@@ -106,9 +83,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 val selectedTag = backStackEntry.arguments?.getString("selectedTag")
                 PostScreen(navController = navController, selectedTag = selectedTag, user)
             }
-
             composable("postCreate") { PostCreate(navController) }
-
             composable(
                 route = "postEdit/{postId}",
                 arguments = listOf(navArgument("postId") { type = NavType.IntType })
@@ -117,48 +92,38 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 if (postId != -1) {
                     PostEditScreen(navController, user.user, postId)
                 }
-                composable(
-                    route = "postEdit/{postId}",
-                    arguments = listOf(navArgument("postId") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val postId = backStackEntry.arguments?.getInt("postId") ?: -1
-                    if (postId != -1) {
-                        PostEditScreen(navController, user.user, postId)
-                    }
-                }
-                composable(
-                    route = "postDetailedScreen/{postId}",
-                    arguments = listOf(navArgument("postId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val postId = backStackEntry.arguments?.getString("postId") ?: ""
-                    if (postId.isNotEmpty()) {
-                        PostDetailedScreen(navController, postId.toInt())
-                    }
-                }
-                composable("eventCreate") { CreateEventScreen(navController) }
-                composable(
-                    route = "eventEdit/{eventId}",
-                    arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-                    if (eventId.isNotEmpty()) {
-                        EditEventScreen(navController, UUID.fromString(eventId))
-                    }
-                }
-                composable("events") { EventsScreen(navController) }
-                composable(
-                    route = "eventDetailedScreen/{eventId}",
-                    arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
-                    if (eventId.isNotEmpty()) {
-                        EventDetailedScreen(navController, UUID.fromString(eventId))
-                    }
-                }
-                composable("roleRequestUserList") { RoleUpdateUserListScreen(navController) }
-                composable("roleRequestAdminList") { RoleUpdateAdminListScreen(navController) }
-                composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
             }
+            composable(
+                route = "postDetailedScreen/{postId}",
+                arguments = listOf(navArgument("postId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getString("postId") ?: ""
+                if (postId.isNotEmpty()) {
+                    PostDetailedScreen(navController, postId.toInt())
+                }
+            }
+            composable("eventCreate") { CreateEventScreen(navController) }
+            composable(
+                route = "eventEdit/{eventId}",
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+                if (eventId.isNotEmpty()) {
+                    EditEventScreen(navController, UUID.fromString(eventId))
+                }
+            }
+            composable(
+                route = "eventDetailedScreen/{eventId}",
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+                if (eventId.isNotEmpty()) {
+                    EventDetailedScreen(navController, UUID.fromString(eventId))
+                }
+            }
+            composable("roleRequestUserList") { RoleUpdateUserListScreen(navController) }
+            composable("roleRequestAdminList") { RoleUpdateAdminListScreen(navController) }
+            composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
         }
     }
 }

@@ -1,25 +1,22 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
@@ -41,75 +38,105 @@ fun BasicUserInfoCard(
     var nameChanging by remember { mutableStateOf(false) }
     var addressChanging by remember { mutableStateOf(false) }
     var neighbourhoodChanging by remember { mutableStateOf(false) }
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        modifier = modifier
-            .wrapContentHeight()
-    ) {
-        Text(
-            text = "Información básica",
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(12.dp)
-        )
+    var showing by remember { mutableStateOf(false) }
+
+    if(showing) {
         ListItem(
             headlineContent = { Text(user.id.toString()) },
             supportingContent = { Text("Id") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.tag),
+                    contentDescription = "Id"
+                )
+            }
         )
         ListItem(
             headlineContent = { Text(user.username) },
             supportingContent = { Text("Nombre de usuario") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.alternate_email),
+                    contentDescription = "Nombre de usuario"
+                )
+            }
         )
         ListItem(
             headlineContent = { Text(user.name) },
             supportingContent = { Text("Nombre") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            ),
             modifier = Modifier.clickable {
                 nameChanging = true
+            },
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.person),
+                    contentDescription = "Nombre"
+                )
             }
         )
         ListItem(
             headlineContent = { Text(user.role.name) },
             supportingContent = { Text("Rol") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.badge),
+                    contentDescription = "Rol"
+                )
+            }
         )
         ListItem(
             headlineContent = { Text(user.address) },
             supportingContent = { Text("Dirección") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            ),
             modifier = Modifier.clickable {
                 addressChanging = true
+            },
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.home),
+                    contentDescription = "Dirección"
+                )
             }
         )
         ListItem(
-            headlineContent = { Text(
-                if(user.neighbourhood != null)
-                    "${user.neighbourhood.name}, ${user.neighbourhood.city.name}"
-                else ""
-            ) },
+            headlineContent = {
+                Text(
+                    if (user.neighbourhood != null)
+                        "${user.neighbourhood.name}, ${user.neighbourhood.city.name}"
+                    else ""
+                )
+            },
             supportingContent = { Text("Barrio asociado") },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-            ),
             modifier = Modifier.clickable {
                 neighbourhoodChanging = true
+            },
+            leadingContent = {
+                Icon(
+                    painterResource(id = R.drawable.location_city),
+                    contentDescription = "Barrio asociado"
+                )
             }
         )
-        Spacer(modifier = Modifier.height(8.dp))
     }
+
+    ListItem(
+        modifier = Modifier.clickable {
+            showing = !showing
+        },
+        headlineContent = {
+            Text(if(showing) "Ocultar información básica" else "Información básica")
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(
+                    if(showing) R.drawable.keyboard_arrow_up
+                    else R.drawable.keyboard_arrow_down
+                ),
+                contentDescription = if(showing) "Ocultar" else "Mostrar"
+            )
+        }
+    )
+    HorizontalDivider(Modifier.fillMaxWidth())
+
     if(nameChanging) NameEmergentField(
         placeholder = user.name,
         onDismissRequest = { nameChanging = false },

@@ -14,24 +14,22 @@ fun <T> Response<T>.process(ifNull: () -> Unit = {  }): ApiResponse<T?> {
 class ApiResponseHandler {
 
     fun <T> getResponse(response: Response<T>): ApiResponse<T?> {
-        try {
-            if(response.isSuccessful) {
-                return ApiResponse.Success(response.body());
-            } else if(response.code() == 403) {
-                return ApiResponse.Error(Fail(message = "Recurso prohibido. ", status = response.code()))
-            } else {
-                val error = response.errorBody()?.string();
-                val jsonA = JsonParser.parseString(error)
-                val json = jsonA.asJsonObject
-                if(json.has("message")) {
-                    return ApiResponse.Error(Fail(message = json.get("message").asString, status = response.code()))
-                } else if(json.has("field") || json.has("errors")) {
-                    return ApiResponse.ValidationError(ValidationError(json.get("field").asString, json.get("errors").asJsonArray.map { it.asString }.toTypedArray().toMutableSet()))
-                } else
-                    return ApiResponse.Error(Fail(message = "Error desconocido. ", status = response.code()))
-            }
-        } catch(e: IOException) {
-            return ApiResponse.Error(Fail(message = "Error desconocido. ", status = 0))
+        if(response.isSuccessful) {
+            if(response.code() == 204 || response.body() == null)
+                return ApiResponse.Success(null);
+            return ApiResponse.Success(response.body());
+        } else if(response.code() == 403) {
+            return ApiResponse.Error(Fail(message = "Recurso prohibido. ", status = response.code()))
+        } else {
+            val error = response.errorBody()?.string();
+            val jsonA = JsonParser.parseString(error)
+            val json = jsonA.asJsonObject
+            if(json.has("message")) {
+                return ApiResponse.Error(Fail(message = json.get("message").asString, status = response.code()))
+            } else if(json.has("field") || json.has("errors")) {
+                return ApiResponse.ValidationError(ValidationError(json.get("field").asString, json.get("errors").asJsonArray.map { it.asString }.toTypedArray().toMutableSet()))
+            } else
+                return ApiResponse.Error(Fail(message = "Error desconocido. ", status = response.code()))
         }
     }
 

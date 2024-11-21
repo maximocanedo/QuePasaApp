@@ -78,9 +78,9 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
     if (event != null) {
         BaseComponent(
             navController = navController,
-            user = user.user,
             title = "Detalle Evento",
-            back = true
+            back = true,
+            backRoute = "events"
         ) {
             Column(
                 modifier = Modifier.padding(12.dp)
@@ -238,18 +238,21 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.upVoteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onDownvoteClick = {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.downVoteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onDeleteClick = {
                                                 viewModel.viewModelScope.launch {
                                                     commentViewModel.deleteComment(comment.id)
                                                     viewModel.getComments(eventId, 0, 10)
+                                                    viewModel.sortCommentsByVotes()
                                                 }
                                             },
                                             onEditClick = {
@@ -277,6 +280,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                     viewModel.viewModelScope.launch {
                         viewModel.comment(eventId, content)
                         viewModel.getComments(eventId, 0, 10)
+                        viewModel.sortCommentsByVotes()
                     }
                     commentDialogState = false
                 }
@@ -290,6 +294,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                     viewModel.viewModelScope.launch {
                         commentViewModel.updateComment(commentEditUUID, content)
                         viewModel.getComments(eventId, 0, 10)
+                        viewModel.sortCommentsByVotes()
                     }
                     commentEditText = ""
                     commentEditState = false

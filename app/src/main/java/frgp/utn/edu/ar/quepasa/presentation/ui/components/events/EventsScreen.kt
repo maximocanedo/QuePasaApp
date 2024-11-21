@@ -12,8 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -21,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,9 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
@@ -52,13 +49,11 @@ fun EventsScreen(navController: NavHostController) {
     val viewModel: EventViewModel = hiltViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
-    val eventState = viewModel.events.collectAsStateWithLifecycle()
 
     val events by viewModel.events.collectAsState()
     val eventRvsps by viewModel.eventRvsps.collectAsState()
     val pictures by eventPictureViewModel.eventPictures.collectAsState()
     val eventPictureDTO by pictureViewModel.eventPictureDTO.collectAsState()
-    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
 
     var category by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
@@ -66,14 +61,23 @@ fun EventsScreen(navController: NavHostController) {
     var eventToDelete by remember { mutableStateOf<UUID?>(null) }
 
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    var currentPage by remember { mutableIntStateOf(0) }
+    val actualElements by viewModel.actualElements.collectAsState()
+    val totalElements by viewModel.totalElements.collectAsState()
 
-    var showSnackbar by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        if (user.isAdmin) {
+            viewModel.getEvents()
+        } else {
+            viewModel.getEventsByNeighbourhood(user.user?.neighbourhood?.id!!)
+        }
+        viewModel.sortEventsByVotes()
+    }
 
     LaunchedEffect(Unit, events) {
         viewModel.getRvspsByUser()
+        viewModel.sortEventsByVotes()
         viewModel.viewModelScope.launch {
             events.content.forEach { event ->
                 if (pictures.find { it.event?.id == event.id } == null) {
@@ -98,14 +102,12 @@ fun EventsScreen(navController: NavHostController) {
         }
     }
 
-    BaseComponent(navController, user.user, "Listado Eventos", false) {
+    BaseComponent(navController, "Listado Eventos", false) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
                 coroutineScope.launch {
-                    viewModel.refreshEvents()
-                    viewModel.getRvspsByUser()
-                    currentPage = 0
+                    user.user?.neighbourhood?.id?.let { viewModel.refreshEvents(user.isAdmin, it) }
                 }
             }
         ) {
@@ -124,7 +126,13 @@ fun EventsScreen(navController: NavHostController) {
                         onValueChange = {
                             search = it
                             viewModel.viewModelScope.launch {
-                                viewModel.getEvents(search)
+                                if (user.isAdmin) {
+                                    viewModel.getEvents(it)
+                                } else {
+                                    user.user?.neighbourhood?.id?.let { id ->
+                                        viewModel.getEventsByNeighbourhood(id, it)
+                                    }
+                                }
                                 category = ""
                             }
                         },
@@ -143,7 +151,16 @@ fun EventsScreen(navController: NavHostController) {
                         onItemSelected = {
                             category = it
                             viewModel.viewModelScope.launch {
-                                viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                if (user.isAdmin) {
+                                    viewModel.getEventsByCategory(EventCategory.valueOf(it))
+                                } else {
+                                    user.user?.neighbourhood?.id?.let { id ->
+                                        viewModel.getEventsByNeighbourhoodAndCategory(
+                                            id,
+                                            EventCategory.valueOf(it)
+                                        )
+                                    }
+                                }
                                 search = ""
                             }
                         }
@@ -153,6 +170,7 @@ fun EventsScreen(navController: NavHostController) {
                 LazyColumn(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     userScrollEnabled = true,
                 ) {
                     items(events.content) { event ->
@@ -166,7 +184,15 @@ fun EventsScreen(navController: NavHostController) {
                                 onAssistanceClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.rsvpEvent(event.id!!)
-                                        resetEvents(viewModel, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                         viewModel.getRvspsByUser()
                                     }
                                 },
@@ -177,35 +203,51 @@ fun EventsScreen(navController: NavHostController) {
                                 onUpvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.upVote(event.id!!)
-                                        resetEvents(viewModel, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                     }
                                 },
                                 onDownvoteClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.downVote(event.id!!)
-                                        resetEvents(viewModel, category, search)
+                                        user.user?.let {
+                                            resetEvents(
+                                                it,
+                                                viewModel,
+                                                actualElements,
+                                                category,
+                                                search
+                                            )
+                                        }
                                     }
                                 }
                             )
                         }
                     }
-
-                    if (currentPage < eventState.value.totalPages - 1) {
-                        item {
-                            if (isLoadingMore) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(16.dp)
-                                )
-                            } else {
+                    item {
+                        if (isLoadingMore) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            )
+                        } else {
+                            if (actualElements < totalElements) {
                                 Button(
                                     onClick = {
-                                        if (currentPage < eventState.value.totalPages - 1) {
-                                            currentPage++
-                                            viewModel.loadMoreEvents()
-                                        } else {
-                                            showSnackbar = true
+                                        viewModel.viewModelScope.launch {
+                                            user.user?.neighbourhood?.let {
+                                                viewModel.loadMoreEvents(
+                                                    user.isAdmin,
+                                                    it.id
+                                                )
+                                            }
                                         }
                                     },
                                     modifier = Modifier
@@ -222,16 +264,6 @@ fun EventsScreen(navController: NavHostController) {
         }
     }
 
-    LaunchedEffect(showSnackbar) {
-        if (showSnackbar) {
-            snackbarHostState.showSnackbar("Ya estás al día con los eventos.")
-            showSnackbar = false
-        }
-    }
-    SnackbarHost(
-        hostState = snackbarHostState
-    )
-
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -243,7 +275,15 @@ fun EventsScreen(navController: NavHostController) {
                         viewModel.viewModelScope.launch {
                             eventToDelete?.let { event ->
                                 viewModel.deleteEvent(event)
-                                resetEvents(viewModel, category, search)
+                                user.user?.let {
+                                    resetEvents(
+                                        it,
+                                        viewModel,
+                                        actualElements,
+                                        category,
+                                        search
+                                    )
+                                }
                             }
                             eventToDelete = null
                             showDialog = false
@@ -264,20 +304,43 @@ fun EventsScreen(navController: NavHostController) {
 }
 
 fun resetEvents(
+    user: User,
     viewModel: EventViewModel,
+    actualElements: Int,
     category: String,
     search: String
 ) {
     viewModel.viewModelScope.launch {
-        if (category.isNotBlank()) {
-            viewModel.getEventsByCategory(EventCategory.valueOf(category))
-            viewModel.sortEventsByVotes()
-        } else if (search.isNotBlank()) {
-            viewModel.getEvents(search)
-            viewModel.sortEventsByVotes()
+        if (user.role.toString() == "ADMIN") {
+            if (category.isNotBlank()) {
+                viewModel.getEventsByCategory(
+                    EventCategory.valueOf(category),
+                    size = actualElements
+                )
+            } else if (search.isNotBlank()) {
+                viewModel.getEvents(search, size = actualElements)
+            } else {
+                viewModel.getEvents(size = actualElements)
+            }
         } else {
-            viewModel.getEvents()
-            viewModel.sortEventsByVotes()
+            if (category.isNotBlank()) {
+                viewModel.getEventsByNeighbourhoodAndCategory(
+                    user.neighbourhood?.id!!,
+                    EventCategory.valueOf(category),
+                    size = actualElements
+                )
+            } else if (search.isNotBlank()) {
+                user.neighbourhood?.let {
+                    viewModel.getEventsByNeighbourhood(
+                        it.id,
+                        search,
+                        size = actualElements
+                    )
+                }
+            } else {
+                viewModel.getEventsByNeighbourhood(user.neighbourhood?.id!!, size = actualElements)
+            }
         }
+        viewModel.sortEventsByVotes()
     }
 }

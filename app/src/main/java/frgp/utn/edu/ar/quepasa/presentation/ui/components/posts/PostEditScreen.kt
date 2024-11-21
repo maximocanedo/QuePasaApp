@@ -34,15 +34,15 @@ import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.ImageField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.NeighbourhoodField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.AudienceField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.DescriptionField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.ImageField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.NeighbourhoodField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TagField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TagValue
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TitleField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeSubtypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
@@ -68,7 +68,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val postPictureViewModel: PostPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
 
-    BaseComponent(navController, user, "Modificar publicación", true) {
+    BaseComponent(navController, "Modificar publicación", true) {
         LaunchedEffect(Unit) {
             viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)

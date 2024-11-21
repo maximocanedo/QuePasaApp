@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -32,16 +32,16 @@ import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.AudienceField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.DescriptionField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.ImageField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.NeighbourhoodField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TagValue
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TitleField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields.TypeSubtypeField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostCreateImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.AudienceField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.DescriptionField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.ImageField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.NeighbourhoodField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TagField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TagValue
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TitleField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeSubtypeField
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.previews.PostCreateImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
+@Deprecated("Usar paquete 'create'")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PostCreateScreen(navController: NavHostController, user: User?) {
@@ -64,7 +65,7 @@ fun PostCreateScreen(navController: NavHostController, user: User?) {
     val imageViewModel = ImageViewModel()
     val pictureViewModel: PostPictureViewModel = hiltViewModel()
 
-    BaseComponent(navController, user, "Crear publicación", true) {
+    BaseComponent(navController, "Crear publicación", true) {
         var title by remember { mutableStateOf("") }
         var audience by remember { mutableStateOf("PUBLIC") }
         var description by remember { mutableStateOf("") }

@@ -1,7 +1,5 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.events
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +15,6 @@ import frgp.utn.edu.ar.quepasa.domain.repository.EventRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.events.EventAddressValidator
@@ -36,12 +33,12 @@ class EventViewModel @Inject constructor(
     private val titleMutable = MutableStateFlow("")
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
-    val currentPage: MutableState<Int> = mutableStateOf(0)
-    private val pageSize = 5
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore = _isLoadingMore.asStateFlow()
-    val totalPages: MutableState<Int> = mutableStateOf(0)
-    val actualPage: MutableState<Int> = mutableStateOf(0)
+    private val _actualElements = MutableStateFlow(5)
+    val actualElements = _actualElements.asStateFlow()
+    private val _totalElements = MutableStateFlow(10)
+    val totalElements = _totalElements.asStateFlow()
 
 
     fun setTitle(x: String) {
@@ -190,13 +187,6 @@ class EventViewModel @Inject constructor(
         neighbourhoodIsValidMutable.value = x
     }
 
-    init {
-        viewModelScope.launch {
-            getEvents(page = 0, size = 5)
-            sortEventsByVotes()
-        }
-    }
-
     /** GET **/
     suspend fun getEvents(
         search: String = "",
@@ -215,8 +205,7 @@ class EventViewModel @Inject constructor(
                     sort = sort
                 )
             _events.value = events
-            totalPages.value = events.totalPages
-            actualPage.value = events.pageNumber
+            _totalElements.value = events.totalElements
 
         } catch (e: Exception) {
             _errorMessage.value = e.message
@@ -272,6 +261,54 @@ class EventViewModel @Inject constructor(
     ) {
         try {
             val events = repository.getEventsByCategory(category, page, size, active)
+            _events.value = events
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun getEventsByNeighbourhood(
+        neighbourhoodId: Long,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ) {
+        try {
+            val events = repository.getEventsByNeighbourhood(
+                neighbourhoodId,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
+            _events.value = events
+        } catch (e: Exception) {
+            _errorMessage.value = e.message
+        }
+    }
+
+    suspend fun getEventsByNeighbourhoodAndCategory(
+        neighbourhoodId: Long,
+        category: EventCategory,
+        query: String = "",
+        page: Int = 0,
+        size: Int = 10,
+        active: Boolean = true,
+        sort: String = "title,asc"
+    ) {
+        try {
+            val events = repository.getEventsByNeighbourhoodAndCategory(
+                neighbourhoodId,
+                category,
+                query,
+                page,
+                size,
+                active,
+                sort
+            )
             _events.value = events
         } catch (e: Exception) {
             _errorMessage.value = e.message
@@ -409,6 +446,19 @@ class EventViewModel @Inject constructor(
         ).content
     }
 
+    fun sortCommentsByVotes() {
+        val comments = _comments.value.content.sortedWith(
+            compareByDescending<EventComment> { it.votes?.votes }
+                .thenByDescending { it.timestamp }
+        )
+        _comments.value.content = Page(
+            content = comments,
+            totalElements = comments.size,
+            totalPages = _comments.value.totalPages,
+            pageNumber = _comments.value.pageNumber
+        ).content
+    }
+
 
     fun titleValidator(title: String): EventTitleValidator {
         return EventTitleValidator(title).isNotBlank().meetsLimits()
@@ -498,12 +548,16 @@ class EventViewModel @Inject constructor(
         }
     }
 
-    fun refreshEvents() {
+    fun refreshEvents(isAdmin: Boolean, neighbourhoodId: Long) {
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                getEvents(page = 0, size = 5)
-                currentPage.value=0
+                _actualElements.value = 5
+                if (isAdmin) {
+                    getEvents(size = actualElements.value)
+                } else {
+                    getEventsByNeighbourhood(neighbourhoodId, size = actualElements.value)
+                }
                 sortEventsByVotes()
                 getRvspsByUser()
             } catch (e: Exception) {
@@ -513,20 +567,22 @@ class EventViewModel @Inject constructor(
             }
         }
     }
-    fun loadMoreEvents() {
-        if (currentPage.value < totalPages.value) {
-            viewModelScope.launch {
-                _isLoadingMore.value = true
-                try {
-                    val moreEvents = repository.getEvents(page = currentPage.value + 1, size = pageSize, active = true)
-                    _events.update { it.copy(content = it.content + moreEvents.content) }
-                    sortEventsByVotes()
-                    currentPage.value += 1
-                } catch (e: Exception) {
-                    _errorMessage.value = e.message
-                } finally {
-                    _isLoadingMore.value = false
+
+    suspend fun loadMoreEvents(isAdmin: Boolean, neighbourhoodId: Long) {
+        if (actualElements.value < totalElements.value) {
+            _actualElements.value += 5
+            _isLoadingMore.value = true
+            try {
+                if (isAdmin) {
+                    getEvents(size = actualElements.value)
+                } else {
+                    getEventsByNeighbourhood(neighbourhoodId, size = actualElements.value)
                 }
+                sortEventsByVotes()
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isLoadingMore.value = false
             }
         }
     }

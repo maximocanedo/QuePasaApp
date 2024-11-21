@@ -29,11 +29,11 @@ class NeighbourhoodRepository @Inject constructor(
         handleResponse { neighbourhoodService.getNeighbourhoodById(id) }
 
     suspend fun getNeighbourhoodsByName(
-        name: String,
+        q: String,
         page: Int = 0,
         size: Int = 10
     ): Page<Neighbourhood> =
-        handleResponse { neighbourhoodService.getNeighbourhoodsByName(name, page, size) }
+        handleResponse { neighbourhoodService.getNeighbourhoodsByName(q, page, size) }
 
     suspend fun createNeighbourhood(neighbourhood: Neighbourhood): Neighbourhood =
         handleResponse { neighbourhoodService.createNeighbourhood(neighbourhood) }

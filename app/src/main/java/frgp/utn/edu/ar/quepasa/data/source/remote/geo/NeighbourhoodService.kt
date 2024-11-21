@@ -27,7 +27,7 @@ interface NeighbourhoodService {
 
     @GET("neighbourhoods/search")
     suspend fun getNeighbourhoodsByName(
-        @Query("name") name: String,
+        @Query("q") query: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("city") city: Int = -1

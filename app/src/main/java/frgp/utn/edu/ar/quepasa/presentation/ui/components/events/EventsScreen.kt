@@ -65,7 +65,6 @@ fun EventsScreen(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val actualElements by viewModel.actualElements.collectAsState()
     val totalElements by viewModel.totalElements.collectAsState()
-    // Listado por barrios para usuario NEIGHBOUR
 
     LaunchedEffect(Unit) {
         if (user.isAdmin) {
@@ -323,7 +322,11 @@ fun resetEvents(
             }
         } else {
             if (category.isNotBlank()) {
-                //viewModel.getEventsByNeighbourhoodAndCategory()
+                viewModel.getEventsByNeighbourhoodAndCategory(
+                    user.neighbourhood?.id!!,
+                    EventCategory.valueOf(category),
+                    size = actualElements
+                )
             } else if (search.isNotBlank()) {
                 user.neighbourhood?.let {
                     viewModel.getEventsByNeighbourhood(

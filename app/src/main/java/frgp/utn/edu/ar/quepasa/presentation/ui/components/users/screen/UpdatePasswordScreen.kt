@@ -73,7 +73,6 @@ fun UpdatePasswordScreen(
 
     BaseComponent(
         navController = navController,
-        user = auth.user,
         title = "Cambiar contraseña",
         back = true,
         backRoute = navController.backQueue

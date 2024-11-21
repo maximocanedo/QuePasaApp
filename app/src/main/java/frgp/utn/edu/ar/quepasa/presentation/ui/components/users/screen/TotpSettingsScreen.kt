@@ -53,7 +53,6 @@ fun TotpSettingsScreen(
     }
     BaseComponent(
         navController = navController,
-        user = auth.user,
         title = "Autenticación mediante TOTP",
         back = true,
         backRoute = navController.backQueue

@@ -95,7 +95,6 @@ fun AdvancedUserSettings(
     }
     BaseComponent(
         navController = navController,
-        user = auth.user,
         title = "Cuenta",
         back = true,
         backRoute = navController.backQueue

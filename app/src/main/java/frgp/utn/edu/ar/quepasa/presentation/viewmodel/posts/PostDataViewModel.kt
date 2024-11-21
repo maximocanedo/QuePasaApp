@@ -1,7 +1,5 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,15 +12,13 @@ import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.domain.repository.PostRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@Deprecated("Usar PostDataViewModel para peticiones a la API, y PostFormViewModel para manejo local de estados")
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class PostDataViewModel @Inject constructor(
     private val repository: PostRepository
 ): ViewModel() {
     private val _posts = MutableStateFlow<Page<Post>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
@@ -37,39 +33,16 @@ class PostViewModel @Inject constructor(
     private val _votes = MutableStateFlow<VoteCount?>(null)
     val votes: StateFlow<VoteCount?> get() = _votes
 
-    private val _comments = MutableStateFlow<Page<PostComment>>(
-        Page(
-            content = emptyList(),
-            totalElements = 0,
-            totalPages = 0,
-            pageNumber = 0
-        )
-    )
+    private val _comments = MutableStateFlow<Page<PostComment>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val comments: StateFlow<Page<PostComment>> get() = _comments
 
     private val _comment = MutableStateFlow<PostComment?>(null)
     val comment: StateFlow<PostComment?> get() = _comment
 
-    private val _tags = MutableStateFlow<List<String>>(emptyList())
-    val tags: StateFlow<List<String>> get() = _tags
-
-    private var _tagCount = MutableStateFlow(0)
-    val tagCount: StateFlow<Int> get() = _tagCount
-
-    private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }
-
-    private val _fieldTagValidation = MutableSharedFlow<Boolean>()
-
     private val _errorMessage = MutableStateFlow<String?>(null)
 
     private val _isLoading = MutableStateFlow(false)
-
     val isLoading: StateFlow<Boolean> get() = _isLoading
-    private val _allPosts = MutableLiveData<List<Post>>()
-    val allPosts: LiveData<List<Post>> get() = _allPosts
-
-    private val _filteredPosts = MutableLiveData<List<Post>>()
-    val filteredPosts: LiveData<List<Post>> get() = _filteredPosts
 
     init {
         viewModelScope.launch {
@@ -77,18 +50,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun filterPostsByTag(tag: String) {
-        val filtered = _posts.value.content.filter { post ->
-            post.tags?.split(",")?.contains(tag) == true
-        }
-        _filteredPosts.value = filtered
-    }
-
-    fun clearFilter() {
-        _filteredPosts.value = _posts.value.content
-    }
-
-    suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
+    private suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
         try {
             val newPosts = repository.getPosts(page, size, activeOnly)
             _posts.value = if (page == 0) {
@@ -121,8 +83,6 @@ class PostViewModel @Inject constructor(
         try {
             val post = repository.getPostById(id)
             _post.value = post
-            _tags.value = _post.value!!.tags?.split(",") ?: emptyList()
-            _tagCount.value = _tags.value.size
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -246,7 +206,6 @@ class PostViewModel @Inject constructor(
             println("New post: Title ${request.title} + Audience ${request.audience} + Subtype ${request.subtype} + Desc ${request.description} + Neigh ${request.neighbourhood} + Tags ${request.tags}")
             val newPost = repository.createPost(request)
             _post.value = newPost
-            clearTags()
             return true
         }
         catch(e: Exception) {
@@ -282,7 +241,6 @@ class PostViewModel @Inject constructor(
             println("Updated post: Title ${request.title} + Audience ${request.audience} + Subtype ${request.subtype} + Desc ${request.description} + Neigh ${request.neighbourhood} + Tags ${request.tags}")
             val updatedPost = repository.updatePost(id, request)
             _post.value = updatedPost
-            clearTags()
             return true
         }
         catch(e: Exception) {
@@ -381,47 +339,6 @@ class PostViewModel @Inject constructor(
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
-        }
-    }
-
-    fun getTags(): List<String> {
-        return tags.value
-    }
-
-    fun addTag(tag: String) {
-        if(tagCount.value < 5) {
-            val tags = _tags.value + tag
-            _tags.value = tags
-            _tagCount.value = _tags.value.size
-        }
-    }
-
-    fun removeTag(tag: String) {
-        var tags: List<String> = emptyList()
-        _tags.value.forEach { tagValue ->
-            if(tagValue != tag) tags = tags + tagValue
-        }
-        _tags.value = tags
-        _tagCount.value = _tags.value.size
-    }
-
-    private fun clearTags() {
-        _tags.value = emptyList()
-        _tagCount.value = 0
-    }
-
-    fun toggleValidationField(index: Int, state: Boolean) {
-        require(index in _fieldsValidation.indices) { "Index out of bounds" }
-        _fieldsValidation[index].value = state
-    }
-
-    fun checkValidationFields(): Boolean {
-        return _fieldsValidation.all { it.value }
-    }
-
-    fun toggleTagValidationField(state: Boolean) {
-        viewModelScope.launch {
-            _fieldTagValidation.emit(state)
         }
     }
 }

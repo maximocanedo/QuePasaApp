@@ -16,10 +16,10 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.CreateEventScre
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostCreateScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create.PostCreate
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
@@ -64,9 +64,8 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             val selectedTag = backStackEntry.arguments?.getString("selectedTag")
             PostScreen(navController = navController, selectedTag = selectedTag, user)
         }
-
        
-        composable("postCreate") { PostCreateScreen(navController, user.user) }
+        composable("postCreate") {  PostCreate(navController) }
 
         composable(
             route = "postEdit/{postId}",

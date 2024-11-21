@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text

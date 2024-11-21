@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.fields
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.StringValidator
 
 @Composable

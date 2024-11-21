@@ -80,16 +80,18 @@ fun PostCommentCard(
             Column {
                 UpVoteButton(
                     onClick = {
-
+                        onUpvoteClick()
                     },
-                    text = "1",
+                    text = voteCount?.votes.toString(),
                 )
             }
             Column {
                 CardButton(
-                    description = "",
+                    description = "Downvote button",
                     icon = R.drawable.baseline_arrow_downward_24,
-                    onClick = {}
+                    onClick = {
+                        onDownvoteClick()
+                    }
                 )
             }
             if (user.id == comment.author?.id) {
@@ -97,14 +99,18 @@ fun PostCommentCard(
                     CardButton(
                         description = "",
                         icon = R.drawable.baseline_delete_24,
-                        onClick = {}
+                        onClick = {
+                            onDeleteClick()
+                        }
                     )
                 }
                 Column {
                     CardButton(
                         description = "",
                         icon = R.drawable.baseline_edit_document_24,
-                        onClick = {}
+                        onClick = {
+                            onEditClick()
+                        }
                     )
                 }
             }

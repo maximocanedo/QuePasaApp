@@ -41,6 +41,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.User
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import java.sql.Timestamp
+import frgp.utn.edu.ar.quepasa.utils.audience.audienceToSpanish
 
 @Composable
 fun PostCard(
@@ -51,180 +52,192 @@ fun PostCard(
     onCommentClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onRemoveClick: (Int) -> Unit,
-
-    ) {
+) {
     val user by LocalAuth.current.collectAsState()
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(3.dp)
-            .shadow(8.dp, RoundedCornerShape(18.dp))
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(18.dp)
-            ),
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        onClick = {
-            navController.navigate("postDetailedScreen/${post.id}")
-        }
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                post.owner?.let {
-                    UserHorizontalDesign(
-                        user = it,
-                        modifier = Modifier,
+    if (user.user?.role != Role.NEIGHBOUR || !(post.audience.name == "NEIGHBORHOOD" &&
+                post.neighbourhood?.name != user.user?.neighbourhood?.name
                     )
-                }
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    post.neighbourhood?.name?.let { neighbourhoodName ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(R.drawable.location),
-                                contentDescription = "Ubicación",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = neighbourhoodName,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                    Text(
-                        text = post.timestamp.formatTimeAgo(),
-                        fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp),
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            ReadMoreText(
-                text = post.description,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontSize = 14.sp
+                /*|| !(post.audience.name == "CITY" &&
+                post.neighbourhood?.name != user.user?.neighbourhood?.name)
+                || !(post.audience.name == "NEIGHBORHOOD" &&
+                post.neighbourhood?.name != user.user?.neighbourhood?.name)
+*/
+        ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(3.dp)
+                .shadow(8.dp, RoundedCornerShape(18.dp))
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(18.dp)
                 ),
-                minLines = 3,
-                maxLines = 10
-            )
+            shape = RoundedCornerShape(18.dp),
+            elevation = CardDefaults.cardElevation(4.dp),
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if(user.user?.role != Role.USER) {
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            onClick = {
+                navController.navigate("postDetailedScreen/${post.id}")
+            }
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Like y Dislike juntos a la izquierda
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                    post.owner?.let {
+                        UserHorizontalDesign(
+                            user = it,
+                            modifier = Modifier,
+                        )
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.End
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable(onClick = onLikeClick)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                                contentDescription = "Like",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-
-                            Spacer(modifier = Modifier.width(4.dp))
-                            if(post.votes?.votes!! < 0)
-                            {
-                                Text(
-                                    text = formatNumber(post.votes?.votes ?: 0),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                        post.neighbourhood?.name?.let { neighbourhoodName ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    painter = painterResource(R.drawable.location),
+                                    contentDescription = "Ubicación",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
                                 )
-                            }else{
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = formatNumber(post.votes?.votes ?: 0),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    text = neighbourhoodName,
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
-
                         }
-
-                        Spacer(modifier = Modifier.width(16.dp)) // Espacio entre Like y Dislike
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable(onClick = onDislikeClick)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                                contentDescription = "Dislike",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                        Text(
+                            text = post.timestamp.formatTimeAgo(),
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    // Editar y Eliminar en el centro
-                    Row(
-                        modifier = Modifier.padding(horizontal = 64.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                            Icon(
-                                painter = painterResource(R.drawable.edit),
-                                contentDescription = "Edit",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clickable { onEditClick(post.id) }
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp)) // Espacio entre Editar y Eliminar
-
-                        if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_delete_24),
-                                contentDescription = "Remove",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clickable { onRemoveClick(post.id) }
-                            )
-                        }
+                Column {
+                    Text(
+                        text = post.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    post.audience?.let { audience ->
+                        Text(
+                            text = "Audiencia: "+audienceToSpanish(audience.name),
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                ReadMoreText(
+                    text = post.description,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontSize = 14.sp
+                    ),
+                    minLines = 3,
+                    maxLines = 10
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (user.user?.role != Role.USER) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable(onClick = onLikeClick)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_arrow_upward_24),
+                                    contentDescription = "Like",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+
+                                Spacer(modifier = Modifier.width(4.dp))
+                                if (post.votes?.votes!! < 0) {
+                                    Text(
+                                        text = formatNumber(post.votes?.votes ?: 0),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                } else {
+                                    Text(
+                                        text = formatNumber(post.votes?.votes ?: 0),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable(onClick = onDislikeClick)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_arrow_downward_24),
+                                    contentDescription = "Dislike",
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.padding(horizontal = 64.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                                Icon(
+                                    painter = painterResource(R.drawable.edit),
+                                    contentDescription = "Edit",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clickable { onEditClick(post.id) }
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_delete_24),
+                                    contentDescription = "Remove",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clickable { onRemoveClick(post.id) }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

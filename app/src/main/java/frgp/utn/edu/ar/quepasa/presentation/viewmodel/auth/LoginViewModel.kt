@@ -231,15 +231,6 @@ class LoginViewModel @Inject constructor(
 
         when (res) {
             is ApiResponse.Success -> {
-                val user = userRepository.getAuthenticatedUser()
-                if (user == null) {
-                    snackMutable.emit("Usuario no encontrado o hubo un error.")
-                    return
-                }
-                if (!user.active) {
-                    snackMutable.emit("Tu cuenta no está activa. Contacta al soporte.")
-                    return
-                }
                 requiresTOTPMutable.value = res.data?.totpRequired ?: false
                 if (!requiresTOTPMutable.value) {
                     updateLoggedInState(true)
@@ -254,7 +245,7 @@ class LoginViewModel @Inject constructor(
                 if (requiresTOTPMutable.value) {
                     invalidateTotp()
                 } else {
-                    snackMutable.emit("Error: ${res.exception.message}")
+                    snackMutable.emit("Error: ${res.exception.status ?: 0}")
                 }
             }
         }

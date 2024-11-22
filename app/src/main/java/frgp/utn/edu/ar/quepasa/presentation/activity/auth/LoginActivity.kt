@@ -239,7 +239,7 @@ fun AlreadyLoggedInUser(viewModel: LoginViewModel?, modifier: Modifier, loginTab
 fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
     if(viewModel == null) return
     val user by viewModel.userLogged.collectAsState()
-    var tab by remember { mutableStateOf(1) } // (2) } //
+    var tab by remember { mutableStateOf(0) } // (2) } //
     if(user != null) tab = 2
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

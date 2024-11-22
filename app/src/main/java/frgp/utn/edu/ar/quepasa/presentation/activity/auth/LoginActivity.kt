@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,12 +21,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,8 +52,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.NameField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.OtpTextField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.PasswordField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.UsernameField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.Avatar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
+import frgp.utn.edu.ar.quepasa.presentation.ui.theme.TP4Theme
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -95,53 +91,56 @@ class LoginActivity : ComponentActivity() {
                     }
                 }
             }
-            Scaffold(
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState)
-                },
-                floatingActionButton = {
+            TP4Theme {
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
+                    floatingActionButton = {
+                    }
+                ) { contentPadding ->
+                    SignUpScreen(viewModel, Modifier.padding(contentPadding))
+
                 }
-            ) { contentPadding ->
-                SignUpScreen(viewModel, Modifier.padding(contentPadding))
+                if (rt.value) ModalBottomSheet(onDismissRequest = {
+                    forceRecompose = !forceRecompose
+                    viewModel.resetLogin()
+                }) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Código TOTP",
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OtpTextField(
+                            otpText = totp.value,
+                            isError = !viewModel.totpValid.collectAsState().value,
+                            onOtpTextChange = { value, otpInputFilled ->
+                                viewModel.setTotpCode(value)
+                                if (value.length == 6) CoroutineScope(IO).launch {
+                                    viewModel.login()
+                                }
+                            },
+                            onClearError = {
 
-            }
-            if(rt.value) ModalBottomSheet(onDismissRequest = {
-                forceRecompose = !forceRecompose
-                viewModel.resetLogin()
-            }) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "Código TOTP",
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OtpTextField(
-                        otpText = totp.value,
-                        isError = !viewModel.totpValid.collectAsState().value,
-                        onOtpTextChange = { value, otpInputFilled ->
-                            viewModel.setTotpCode(value)
-                            if(value.length == 6) CoroutineScope(IO).launch {
-                                viewModel.login()
-                            }
-                        },
-                        onClearError = {
+                            })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            modifier = Modifier.padding(24.dp, 0.dp),
+                            text = "Ingresá el código de seis dígitos generado por tu aplicación de autenticación. ",
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                        })
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        modifier = Modifier.padding(24.dp, 0.dp),
-                        text = "Ingresá el código de seis dígitos generado por tu aplicación de autenticación. ",
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center)
-                    Spacer(modifier = Modifier.height(24.dp))
-
+                    }
                 }
             }
         }
@@ -240,7 +239,7 @@ fun AlreadyLoggedInUser(viewModel: LoginViewModel?, modifier: Modifier, loginTab
 fun SignUpScreen(viewModel: LoginViewModel?, modifier: Modifier) {
     if(viewModel == null) return
     val user by viewModel.userLogged.collectAsState()
-    var tab by remember { mutableStateOf(1) } // (2) } //
+    var tab by remember { mutableStateOf(0) } // (2) } //
     if(user != null) tab = 2
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -263,6 +262,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
     if(viewModel == null) return;
     val username by viewModel.loginUsername.collectAsState()
     val password by viewModel.loginPassword.collectAsState()
+    val feedback by viewModel.serverFeedback.collectAsState()
+    val feedbackField by viewModel.serverFeedbackField.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -281,7 +282,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
                 value = username,
                 validator = { UsernameValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginUsername,
-                serverError = null
+                serverError = if(feedbackField == "login" && feedback != "") "" else null,
+                clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -291,7 +293,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
                 value = password,
                 validator = { PasswordValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginPassword,
-                serverError = null,
+                serverError = if(feedbackField == "login" && feedback != "") feedback else null,
+                clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(16.dp))

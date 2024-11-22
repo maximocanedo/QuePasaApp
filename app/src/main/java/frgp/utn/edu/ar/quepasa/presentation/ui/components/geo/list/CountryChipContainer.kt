@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.data.model.geo.Country
-import frgp.utn.edu.ar.quepasa.data.model.geo.SubnationalDivision
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

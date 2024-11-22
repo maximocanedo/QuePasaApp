@@ -21,12 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.LocalFeedback
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.MailField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.PhoneField
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import quepasa.api.validators.users.MailValidator
-import quepasa.api.validators.users.PhoneValidator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

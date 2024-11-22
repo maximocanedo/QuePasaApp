@@ -37,6 +37,14 @@ import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationContext
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostDataViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostFormViewModel
 
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.Icon
+import frgp.utn.edu.ar.quepasa.R
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostScreen(
@@ -44,8 +52,7 @@ fun PostScreen(
     selectedTag: String?,
     user: AuthenticationContext,
     wrapInBaseComponent: Boolean = false
-
-    ) {
+) {
     val postViewModel: PostDataViewModel = hiltViewModel()
     val postFormViewModel: PostFormViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
@@ -55,11 +62,31 @@ fun PostScreen(
     var showDialog by remember { mutableStateOf(false) }
     var postToDelete by remember { mutableStateOf<Int?>(null) }
     var currentPage by remember { mutableStateOf(0) }
+    var searchText by remember { mutableStateOf("") }
 
-    val sortedPosts = postsState.value.content
-        .filter { post -> selectedTag == null || (post.tags?.contains(selectedTag) ?: false) }
-        .sortedWith(compareByDescending<Post> { post -> post.votes?.votes }
-            .thenByDescending { post -> post.timestamp })
+    val filteredPosts = postsState.value.content.filter { post ->
+        val matchesTag = selectedTag == null || (post.tags?.contains(selectedTag) ?: false)
+
+        val matchesSearch = searchText.isEmpty() || listOf(
+            post.id.toString(),
+            post.owner?.name ?: "",
+            post.audience.name,
+            post.title,
+            post.subtype.description,
+            post.description,
+            post.neighbourhood?.name ?: "",
+            post.timestamp.toString(),
+            post.tags ?: "",
+            post.isActive.toString(),
+            post.votes?.votes.toString()
+        ).any { field ->
+            field.contains(searchText, ignoreCase = true)
+        }
+
+        matchesTag && matchesSearch
+    }
+        .sortedWith(compareByDescending<Post> { it.votes?.votes }
+            .thenByDescending { it.timestamp })
 
     val content: @Composable () -> Unit = {
         PullToRefreshBox(
@@ -67,7 +94,7 @@ fun PostScreen(
             onRefresh = {
                 coroutineScope.launch {
                     postViewModel.refreshPosts()
-                    currentPage=0
+                    currentPage = 0
                 }
             }
         ) {
@@ -77,9 +104,17 @@ fun PostScreen(
                     .verticalScroll(rememberScrollState())
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(6.dp)
-
-
             ) {
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = { Text("Buscar publicaciones") },
+                    leadingIcon = { (R.drawable.edit) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+
                 if (!selectedTag.isNullOrEmpty()) {
                     Row(
                         modifier = Modifier
@@ -109,7 +144,7 @@ fun PostScreen(
 
                 TrendsScreen(navController, user)
 
-                sortedPosts.forEach { post ->
+                filteredPosts.forEach { post ->
                     PostCard(
                         post = post,
                         navController = navController,

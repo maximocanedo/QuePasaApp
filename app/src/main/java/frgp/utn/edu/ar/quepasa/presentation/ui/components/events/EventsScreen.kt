@@ -44,8 +44,8 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
-import java.util.UUID
 import java.time.ZoneId
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,7 +201,8 @@ fun EventsScreen(navController: NavHostController) {
                                         }
                                         viewModel.getRvspsByUser()
                                     }
-
+                                },
+                                onEventAddToCalendar = {
                                     val title = event.title ?: "Evento"
                                     val description = event.description ?: "Descripción"
                                     val beginTime = event.start?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
@@ -224,9 +225,7 @@ fun EventsScreen(navController: NavHostController) {
                                     } catch (e: Exception) {
                                         Toast.makeText(context, "Error al abrir el calendario: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                }
-
-                                ,
+                                },
                                 onRemoveClick = {
                                     eventToDelete = event.id
                                     showDialog = true

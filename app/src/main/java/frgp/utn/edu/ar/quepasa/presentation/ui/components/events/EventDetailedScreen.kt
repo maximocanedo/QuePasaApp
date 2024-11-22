@@ -195,7 +195,8 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
 
                                         viewModel.getRvspsByUser()
                                     }
-
+                                },
+                                onEventAddToCalendar = {
                                     val title = event!!.title ?: "Evento"
                                     val description = event!!.description ?: "Descripción"
                                     val beginTime = event!!.start?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
@@ -218,8 +219,7 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                                     } catch (e: Exception) {
                                         Toast.makeText(context, "Error al abrir el calendario: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
-                                }
-                                ,
+                                },
                                 onRemoveClick = {
                                     viewModel.viewModelScope.launch {
                                         viewModel.deleteEvent(event!!.id!!)

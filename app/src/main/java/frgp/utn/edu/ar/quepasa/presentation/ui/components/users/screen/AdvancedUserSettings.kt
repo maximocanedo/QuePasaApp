@@ -31,6 +31,7 @@ import frgp.utn.edu.ar.quepasa.data.model.auth.Phone
 import frgp.utn.edu.ar.quepasa.data.source.remote.saveAuthToken
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.FeedbackProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalSnack
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.LoginActivity
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreenContent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
@@ -86,6 +87,7 @@ fun AdvancedUserSettings(
     onRefresh: () -> Unit
 ) {
     val context = LocalContext.current
+    val snack = LocalSnack.current
     var showDisableDialog by remember { mutableStateOf(false) }
     val auth by LocalAuth.current.collectAsState()
     val itsMe by remember {
@@ -124,7 +126,7 @@ fun AdvancedUserSettings(
                     )
                     HorizontalDivider(Modifier.fillMaxWidth())
                 }
-                item {
+                if(itsMe) item {
                     ListItem(
                         modifier = Modifier.clickable {
                             navController.navigate("totpSettings")
@@ -140,7 +142,7 @@ fun AdvancedUserSettings(
                         }
                     )
                 }
-                item {
+                if(itsMe) item {
                     ListItem(
                         modifier = Modifier.clickable {
                             navController.navigate("updatePassword")
@@ -180,7 +182,7 @@ fun AdvancedUserSettings(
     if(showDisableDialog) AlertDialog(
         onDismissRequest = { showDisableDialog = false },
         title = {
-            Text("¿Seguro de eliminar ${if(itsMe) "tu " else ""}cuenta?")
+            Text("¿Seguro de eliminar ${ if(itsMe) "tu" else "esta" } cuenta?")
         },
         text = {
             Text("Esta acción es permanente y no se puede deshacer. ")
@@ -191,9 +193,16 @@ fun AdvancedUserSettings(
                     showDisableDialog = false
                     CoroutineScope(IO).launch {
                         onConfirmedDisableRequest()
-                        saveAuthToken(context, "")
-                        val intent = Intent(context, LoginActivity::class.java)
-                        context.startActivity(intent)
+                        if(itsMe) {
+                            saveAuthToken(context, "")
+                            val intent = Intent(context, LoginActivity::class.java)
+                            context.startActivity(intent)
+                        } else {
+                            snack.showSnackbar(
+                                message = "La cuenta fue deshabilitada. "
+                            )
+                            navController.navigate("home")
+                        }
                     }
                 }
             ) {

@@ -37,6 +37,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
 import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
@@ -89,9 +90,13 @@ fun PostCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     post.owner?.let {
-                        UserHorizontalDesign(
+                        UserHorizontalButton(
                             user = it,
                             modifier = Modifier,
+                            onClick = {
+                                navController.navigate("user/${it.username}")
+                            },
+                            caption = post.timestamp.formatTimeAgo()
                         )
                     }
                     Column(
@@ -115,11 +120,11 @@ fun PostCard(
                                 )
                             }
                         }
-                        Text(
+                        /* Text(
                             text = post.timestamp.formatTimeAgo(),
                             fontSize = 10.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        ) */
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))

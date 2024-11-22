@@ -215,7 +215,7 @@ fun EventsScreen(navController: NavHostController) {
                                         putExtra(CalendarContract.Events.DESCRIPTION, description)
                                         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime)
                                         putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
-                                        putExtra(CalendarContract.Events.EVENT_LOCATION, "Ubicación no especificada")
+                                        putExtra(CalendarContract.Events.EVENT_LOCATION, event.address.toString()?:"Ubicación no especificada")
                                     }
 
                                     try {

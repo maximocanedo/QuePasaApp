@@ -49,6 +49,12 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+
             merges += "META-INF/LICENSE.md"
             merges += "META-INF/LICENSE-notice.md"
         }
@@ -99,5 +105,10 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-ktor3:3.0.1")
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.17")
     implementation ("com.valentinilk.shimmer:compose-shimmer:1.0.3")
+
+    implementation ("com.google.api-client:google-api-client:2.0.0")
+    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+    implementation ("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+
 
 }

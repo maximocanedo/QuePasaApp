@@ -245,7 +245,15 @@ class LoginViewModel @Inject constructor(
                 if (requiresTOTPMutable.value) {
                     invalidateTotp()
                 } else {
-                    snackMutable.emit("Error: ${res.exception.status ?: 0}")
+                    if(res.exception.status == 403) {
+                       // snackMutable.emit("Credenciales inválidas. ")
+                        setServerFeedback("Credenciales inválidas")
+                        setServerFeedbackField("login")
+                    }
+                    else {
+                        setServerFeedback("Error: ${res.exception.message} (${res.exception.status})")
+                        setServerFeedbackField("login")
+                    }
                 }
             }
         }

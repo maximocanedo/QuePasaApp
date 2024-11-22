@@ -262,6 +262,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
     if(viewModel == null) return;
     val username by viewModel.loginUsername.collectAsState()
     val password by viewModel.loginPassword.collectAsState()
+    val feedback by viewModel.serverFeedback.collectAsState()
+    val feedbackField by viewModel.serverFeedbackField.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -280,7 +282,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
                 value = username,
                 validator = { UsernameValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginUsername,
-                serverError = null
+                serverError = if(feedbackField == "login" && feedback != "") "" else null,
+                clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -290,7 +293,8 @@ fun LoginTabContent(viewModel: LoginViewModel?, signupTab: () -> Unit) {
                 value = password,
                 validator = { PasswordValidator(it).isNotBlank() },
                 onChange = viewModel::setLoginPassword,
-                serverError = null,
+                serverError = if(feedbackField == "login" && feedback != "") feedback else null,
+                clearServerError = viewModel::clearFeedback
             )
         }
         Spacer(modifier = Modifier.height(16.dp))

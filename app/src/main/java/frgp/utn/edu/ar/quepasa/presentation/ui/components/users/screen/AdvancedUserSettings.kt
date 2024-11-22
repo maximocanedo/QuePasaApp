@@ -159,7 +159,7 @@ fun AdvancedUserSettings(
                     )
                 }
 
-                item {
+                if(auth.isAdmin || itsMe) item {
                     HorizontalDivider(Modifier.fillMaxWidth())
                     ListItem(
                         modifier = Modifier.clickable {

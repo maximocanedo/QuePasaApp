@@ -141,7 +141,7 @@ fun ProfileScreenContent(
                         }
                     )
                 }
-                item {
+                if(itsMe || auth.isAdmin) item {
                     ListItem(
                         headlineContent = { Text("Configuración de la cuenta") },
                         leadingContent = {

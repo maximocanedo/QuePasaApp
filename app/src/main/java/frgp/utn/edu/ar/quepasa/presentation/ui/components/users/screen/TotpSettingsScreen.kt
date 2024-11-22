@@ -85,19 +85,11 @@ fun TotpSettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
+                        val i = Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(details.url));
+                        context.startActivity(i);
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             data = Uri.parse(details.url)
-                        }
-                        if (intent.resolveActivity(context.packageManager) != null) {
-                            context.startActivity(intent)
-                        } else {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "No hay aplicaciones compatibles instaladas",
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
                         }
                     }
             )

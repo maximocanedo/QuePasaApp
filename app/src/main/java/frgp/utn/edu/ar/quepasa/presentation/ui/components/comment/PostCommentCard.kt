@@ -20,6 +20,7 @@ import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.commenting.PostComment
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.UpVoteButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
@@ -70,6 +71,7 @@ fun PostCommentCard(
             minLines = 1,
             maxLines = 4,
         )
+        if(user.role != Role.USER) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,6 +116,7 @@ fun PostCommentCard(
                     )
                 }
             }
+        }
         }
     }
 }

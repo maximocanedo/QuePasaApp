@@ -37,6 +37,9 @@ class EventViewModel @Inject constructor(
     val isLoadingMore = _isLoadingMore.asStateFlow()
     private val _actualElements = MutableStateFlow(5)
     val actualElements = _actualElements.asStateFlow()
+    fun setActualElements(x: Int) {
+        _actualElements.value = x
+    }
     private val _totalElements = MutableStateFlow(10)
     val totalElements = _totalElements.asStateFlow()
 
@@ -205,6 +208,7 @@ class EventViewModel @Inject constructor(
                     sort = sort
                 )
             _events.value = events
+            _actualElements.value = events.content.size
             _totalElements.value = events.totalElements
 
         } catch (e: Exception) {
@@ -262,6 +266,8 @@ class EventViewModel @Inject constructor(
         try {
             val events = repository.getEventsByCategory(category, page, size, active)
             _events.value = events
+            _actualElements.value = events.content.size
+            _totalElements.value = events.totalElements
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -285,6 +291,8 @@ class EventViewModel @Inject constructor(
                 sort
             )
             _events.value = events
+            _actualElements.value = events.content.size
+            _totalElements.value = events.totalElements
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }
@@ -310,6 +318,8 @@ class EventViewModel @Inject constructor(
                 sort
             )
             _events.value = events
+            _actualElements.value = events.content.size
+            _totalElements.value = events.totalElements
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }

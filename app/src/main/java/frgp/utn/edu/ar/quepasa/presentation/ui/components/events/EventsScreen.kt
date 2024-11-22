@@ -205,10 +205,14 @@ fun EventsScreen(navController: NavHostController) {
                                 onEventAddToCalendar = {
                                     val title = event.title ?: "Evento"
                                     val description = event.description ?: "Descripción"
-                                    val beginTime = event.start?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-                                        ?: System.currentTimeMillis()
-                                    val endTime = event.end?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-                                        ?: (beginTime + 3600000)
+                                    val beginTime =
+                                        event.start?.atZone(ZoneId.systemDefault())?.toInstant()
+                                            ?.toEpochMilli()
+                                            ?: System.currentTimeMillis()
+                                    val endTime =
+                                        event.end?.atZone(ZoneId.systemDefault())?.toInstant()
+                                            ?.toEpochMilli()
+                                            ?: (beginTime + 3600000)
 
                                     val intent = Intent(Intent.ACTION_INSERT).apply {
                                         data = CalendarContract.Events.CONTENT_URI
@@ -216,14 +220,25 @@ fun EventsScreen(navController: NavHostController) {
                                         putExtra(CalendarContract.Events.DESCRIPTION, description)
                                         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime)
                                         putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
-                                        putExtra(CalendarContract.Events.EVENT_LOCATION, event.address.toString()?:"Ubicación no especificada")
+                                        putExtra(
+                                            CalendarContract.Events.EVENT_LOCATION,
+                                            event.address.toString() ?: "Ubicación no especificada"
+                                        )
                                     }
 
                                     try {
                                         context.startActivity(intent)
-                                        Toast.makeText(context, "Agrega el evento al calendario", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Agrega el evento al calendario",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     } catch (e: Exception) {
-                                        Toast.makeText(context, "Error al abrir el calendario: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Error al abrir el calendario: ${e.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 },
                                 onRemoveClick = {
@@ -272,12 +287,37 @@ fun EventsScreen(navController: NavHostController) {
                                 Button(
                                     onClick = {
                                         viewModel.viewModelScope.launch {
-                                            user.user?.neighbourhood?.let {
-                                                viewModel.loadMoreEvents(
-                                                    user.isAdmin,
-                                                    it.id
+                                            if (category.isNotBlank() && search.isNotBlank() && !user.isAdmin) {
+                                                user.user?.neighbourhood?.let {
+                                                    viewModel.getEventsByNeighbourhoodAndCategory(
+                                                        it.id,
+                                                        EventCategory.valueOf(category),
+                                                        query = search,
+                                                        size = actualElements + 10
+                                                    )
+                                                }
+                                                viewModel.setActualElements(actualElements + 10)
+                                            } else if (category.isNotBlank() && user.isAdmin) {
+                                                viewModel.getEventsByCategory(
+                                                    EventCategory.valueOf(category),
+                                                    size = actualElements + 10
                                                 )
+                                                viewModel.setActualElements(actualElements + 10)
+                                            } else if (search.isNotBlank() && user.isAdmin) {
+                                                viewModel.getEvents(
+                                                    search,
+                                                    size = actualElements + 10
+                                                )
+                                                viewModel.setActualElements(actualElements + 10)
+                                            } else {
+                                                user.user?.neighbourhood?.let {
+                                                    viewModel.loadMoreEvents(
+                                                        user.isAdmin,
+                                                        it.id
+                                                    )
+                                                }
                                             }
+                                            viewModel.sortEventsByVotes()
                                         }
                                     },
                                     modifier = Modifier

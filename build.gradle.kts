@@ -12,6 +12,7 @@ plugins {
 buildscript {
     repositories {
         mavenCentral()
+        google()
     }
     dependencies {
         classpath(libs.hilt.android.gradle.plugin)

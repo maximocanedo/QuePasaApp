@@ -7,9 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,11 +24,11 @@ fun CardButtonsBar(
     navController: NavHostController,
     assists: Boolean,
     onAssistanceClick: () -> Unit = {},
+    onEventAddToCalendar: () -> Unit = {},
     onRemoveClick: () -> Unit = {},
     onUpvoteClick: () -> Unit = {},
     onDownvoteClick: () -> Unit = {}
 ) {
-    val assist by remember { mutableStateOf(assists) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,10 +43,19 @@ fun CardButtonsBar(
                 onClick = {
                     onAssistanceClick()
                 },
-                tint = if (assist) {
+                tint = if (assists) {
                     MaterialTheme.colorScheme.inversePrimary
                 } else {
                     MaterialTheme.colorScheme.onPrimary
+                }
+            )
+        }
+        Column {
+            CardButton(
+                description = "agregar a calendario",
+                icon = R.drawable.baseline_calendar_month_24,
+                onClick = {
+                    onEventAddToCalendar()
                 }
             )
         }

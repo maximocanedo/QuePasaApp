@@ -34,6 +34,8 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationContext
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostDataViewModel
+import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostFormViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +46,8 @@ fun PostScreen(
     wrapInBaseComponent: Boolean = false
 
     ) {
-    val postViewModel: PostViewModel = hiltViewModel()
+    val postViewModel: PostDataViewModel = hiltViewModel()
+    val postFormViewModel: PostFormViewModel = hiltViewModel()
     val postsState = postViewModel.posts.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val isRefreshing by postViewModel.isRefreshing.collectAsStateWithLifecycle()

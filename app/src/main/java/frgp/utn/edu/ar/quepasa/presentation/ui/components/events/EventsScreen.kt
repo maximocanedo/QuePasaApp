@@ -1,5 +1,8 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
+import android.content.Intent
+import android.provider.CalendarContract
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +44,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +70,7 @@ fun EventsScreen(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val actualElements by viewModel.actualElements.collectAsState()
     val totalElements by viewModel.totalElements.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         if (user.isAdmin) {
@@ -194,6 +200,30 @@ fun EventsScreen(navController: NavHostController) {
                                             )
                                         }
                                         viewModel.getRvspsByUser()
+                                    }
+                                },
+                                onEventAddToCalendar = {
+                                    val title = event.title ?: "Evento"
+                                    val description = event.description ?: "Descripción"
+                                    val beginTime = event.start?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+                                        ?: System.currentTimeMillis()
+                                    val endTime = event.end?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+                                        ?: (beginTime + 3600000)
+
+                                    val intent = Intent(Intent.ACTION_INSERT).apply {
+                                        data = CalendarContract.Events.CONTENT_URI
+                                        putExtra(CalendarContract.Events.TITLE, title)
+                                        putExtra(CalendarContract.Events.DESCRIPTION, description)
+                                        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime)
+                                        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
+                                        putExtra(CalendarContract.Events.EVENT_LOCATION, event.address.toString()?:"Ubicación no especificada")
+                                    }
+
+                                    try {
+                                        context.startActivity(intent)
+                                        Toast.makeText(context, "Agrega el evento al calendario", Toast.LENGTH_SHORT).show()
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Error al abrir el calendario: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 onRemoveClick = {

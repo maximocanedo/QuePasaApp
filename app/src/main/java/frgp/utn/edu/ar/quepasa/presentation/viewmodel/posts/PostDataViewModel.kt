@@ -50,7 +50,7 @@ class PostDataViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
+    suspend fun getPosts(page: Int = 0, size: Int = 5, activeOnly: Boolean = true) {
         try {
             val newPosts = repository.getPosts(page, size, activeOnly)
             _posts.value = if (page == 0) {

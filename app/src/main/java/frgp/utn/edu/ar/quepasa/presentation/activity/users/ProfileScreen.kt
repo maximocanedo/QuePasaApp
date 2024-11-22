@@ -128,16 +128,24 @@ fun ProfileScreenContent(
                             .fillMaxWidth()
                             .animateContentSize(),
                         onNameUpdateRequest = {
-                            val req = UserPatchEditRequest(name = it)
-                            onPatchEditRequest(req)
+                            if(itsMe || auth.isAdmin) {
+                                val req = UserPatchEditRequest(name = it)
+                                onPatchEditRequest(req)
+                            }
                         },
                         onAddressUpdateRequest = {
-                            val req = UserPatchEditRequest(address = it)
-                            onPatchEditRequest(req)
+                            if(itsMe || auth.isAdmin) {
+
+                                val req = UserPatchEditRequest(address = it)
+                                onPatchEditRequest(req)
+                            }
                         },
                         onNeighbourhoodUpdateRequest = {
-                            val req = UserPatchEditRequest(neighbourhood = it)
-                            onPatchEditRequest(req)
+                            if(itsMe || auth.isAdmin) {
+
+                                val req = UserPatchEditRequest(neighbourhood = it)
+                                onPatchEditRequest(req)
+                            }
                         }
                     )
                 }

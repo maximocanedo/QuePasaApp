@@ -94,7 +94,8 @@ fun PostCard(
                             user = it,
                             modifier = Modifier,
                             onClick = {
-                                navController.navigate("user/${it.username}")
+                                    navController.navigate("user/${it.username}")
+
                             },
                             caption = post.timestamp.formatTimeAgo()
                         )

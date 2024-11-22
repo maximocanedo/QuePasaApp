@@ -9,6 +9,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +23,7 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.data.model.media.Picture
+import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.AddressEmergentField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NameEmergentField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.fields.emergent.NeighbourhoodEmergentField
@@ -39,7 +42,12 @@ fun BasicUserInfoCard(
     var addressChanging by remember { mutableStateOf(false) }
     var neighbourhoodChanging by remember { mutableStateOf(false) }
     var showing by remember { mutableStateOf(false) }
-
+    val auth by LocalAuth.current.collectAsState()
+    val itsMe by remember {
+        derivedStateOf {
+            auth.ok && auth.username == (user.username)
+        }
+    }
     if(showing) {
         ListItem(
             headlineContent = { Text(user.id.toString()) },
@@ -64,8 +72,13 @@ fun BasicUserInfoCard(
         ListItem(
             headlineContent = { Text(user.name) },
             supportingContent = { Text("Nombre") },
-            modifier = Modifier.clickable {
-                nameChanging = true
+            modifier =
+
+            Modifier.clickable {
+                if(itsMe || auth.isAdmin) {
+                    nameChanging = true
+                }
+
             },
             leadingContent = {
                 Icon(
@@ -88,7 +101,9 @@ fun BasicUserInfoCard(
             headlineContent = { Text(user.address) },
             supportingContent = { Text("Dirección") },
             modifier = Modifier.clickable {
-                addressChanging = true
+                if(itsMe || auth.isAdmin) {
+                    addressChanging = true
+                }
             },
             leadingContent = {
                 Icon(
@@ -107,7 +122,9 @@ fun BasicUserInfoCard(
             },
             supportingContent = { Text("Barrio asociado") },
             modifier = Modifier.clickable {
-                neighbourhoodChanging = true
+                if(itsMe || auth.isAdmin) {
+                    neighbourhoodChanging = true
+                }
             },
             leadingContent = {
                 Icon(

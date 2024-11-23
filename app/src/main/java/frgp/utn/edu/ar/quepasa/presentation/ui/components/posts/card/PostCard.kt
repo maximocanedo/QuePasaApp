@@ -56,8 +56,9 @@ fun PostCard(
 ) {
     val user by LocalAuth.current.collectAsState()
 
-    if (user.user?.role != Role.NEIGHBOUR || !(post.audience.name == "NEIGHBORHOOD" &&
-                post.neighbourhood?.name != user.user?.neighbourhood?.name
+    if ((user.user?.role != Role.NEIGHBOUR || !(post.audience.name == "NEIGHBORHOOD" &&
+                post.neighbourhood?.name != user.user?.neighbourhood?.name)
+                || post.owner?.id   == user.user!!.id
                     )
                 /*|| !(post.audience.name == "CITY" &&
                 post.neighbourhood?.name != user.user?.neighbourhood?.name)

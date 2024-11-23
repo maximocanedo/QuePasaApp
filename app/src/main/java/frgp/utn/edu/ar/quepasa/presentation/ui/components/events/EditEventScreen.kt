@@ -66,7 +66,7 @@ fun EditEventScreen(navController: NavHostController, eventId: UUID) {
         pictureViewModel.setPicturesBitmap(eventPictureViewModel.picturesIds.value)
     }
     if (event != null) {
-        BaseComponent(navController, "Editar de Evento", true) {
+        BaseComponent(navController, "Editar de Evento", true, backRoute = "events") {
             val title by viewModel.title.collectAsState()
             val description by viewModel.description.collectAsState()
             val address by viewModel.address.collectAsState()

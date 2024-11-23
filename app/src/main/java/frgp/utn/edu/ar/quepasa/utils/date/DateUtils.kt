@@ -27,7 +27,7 @@ fun Timestamp.formatTimeAgo(): String {
         diff < TimeUnit.MINUTES.toMillis(1) -> "justo ahora"
         diff < TimeUnit.HOURS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toMinutes(diff)}m atrás"
         diff < TimeUnit.DAYS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toHours(diff)}h atrás"
-        days < 7 -> "${days}d atrás"
+        days < 30 -> "${days}d atrás"
         months < 12 -> "${months}m atrás"
         years < 100 -> "${years}a atrás"
         else -> {

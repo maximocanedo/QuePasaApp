@@ -55,7 +55,7 @@ fun TagField(
 
 @Preview
 @Composable
-fun DescriptionFieldPreview() {
+fun TagFieldPreview() {
     TagField(
         modifier = Modifier,
         value = "",

@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.R
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentDialog
@@ -42,6 +43,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.EventCommentCa
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButton
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.components.CardButtonsBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.WarningMessage
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.commenting.CommentViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.EventPictureViewModel
@@ -170,137 +172,168 @@ fun EventDetailedScreen(navController: NavHostController, eventId: UUID) {
                         if (bitmaps.value.isNotEmpty()) {
                             ImagesListPreview(bitmaps = bitmaps.value)
                         }
+                        if (user.user?.role != Role.USER){
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CardButton(
+                                    icon = R.drawable.baseline_add_comment_24,
+                                    description = "Comentar",
+                                    onClick = {
+                                        commentDialogState = true
+                                    }
+                                )
+                                CardButtonsBar(
+                                    event = event!!,
+                                    user = user.user,
+                                    navController = navController,
+                                    voteCount = event!!.votes!!,
+                                    assists = eventRvsp.find { it.event?.id == event!!.id }?.confirmed
+                                        ?: false,
+                                    onAssistanceClick = {
+                                        viewModel.viewModelScope.launch {
+                                            viewModel.rsvpEvent(event!!.id!!)
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CardButton(
-                                icon = R.drawable.baseline_add_comment_24,
-                                description = "Comentar",
-                                onClick = {
-                                    commentDialogState = true
-                                }
-                            )
-                            CardButtonsBar(
-                                event = event!!,
-                                user = user.user,
-                                navController = navController,
-                                voteCount = event!!.votes!!,
-                                assists = eventRvsp.find { it.event?.id == event!!.id }?.confirmed
-                                    ?: false,
-                                onAssistanceClick = {
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.rsvpEvent(event!!.id!!)
+                                            viewModel.getRvspsByUser()
+                                        }
+                                    },
+                                    onEventAddToCalendar = {
+                                        val title = event!!.title ?: "Evento"
+                                        val description = event!!.description ?: "Descripción"
+                                        val beginTime =
+                                            event!!.start?.atZone(ZoneId.systemDefault())
+                                                ?.toInstant()?.toEpochMilli()
+                                                ?: System.currentTimeMillis()
+                                        val endTime =
+                                            event!!.end?.atZone(ZoneId.systemDefault())?.toInstant()
+                                                ?.toEpochMilli()
+                                                ?: (beginTime + 3600000)
 
-                                        viewModel.getRvspsByUser()
-                                    }
-                                },
-                                onEventAddToCalendar = {
-                                    val title = event!!.title ?: "Evento"
-                                    val description = event!!.description ?: "Descripción"
-                                    val beginTime = event!!.start?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-                                        ?: System.currentTimeMillis()
-                                    val endTime = event!!.end?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-                                        ?: (beginTime + 3600000)
+                                        val intent = Intent(Intent.ACTION_INSERT).apply {
+                                            data = CalendarContract.Events.CONTENT_URI
+                                            putExtra(CalendarContract.Events.TITLE, title)
+                                            putExtra(
+                                                CalendarContract.Events.DESCRIPTION,
+                                                description
+                                            )
+                                            putExtra(
+                                                CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                                                beginTime
+                                            )
+                                            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
+                                            putExtra(
+                                                CalendarContract.Events.EVENT_LOCATION,
+                                                event!!.address.toString()
+                                                    ?: "Ubicación no especificada"
+                                            )
+                                        }
 
-                                    val intent = Intent(Intent.ACTION_INSERT).apply {
-                                        data = CalendarContract.Events.CONTENT_URI
-                                        putExtra(CalendarContract.Events.TITLE, title)
-                                        putExtra(CalendarContract.Events.DESCRIPTION, description)
-                                        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime)
-                                        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
-                                        putExtra(CalendarContract.Events.EVENT_LOCATION, event!!.address.toString()?:"Ubicación no especificada")
+                                        try {
+                                            context.startActivity(intent)
+                                            Toast.makeText(
+                                                context,
+                                                "Agrega el evento a tu calendario",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "Error al abrir el calendario: ${e.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
+                                    onRemoveClick = {
+                                        viewModel.viewModelScope.launch {
+                                            viewModel.deleteEvent(event!!.id!!)
+                                            viewModel.getEventById(eventId)
+                                        }
+                                    },
+                                    onUpvoteClick = {
+                                        viewModel.viewModelScope.launch {
+                                            viewModel.upVote(event!!.id!!)
+                                            viewModel.getEventById(eventId)
+                                        }
+                                    },
+                                    onDownvoteClick = {
+                                        viewModel.viewModelScope.launch {
+                                            viewModel.downVote(event!!.id!!)
+                                            viewModel.getEventById(eventId)
+                                        }
                                     }
-
-                                    try {
-                                        context.startActivity(intent)
-                                        Toast.makeText(context, "Agrega el evento a tu calendario", Toast.LENGTH_SHORT).show()
-                                    } catch (e: Exception) {
-                                        Toast.makeText(context, "Error al abrir el calendario: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                                onRemoveClick = {
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.deleteEvent(event!!.id!!)
-                                        viewModel.getEventById(eventId)
-                                    }
-                                },
-                                onUpvoteClick = {
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.upVote(event!!.id!!)
-                                        viewModel.getEventById(eventId)
-                                    }
-                                },
-                                onDownvoteClick = {
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.downVote(event!!.id!!)
-                                        viewModel.getEventById(eventId)
-                                    }
-                                }
-                            )
-                        }
+                                )
+                            }
+                    }
                     }
                 }
-                Row(
-                    modifier = Modifier.padding(top = 4.dp)
-                ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
-                HorizontalDivider(
-                    thickness = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Row {
-                    if (comments.content.isNotEmpty()) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            userScrollEnabled = true
-                        ) {
-                            items(comments.content) { comment ->
-                                key(comment.id) {
-                                    user.user?.let {
-                                        EventCommentCard(
-                                            comment = comment,
-                                            voteCount = comment.votes,
-                                            user = it,
-                                            onUpvoteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.upVoteComment(comment.id)
-                                                    viewModel.getComments(eventId, 0, 10)
-                                                    viewModel.sortCommentsByVotes()
+                if (user.user?.role != Role.USER) {
+
+                    Row(
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
+                    HorizontalDivider(
+                        thickness = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row {
+                        if (comments.content.isNotEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                userScrollEnabled = true
+                            ) {
+                                items(comments.content) { comment ->
+                                    key(comment.id) {
+                                        user.user?.let {
+                                            EventCommentCard(
+                                                comment = comment,
+                                                voteCount = comment.votes,
+                                                user = it,
+                                                onUpvoteClick = {
+                                                    viewModel.viewModelScope.launch {
+                                                        commentViewModel.upVoteComment(comment.id)
+                                                        viewModel.getComments(eventId, 0, 10)
+                                                        viewModel.sortCommentsByVotes()
+                                                    }
+                                                },
+                                                onDownvoteClick = {
+                                                    viewModel.viewModelScope.launch {
+                                                        commentViewModel.downVoteComment(comment.id)
+                                                        viewModel.getComments(eventId, 0, 10)
+                                                        viewModel.sortCommentsByVotes()
+                                                    }
+                                                },
+                                                onDeleteClick = {
+                                                    viewModel.viewModelScope.launch {
+                                                        commentViewModel.deleteComment(comment.id)
+                                                        viewModel.getComments(eventId, 0, 10)
+                                                        viewModel.sortCommentsByVotes()
+                                                    }
+                                                },
+                                                onEditClick = {
+                                                    viewModel.viewModelScope.launch {
+                                                        commentEditUUID = comment.id
+                                                        commentEditText = comment.content
+                                                        commentEditState = true
+                                                    }
                                                 }
-                                            },
-                                            onDownvoteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.downVoteComment(comment.id)
-                                                    viewModel.getComments(eventId, 0, 10)
-                                                    viewModel.sortCommentsByVotes()
-                                                }
-                                            },
-                                            onDeleteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.deleteComment(comment.id)
-                                                    viewModel.getComments(eventId, 0, 10)
-                                                    viewModel.sortCommentsByVotes()
-                                                }
-                                            },
-                                            onEditClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentEditUUID = comment.id
-                                                    commentEditText = comment.content
-                                                    commentEditState = true
-                                                }
-                                            }
-                                        )
+                                            )
+                                        }
                                     }
                                 }
                             }
+                        } else {
+                            Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
                         }
-                    } else {
-                        Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
                     }
+                }else{
+                    Row(
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) { WarningMessage("Solicita un rol de vecino como minimo para ver comentarios") }
+
                 }
             }
         }

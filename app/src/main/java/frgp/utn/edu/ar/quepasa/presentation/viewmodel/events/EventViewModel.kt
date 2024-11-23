@@ -277,7 +277,7 @@ class EventViewModel @Inject constructor(
         neighbourhoodId: Long,
         query: String = "",
         page: Int = 0,
-        size: Int = 10,
+        size: Int = 5,
         active: Boolean = true,
         sort: String = "title,asc"
     ) {

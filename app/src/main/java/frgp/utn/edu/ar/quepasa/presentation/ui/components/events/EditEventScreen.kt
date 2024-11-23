@@ -29,7 +29,6 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.dto.request.EventPatchRequest
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
-import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
@@ -50,7 +49,6 @@ import java.util.UUID
 
 @Composable
 fun EditEventScreen(navController: NavHostController, eventId: UUID) {
-    val user by LocalAuth.current.collectAsState()
     val context = LocalContext.current
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel: ImageViewModel = hiltViewModel()
@@ -280,7 +278,7 @@ fun EditEventScreen(navController: NavHostController, eventId: UUID) {
                                                 }
                                             }
                                         }
-                                        navController.navigate("home")
+                                        navController.navigate("events")
                                         Toast.makeText(
                                             context,
                                             "Evento Editado!",

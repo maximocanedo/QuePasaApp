@@ -19,9 +19,6 @@ class PostSubtypeViewModel @Inject constructor(
     private val _postSubtypes = MutableStateFlow<Page<PostSubtype>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
     val postSubtypes: StateFlow<Page<PostSubtype>> get() = _postSubtypes
 
-    private var _postSubtypesSel = MutableStateFlow<Page<PostSubtype>>(Page(content = emptyList(), totalElements = 0, totalPages = 0, pageNumber = 0))
-    val postSubtypesSel: StateFlow<Page<PostSubtype>>  get() = _postSubtypesSel
-
     private val _postSubtype = MutableStateFlow<PostSubtype?>(null)
     val postSubtype: StateFlow<PostSubtype?> get() = _postSubtype
 
@@ -41,7 +38,6 @@ class PostSubtypeViewModel @Inject constructor(
         try {
             val subtypes = repository.getSubtypes(page, size, activeOnly)
             _postSubtypes.value = subtypes
-            _postSubtypesSel.value = subtypes
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -78,9 +74,9 @@ class PostSubtypeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getSubtypesBySelectedFirst(idType: Int, idSubtype: Int) {
+    suspend fun getSubtypesBySelectedFirst(idType: Int, idSubtype: Int, page: Int, size: Int) {
         try {
-            val subtypes = repository.getSubtypesByType(idType, 0, 10)
+            val subtypes = repository.getSubtypesByType(idType, page, size)
             val subtypesSelFirst: MutableList<PostSubtype> = mutableListOf()
 
             subtypes.content.firstOrNull { it.id == idSubtype }?.let { selectedSubtype ->
@@ -91,7 +87,7 @@ class PostSubtypeViewModel @Inject constructor(
                 subtypesSelFirst.add(subtype)
             }
 
-            _postSubtypesSel.value.content = subtypesSelFirst
+            _postSubtypes.value.content = subtypesSelFirst
         }
         catch(e: Exception) {
             _errorMessage.value = e.message
@@ -114,11 +110,11 @@ class PostSubtypeViewModel @Inject constructor(
     }
 
     fun getSubtypeFirstId(): Int {
-        return _postSubtypesSel.value.content[0].id
+        return _postSubtypes.value.content[0].id
     }
 
     fun getSubtypeFirstDescription(): String {
-        return _postSubtypesSel.value.content[0].description
+        return _postSubtypes.value.content[0].description
     }
 
     suspend fun createSubtype(request: PostSubtypeRequest) {

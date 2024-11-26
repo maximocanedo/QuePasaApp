@@ -68,6 +68,10 @@ class PictureViewModel @Inject constructor(
         }
     }
 
+    fun arePicturesForDeletionEmpty(): Boolean {
+        return _picturesForDeletion.value.isEmpty()
+    }
+
     fun flagPictureForDeletion(pictureId: UUID) {
         _picturesForDeletion.value += pictureId
     }

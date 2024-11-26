@@ -2,12 +2,16 @@ package frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import frgp.utn.edu.ar.quepasa.data.model.Post
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class PostFormViewModel: ViewModel() {
+    private val _id = MutableStateFlow(0)
+    val id: StateFlow<Int> get() = _id
+
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> get() = _title
 
@@ -17,14 +21,14 @@ class PostFormViewModel: ViewModel() {
     private val _description = MutableStateFlow("")
     val description: StateFlow<String> get() = _description
 
-    private val _neighbourhood = MutableStateFlow(0L)
-    val neighbourhood: StateFlow<Long> get() = _neighbourhood
-
     private val _type = MutableStateFlow(0)
     val type: StateFlow<Int> get() = _type
 
     private val _subtype = MutableStateFlow(0)
     val subtype: StateFlow<Int> get() = _subtype
+
+    private val _neighbourhood = MutableStateFlow(0L)
+    val neighbourhood: StateFlow<Long> get() = _neighbourhood
 
     private val _tag = MutableStateFlow("")
     val tag: StateFlow<String> get() = _tag
@@ -38,6 +42,14 @@ class PostFormViewModel: ViewModel() {
 
     private val _fieldTagValidation = MutableSharedFlow<Boolean>()
 
+    fun getId(): Int {
+        return id.value
+    }
+
+    fun updateId(id: Int) {
+        _id.value = id
+    }
+
     fun getTitle(): String {
         return title.value
     }
@@ -46,12 +58,28 @@ class PostFormViewModel: ViewModel() {
         _title.value = title
     }
 
+    fun getDescription(): String {
+        return description.value
+    }
+
+    fun updateDescription(description: String) {
+        _description.value = description
+    }
+
     fun getAudience(): String {
         return audience.value
     }
 
     fun updateAudience(audience: String) {
         _audience.value = audience
+    }
+
+    fun getType(): Int {
+        return type.value
+    }
+
+    fun updateType(type: Int) {
+        _type.value = type
     }
 
     fun getSubtype(): Int {
@@ -70,14 +98,6 @@ class PostFormViewModel: ViewModel() {
         _neighbourhood.value = neighbourhood
     }
 
-    fun getDescription(): String {
-        return description.value
-    }
-
-    fun updateDescription(description: String) {
-        _description.value = description
-    }
-
     fun getTag(): String {
         return tag.value
     }
@@ -88,6 +108,10 @@ class PostFormViewModel: ViewModel() {
 
     fun getTags(): List<String> {
         return _tags.value
+    }
+
+    fun setTags(tags: String) {
+        _tags.value = tags.split(",")
     }
 
     fun addTag(tag: String) {
@@ -107,7 +131,7 @@ class PostFormViewModel: ViewModel() {
         _tagCount.value = _tags.value.size
     }
 
-    private fun clearTags() {
+    fun clearTags() {
         _tags.value = emptyList()
         _tagCount.value = 0
     }
@@ -125,5 +149,16 @@ class PostFormViewModel: ViewModel() {
         viewModelScope.launch {
             _fieldTagValidation.emit(state)
         }
+    }
+
+    fun populatePostFields(post: Post) {
+        updateId(post.id)
+        updateTitle(post.title)
+        updateAudience(post.audience.name)
+        updateDescription(post.description)
+        updateType(post.subtype.type.id)
+        updateSubtype(post.subtype.id)
+        post.neighbourhood?.id?.let { updateNeighbourhood(it) }
+        post.tags?.let { setTags(it) }
     }
 }

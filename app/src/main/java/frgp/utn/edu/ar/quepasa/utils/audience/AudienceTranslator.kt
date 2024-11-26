@@ -14,6 +14,21 @@ fun audiencesToSpanish(): List<String> {
     return audienceTranslations.values.toList()
 }
 
+fun audiencesToSpanishSelectedFirst(audienceSel: String): List<String> {
+    val audiences: MutableList<String> = mutableListOf()
+
+    val audienceSelSpanish = audienceToSpanish(audienceSel)
+    audienceTranslations.filter { it.value == audienceSelSpanish }.forEach { audience ->
+        audiences.add(audience.value)
+    }
+
+    audienceTranslations.filter { it.value != audienceSelSpanish }.forEach { audience ->
+        audiences.add(audience.value)
+    }
+
+    return audiences
+}
+
 fun audienceToSpanish(audience: String): String {
     return audienceTranslations.entries.find { it.key == Audience.valueOf(audience) }?.value ?: throw IllegalArgumentException("Non existing audience")
 }

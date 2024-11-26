@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.previews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

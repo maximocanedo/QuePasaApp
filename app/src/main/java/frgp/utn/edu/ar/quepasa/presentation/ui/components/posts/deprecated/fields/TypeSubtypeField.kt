@@ -39,7 +39,7 @@ fun TypeSubtypeField(
 
     LaunchedEffect(Unit) {
         if(loadBySelected) {
-            viewModel.getSubtypesBySelectedFirst(type, subtype)
+            viewModel.getSubtypesBySelectedFirst(type, subtype, 0, 10)
             selectedItem = viewModel.getSubtypeFirstDescription()
             onItemSelected(viewModel.getSubtypeFirstId())
         }
@@ -51,7 +51,7 @@ fun TypeSubtypeField(
         onItemSelected(viewModel.getSubtypeFirstId())
     }
 
-    val postSubtypes by viewModel.postSubtypesSel.collectAsState()
+    val postSubtypes by viewModel.postSubtypes.collectAsState()
     val items = postSubtypes.content.map { it.description }
     val itemsId = postSubtypes.content.map { it.id }
 

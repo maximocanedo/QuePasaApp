@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -43,7 +43,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.field
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TitleField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.TypeSubtypeField
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.previews.PostEditImagesPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.previews.PostEditImagesPreview
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.images.ImageViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PostPictureViewModel
@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
+@Deprecated("Usar paquete 'edit'")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {

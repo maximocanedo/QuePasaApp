@@ -20,7 +20,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +41,7 @@ fun TypeSubtypeField(
     val itemsId = subtypes.map { it.id }
 
     if(items.isNotEmpty()) {
+        println(subtypes)
         var selectedItem by remember { mutableStateOf(items.firstOrNull() ?: "") }
         var expanded by remember { mutableStateOf(false) }
 

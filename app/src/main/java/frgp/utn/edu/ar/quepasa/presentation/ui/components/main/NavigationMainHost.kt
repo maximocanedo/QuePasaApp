@@ -3,7 +3,6 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.main
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,9 +17,9 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EditEventScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventDetailedScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.EventsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostDetailedScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostEditScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create.PostCreate
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.edit.PostEdit
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
@@ -73,9 +72,6 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             composable("user/{username}") {
                 ProfileScreen(navController, it.arguments?.getString("username") ?: "")
             }
-            composable("events") {
-                EventsScreen(navController)
-            }
             composable(
                 route = "postList/{selectedTag}",
                 arguments = listOf(navArgument("selectedTag") { type = NavType.StringType })
@@ -90,7 +86,7 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
             ) { backStackEntry ->
                 val postId = backStackEntry.arguments?.getInt("postId") ?: -1
                 if (postId != -1) {
-                    PostEditScreen(navController, user.user, postId)
+                    PostEdit(navController, postId)
                 }
             }
             composable(
@@ -101,6 +97,9 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 if (postId.isNotEmpty()) {
                     PostDetailedScreen(navController, postId.toInt())
                 }
+            }
+            composable("events") {
+                EventsScreen(navController)
             }
             composable("eventCreate") { CreateEventScreen(navController) }
             composable(
@@ -121,9 +120,15 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                     EventDetailedScreen(navController, UUID.fromString(eventId))
                 }
             }
-            composable("roleRequestUserList") { RoleUpdateUserListScreen(navController) }
-            composable("roleRequestAdminList") { RoleUpdateAdminListScreen(navController) }
-            composable("roleRequest") { RoleUpdateUserRequestScreen(navController) }
+            composable("roleRequestUserList") {
+                RoleUpdateUserListScreen(navController)
+            }
+            composable("roleRequestAdminList") {
+                RoleUpdateAdminListScreen(navController)
+            }
+            composable("roleRequest") {
+                RoleUpdateUserRequestScreen(navController)
+            }
         }
     }
 }

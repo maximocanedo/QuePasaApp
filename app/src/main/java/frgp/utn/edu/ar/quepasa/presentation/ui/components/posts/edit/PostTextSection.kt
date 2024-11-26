@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.edit
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable

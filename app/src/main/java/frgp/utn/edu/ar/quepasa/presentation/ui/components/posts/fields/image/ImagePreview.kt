@@ -22,16 +22,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.Bitmap
 import coil3.compose.rememberAsyncImagePainter
 
 @Composable
 fun ImagePreview(
     modifier: Modifier,
+    bitmaps: List<Bitmap?>,
     uris: List<Uri>,
-    onClear: (Uri) -> Unit,
+    onClearBitmap: (Bitmap) -> Unit,
+    onClearUri: (Uri) -> Unit,
+    onDeleteBitmap: (Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val borderColor = MaterialTheme.colorScheme.primary
@@ -40,6 +45,44 @@ fun ImagePreview(
         modifier = modifier.horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.Start
     ) {
+        if(bitmaps.isNotEmpty()) {
+            bitmaps.forEachIndexed { index, bitmap ->
+                if (bitmap != null) {
+                    Box(
+                        contentAlignment = Alignment.TopEnd,
+                        modifier = Modifier
+                            .size(75.dp)
+                            .border(
+                                BorderStroke(1.dp, color = borderColor),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Image Preview",
+                            modifier = Modifier.matchParentSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        IconButton(
+                            onClick = {
+                                onClearBitmap(bitmap)
+                                onDeleteBitmap(index)
+                            },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Clear Image",
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                }
+            }
+        }
+
         uris.forEach { uri ->
             if(uri.path != null) {
                 Box(
@@ -61,7 +104,7 @@ fun ImagePreview(
 
                     IconButton(
                         onClick = {
-                            onClear(uri)
+                            onClearUri(uri)
                         },
                         modifier = Modifier.size(24.dp)
                     ) {
@@ -82,7 +125,10 @@ fun ImagePreview(
 fun ImageListPreview() {
     ImagePreview(
         modifier = Modifier,
+        bitmaps = emptyList(),
         uris = emptyList(),
-        onClear = {}
+        onClearBitmap = {},
+        onClearUri = {},
+        onDeleteBitmap = {}
     )
 }

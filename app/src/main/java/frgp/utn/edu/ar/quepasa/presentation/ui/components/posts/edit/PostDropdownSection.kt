@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.edit
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +25,7 @@ import frgp.utn.edu.ar.quepasa.presentation.viewmodel.neighbourhood.Neighbourhoo
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostFormViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostSubtypeViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts.PostTypeViewModel
-import frgp.utn.edu.ar.quepasa.utils.audience.audiencesToSpanish
+import frgp.utn.edu.ar.quepasa.utils.audience.audiencesToSpanishSelectedFirst
 
 @Composable
 fun PostDropdownSection(viewModel: PostFormViewModel) {
@@ -35,17 +35,18 @@ fun PostDropdownSection(viewModel: PostFormViewModel) {
 
     val types = typeViewModel.postTypes.collectAsState()
     val subtypes = subtypeViewModel.postSubtypes.collectAsState()
-    val audiences: List<String> = audiencesToSpanish()
+    val audiences: List<String> = audiencesToSpanishSelectedFirst(viewModel.getAudience())
     val neighbourhoods = neighViewModel.neighbourhoods.collectAsState()
 
-    var selectedType by remember { mutableIntStateOf(1) }
-    var selectedSubtype by remember { mutableIntStateOf(1) }
+    var selectedType by remember { mutableIntStateOf(viewModel.getType()) }
+    var selectedSubtype by remember { mutableIntStateOf(viewModel.getSubtype()) }
 
-    var selectedAudience by remember { mutableStateOf("") }
-    var selectedNeighbourhood by remember { mutableLongStateOf(1) }
+    var selectedAudience by remember { mutableStateOf(viewModel.getAudience()) }
+    var selectedNeighbourhood by remember { mutableLongStateOf(viewModel.getNeighbourhood()) }
 
     LaunchedEffect(Unit, selectedType) {
-        subtypeViewModel.getSubtypesByType(selectedType, 0, 10)
+        typeViewModel.getTypesBySubtype(selectedSubtype, 0, 10)
+        subtypeViewModel.getSubtypesBySelectedFirst(selectedType, selectedSubtype, 0, 10)
     }
 
     Row(modifier = Modifier.fillMaxWidth()) {

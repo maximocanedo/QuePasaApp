@@ -19,7 +19,10 @@ fun PostImageSection(viewModel: ImageViewModel) {
 
     ImagePreview(
         modifier = Modifier,
+        bitmaps = emptyList(),
         uris = uris.value,
-        onClear = { viewModel.clearImage(it) }
+        onClearBitmap = {},
+        onClearUri = { viewModel.clearImage(it) },
+        onDeleteBitmap = {}
     )
 }

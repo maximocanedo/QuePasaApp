@@ -22,7 +22,7 @@ fun PostTextSection(viewModel: PostFormViewModel) {
         validator = { value ->
             StringValidator(value)
                 .isNotBlank()
-                .hasMaximumLength(50)
+                .hasMaximumLength(200)
                 .hasMinimumLength(4)
         },
         onChange = { value, change -> {}
@@ -44,7 +44,7 @@ fun PostTextSection(viewModel: PostFormViewModel) {
         validator = { value ->
             StringValidator(value)
                 .isNotBlank()
-                .hasMaximumLength(256)
+                .hasMaximumLength(5000)
                 .hasMinimumLength(1)
         },
         onChange = { value, change ->

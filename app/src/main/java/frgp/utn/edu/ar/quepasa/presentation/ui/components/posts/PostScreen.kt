@@ -103,7 +103,9 @@ fun PostScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(6.dp)
+                    .padding(6.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+
             ) {
                 OutlinedTextField(
                     value = searchText,

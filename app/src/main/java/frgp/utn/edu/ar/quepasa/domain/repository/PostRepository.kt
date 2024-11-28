@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.domain.repository
 
+import frgp.utn.edu.ar.quepasa.data.dto.ApiResponse
 import frgp.utn.edu.ar.quepasa.data.dto.request.PostCreateRequest
 import frgp.utn.edu.ar.quepasa.data.dto.request.PostPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
@@ -32,6 +33,11 @@ class PostRepository @Inject constructor(
 
     suspend fun getPostById(id: Int): Post =
         handleResponse { postService.getPostById(id) }
+
+    private val handler: ApiResponseHandler = ApiResponseHandler()
+
+    suspend fun findPostById(id: Int): ApiResponse<Post?> =
+        handler.getResponse(postService.getPostById(id))
 
     suspend fun getPostsByOp(id: Int, page: Int, size: Int): Page<Post> =
         handleResponse { postService.getPostsByOp(id, page, size) }
@@ -73,8 +79,14 @@ class PostRepository @Inject constructor(
     suspend fun upVote(id: Int): VoteCount =
         handleResponse { postService.upVote(id) }
 
+    suspend fun upvote(id: Int): ApiResponse<VoteCount?> =
+        handler.getResponse(postService.upVote(id))
+
     suspend fun downVote(id: Int): VoteCount =
         handleResponse { postService.downVote(id) }
+
+    suspend fun downvote(id: Int): ApiResponse<VoteCount?> =
+        handler.getResponse(postService.downVote(id))
 
     suspend fun getComments(id: Int): Page<PostComment> =
         handleResponse { postService.getComments(id) }

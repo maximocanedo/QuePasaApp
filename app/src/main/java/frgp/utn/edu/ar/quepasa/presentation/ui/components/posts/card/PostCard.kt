@@ -1,49 +1,61 @@
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 import frgp.utn.edu.ar.quepasa.R
+import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
 import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 import frgp.utn.edu.ar.quepasa.data.model.PostType
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
+import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.text.ReadMoreText
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SF
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.CommenterIndicator
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.Voter
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.card.IndividualPostViewModel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalButton
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
-import frgp.utn.edu.ar.quepasa.utils.date.formatNumber
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import java.sql.Timestamp
-import frgp.utn.edu.ar.quepasa.utils.audience.audienceToSpanish
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
     post: Post,
@@ -53,212 +65,159 @@ fun PostCard(
     onCommentClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onRemoveClick: (Int) -> Unit,
+    vm: IndividualPostViewModel = hiltViewModel(key = "post@${post.id}")
 ) {
     val user by LocalAuth.current.collectAsState()
+    var showMenu by remember { mutableStateOf(false) }
+    var showDel by remember { mutableStateOf(false) }
+    val p by vm.post.collectAsState()
+    val votes by vm.votes.collectAsState()
 
-    if ((user.user?.role != Role.NEIGHBOUR || !(post.audience.name == "NEIGHBORHOOD" &&
-                post.neighbourhood?.name != user.user?.neighbourhood?.name)
-                || post.owner?.id   == user.user!!.id
+    LaunchedEffect(post) {
+        vm.load(post, post.id)
+    }
+    if(p == null) return
+
+    if (user.user?.role != Role.NEIGHBOUR || !(p!!.audience.name == "NEIGHBORHOOD" &&
+                p!!.neighbourhood?.name != user.user?.neighbourhood?.name
                     )
-                /*|| !(post.audience.name == "CITY" &&
-                post.neighbourhood?.name != user.user?.neighbourhood?.name)
-                || !(post.audience.name == "NEIGHBORHOOD" &&
-                post.neighbourhood?.name != user.user?.neighbourhood?.name)
-*/
         ) {
-        Card(
+        OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(3.dp)
-                .shadow(8.dp, RoundedCornerShape(18.dp))
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(18.dp)
-                ),
-            shape = RoundedCornerShape(18.dp),
-            elevation = CardDefaults.cardElevation(4.dp),
-
+                .padding(vertical = 4.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             onClick = {
-                navController.navigate("postDetailedScreen/${post.id}")
+                navController.navigate("postDetailedScreen/${p!!.id}")
             }
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    post.owner?.let {
-                        UserHorizontalButton(
-                            user = it,
-                            modifier = Modifier,
-                            onClick = {
-                                    navController.navigate("user/${it.username}")
+            val rm = Modifier.fillMaxWidth()
+            Spacer(Modifier.height(4.dp))
+            Row(rm, horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(modifier = Modifier.weight(1f)) {
+                    p!!.owner?.let {
+                        UserHorizontalButton(user = p!!.owner!!, onClick = {
 
-                            },
-                            caption = post.timestamp.formatTimeAgo()
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        post.neighbourhood?.name?.let { neighbourhoodName ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(R.drawable.location),
-                                    contentDescription = "Ubicación",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = neighbourhoodName,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-                        /* Text(
-                            text = post.timestamp.formatTimeAgo(),
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ) */
+                        }, caption = p!!.timestamp.formatTimeAgo())
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Column {
-                    Text(
-                        text = post.title,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    post.audience?.let { audience ->
-                        Text(
-                            text = "Audiencia: "+audienceToSpanish(audience.name),
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-
-                ReadMoreText(
-                    text = post.description,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontSize = 14.sp
-                    ),
-                    minLines = 3,
-                    maxLines = 10
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (user.user?.role != Role.USER) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                Column(Modifier.height(64.dp), verticalArrangement = Arrangement.Center) {
+                    IconButton(
+                        onClick = {
+                            showMenu = true
+                        }
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.clickable(onClick = onLikeClick)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                                    contentDescription = "Like",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-
-                                Spacer(modifier = Modifier.width(4.dp))
-                                if (post.votes?.votes!! < 0) {
-                                    Text(
-                                        text = formatNumber(post.votes?.votes ?: 0),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                } else {
-                                    Text(
-                                        text = formatNumber(post.votes?.votes ?: 0),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.width(16.dp))
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.clickable(onClick = onDislikeClick)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                                    contentDescription = "Dislike",
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.padding(horizontal = 64.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                                Icon(
-                                    painter = painterResource(R.drawable.edit),
-                                    contentDescription = "Edit",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clickable { onEditClick(post.id) }
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-
-                            if (post.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_delete_24),
-                                    contentDescription = "Remove",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clickable { onRemoveClick(post.id) }
-                                )
-                            }
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.more_vert),
+                            contentDescription = "Menú"
+                        )
                     }
                 }
             }
+            Row(
+                rm
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 4.dp, top = 8.dp)) {
+                Text(
+                    text = p!!.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Row(
+                rm
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 4.dp, bottom = 8.dp))  {
+                Text(
+                    text = p!!.description,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            LazyRow(rm.padding(horizontal = 24.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                p!!.neighbourhood?.let {
+                    item {
+                        InputChip(
+                            selected = true,
+                            onClick = {  },
+                            label = { Text(p!!.neighbourhood!!.name) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.location_on),
+                                    contentDescription = "Barrio"
+                                )
+                            }
+                        )
+                    }
+                }
+                item {
+                    InputChip(
+                        selected = true, onClick = { }, label = { Text(p!!.subtype.description) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.tag),
+                                contentDescription = "Subtipo"
+                            )
+                        }
+                    )
+                }
+            }
+            Row(
+                modifier = rm
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp, top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                votes?.let {
+                    Voter(
+                        voteCount = votes!!,
+                        onVote = { if(it == 1) vm.upvote() else vm.downvote() },
+                        clickable = true
+                    )
+                }
+                CommenterIndicator(count = 0, onClick = onCommentClick, clickable = true)
+            }
+            Spacer(Modifier.height(4.dp))
         }
     }
+    if(showMenu) ModalBottomSheet(onDismissRequest = { showMenu = false }) {
+        ListItem(
+            colors = ListItemDefaults.colors(containerColor = BottomSheetDefaults.ContainerColor),
+            leadingContent = { Icon(painterResource(R.drawable.edit), "Editar") },
+            headlineContent = { Text("Editar") },
+            modifier = Modifier.clickable { onEditClick(post.id) }
+        )
+        ListItem(
+            colors = ListItemDefaults.colors(containerColor = BottomSheetDefaults.ContainerColor),
+            leadingContent = { Icon(painterResource(R.drawable.baseline_delete_24), "Eliminar") },
+            headlineContent = { Text("Eliminar") },
+            modifier = Modifier.clickable { showDel = true }
+        )
+    }
+    if(showDel) AlertDialog(
+        onDismissRequest = { showDel = false },
+        confirmButton = { TextButton(onClick = { onRemoveClick(p!!.id) }) { Text("Eliminar") } },
+        title = { Text("¿Estás seguro de eliminar esta publicación?")}
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewPostCard() {
+    val initial = 159
+    var voteCount by remember { mutableStateOf<VoteCount>(
+            VoteCount(
+                votes = initial + 1,
+                uservote = 1,
+                updated = Timestamp(System.currentTimeMillis())
+            )
+        )
+    }
     val examplePost = Post(
         id = 1,
         owner = User(
             id = 1,
-            username = "patriciobor1",
-            name = "Patricio Bordon",
+            username = "munsanfer",
+            name = "Municipo de San Fernando",
             phone = emptySet(),
             address = "123 Calle Falsa",
             neighbourhood = null,
@@ -267,25 +226,42 @@ fun PreviewPostCard() {
             role = Role.USER,
             active = true
         ),
-        title = "Título ejemplo",
-        subtype = PostSubtype(1, PostType(1, "PostType ejemplo"), "PostSubtype ejemplo"),
-        description = "Este es un ejemplo de cómo debería verse un post con una descripción más larga para probar el diseño.",
+        title = "Impuesto al Pomberito",
+        subtype = PostSubtype(1, PostType(1, "Deportes"), "Seguridad"),
+        description = "Debido al último avistamiento de este ser, el municipio anunció un nuevo impuesto del 25% en compras de caramelos media hora para costear el Escuadrón Anti Pomberos, que incluirá desde personal entrenado, patrulleros y helicópteros.",
         timestamp = Timestamp(System.currentTimeMillis()),
-        neighbourhood = null,
+        neighbourhood = Neighbourhood(
+            id = 4,
+            name = "Carupá",
+            city = SF,
+            active = true
+        ),
         isActive = true,
-        votes = frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount(12500, 300, Timestamp(System.currentTimeMillis()))
+        votes = voteCount
     )
 
     MaterialTheme {
         val navController = rememberNavController()
-        PostCard(
-            post = examplePost,
-            navController = navController,
-            onLikeClick = {},
-            onDislikeClick = {},
-            onCommentClick = {},
-            onEditClick = { postId -> {} },
-            onRemoveClick={}
-        )
+        Box(modifier = Modifier.padding(8.dp)) {
+            PostCard(
+                post = examplePost,
+                navController = navController,
+                onLikeClick = {
+                    voteCount = voteCount.copy(
+                        votes = if(voteCount.uservote == 1) initial else initial + 1,
+                        uservote = if(voteCount.uservote == 1) 0 else 1
+                    )
+                },
+                onDislikeClick = {
+                    voteCount = voteCount.copy(
+                        votes = if(voteCount.uservote == -1) initial else initial - 1,
+                        uservote = if(voteCount.uservote == -1) 0 else -1
+                    )
+                },
+                onCommentClick = {},
+                onEditClick = { postId -> {} },
+                onRemoveClick={}
+            )
+        }
     }
 }

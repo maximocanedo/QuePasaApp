@@ -13,12 +13,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -26,6 +24,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import frgp.utn.edu.ar.quepasa.data.model.Post
@@ -46,10 +47,10 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.NeighbourhoodsMDFP
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SF
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.CommenterIndicator
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.Voter
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.card.IndividualPostViewModel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalButton
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
 import java.sql.Timestamp
@@ -64,12 +65,21 @@ fun PostCard(
     onCommentClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onRemoveClick: (Int) -> Unit,
+    vm: IndividualPostViewModel = hiltViewModel(key = "post@${post.id}")
 ) {
     val user by LocalAuth.current.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showDel by remember { mutableStateOf(false) }
-    if (user.user?.role != Role.NEIGHBOUR || !(post.audience.name == "NEIGHBORHOOD" &&
-                post.neighbourhood?.name != user.user?.neighbourhood?.name
+    val p by vm.post.collectAsState()
+    val votes by vm.votes.collectAsState()
+
+    LaunchedEffect(post) {
+        vm.load(post, post.id)
+    }
+    if(p == null) return
+
+    if (user.user?.role != Role.NEIGHBOUR || !(p!!.audience.name == "NEIGHBORHOOD" &&
+                p!!.neighbourhood?.name != user.user?.neighbourhood?.name
                     )
         ) {
         OutlinedCard(
@@ -79,17 +89,17 @@ fun PostCard(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             onClick = {
-                navController.navigate("postDetailedScreen/${post.id}")
+                navController.navigate("postDetailedScreen/${p!!.id}")
             }
         ) {
             val rm = Modifier.fillMaxWidth()
             Spacer(Modifier.height(4.dp))
             Row(rm, horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
-                    post.owner?.let {
-                        UserHorizontalButton(user = post.owner!!, onClick = {
+                    p!!.owner?.let {
+                        UserHorizontalButton(user = p!!.owner!!, onClick = {
 
-                        }, caption = post.timestamp.formatTimeAgo())
+                        }, caption = p!!.timestamp.formatTimeAgo())
                     }
                 }
                 Column(Modifier.height(64.dp), verticalArrangement = Arrangement.Center) {
@@ -110,7 +120,7 @@ fun PostCard(
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 4.dp, top = 8.dp)) {
                 Text(
-                    text = post.title,
+                    text = p!!.title,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -119,17 +129,17 @@ fun PostCard(
                     .padding(horizontal = 24.dp)
                     .padding(top = 4.dp, bottom = 8.dp))  {
                 Text(
-                    text = post.description,
+                    text = p!!.description,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
             LazyRow(rm.padding(horizontal = 24.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                post.neighbourhood?.let {
+                p!!.neighbourhood?.let {
                     item {
                         InputChip(
                             selected = true,
                             onClick = {  },
-                            label = { Text(post.neighbourhood!!.name) },
+                            label = { Text(p!!.neighbourhood!!.name) },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(R.drawable.location_on),
@@ -141,7 +151,7 @@ fun PostCard(
                 }
                 item {
                     InputChip(
-                        selected = true, onClick = { }, label = { Text(post.subtype.description) },
+                        selected = true, onClick = { }, label = { Text(p!!.subtype.description) },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.tag),
@@ -157,10 +167,10 @@ fun PostCard(
                     .padding(bottom = 16.dp, top = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                post.votes?.let {
+                votes?.let {
                     Voter(
-                        voteCount = post.votes,
-                        onVote = { if(it == 1) onLikeClick() else onDislikeClick() },
+                        voteCount = votes!!,
+                        onVote = { if(it == 1) vm.upvote() else vm.downvote() },
                         clickable = true
                     )
                 }
@@ -185,7 +195,7 @@ fun PostCard(
     }
     if(showDel) AlertDialog(
         onDismissRequest = { showDel = false },
-        confirmButton = { TextButton(onClick = { onRemoveClick(post.id) }) { Text("Eliminar") } },
+        confirmButton = { TextButton(onClick = { onRemoveClick(p!!.id) }) { Text("Eliminar") } },
         title = { Text("¿Estás seguro de eliminar esta publicación?")}
     )
 }
@@ -197,7 +207,7 @@ fun PreviewPostCard() {
     var voteCount by remember { mutableStateOf<VoteCount>(
             VoteCount(
                 votes = initial + 1,
-                userVote = 1,
+                uservote = 1,
                 updated = Timestamp(System.currentTimeMillis())
             )
         )
@@ -238,14 +248,14 @@ fun PreviewPostCard() {
                 navController = navController,
                 onLikeClick = {
                     voteCount = voteCount.copy(
-                        votes = if(voteCount.userVote == 1) initial else initial + 1,
-                        userVote = if(voteCount.userVote == 1) 0 else 1
+                        votes = if(voteCount.uservote == 1) initial else initial + 1,
+                        uservote = if(voteCount.uservote == 1) 0 else 1
                     )
                 },
                 onDislikeClick = {
                     voteCount = voteCount.copy(
-                        votes = if(voteCount.userVote == -1) initial else initial - 1,
-                        userVote = if(voteCount.userVote == -1) 0 else -1
+                        votes = if(voteCount.uservote == -1) initial else initial - 1,
+                        uservote = if(voteCount.uservote == -1) 0 else -1
                     )
                 },
                 onCommentClick = {},

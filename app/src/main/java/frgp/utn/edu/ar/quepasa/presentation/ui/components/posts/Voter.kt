@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +55,7 @@ fun Voter(
         ){
             IconToggleButton(
                 enabled = clickable,
-                checked = voteCount.userVote == 1,
+                checked = voteCount.uservote == 1,
                 onCheckedChange = { scope.launch { onVote(1) } }
             ) {
                 Icon(
@@ -69,7 +68,7 @@ fun Voter(
             )
             IconToggleButton(
                 enabled = clickable,
-                checked = voteCount.userVote == -1,
+                checked = voteCount.uservote == -1,
                 onCheckedChange = { scope.launch { onVote(-1) } }
             ) {
                 Icon(
@@ -120,7 +119,7 @@ fun VoterPreview() {
     val initial = 15999
     var voteCount by remember { mutableStateOf<VoteCount>(VoteCount(
         votes = initial ,
-        userVote = 0,
+        uservote = 0,
         updated = Timestamp(System.currentTimeMillis())
     )) }
     Box(modifier = Modifier.padding(all = 16.dp)) {
@@ -128,8 +127,8 @@ fun VoterPreview() {
             voteCount = voteCount,
             onVote = {
                 voteCount = voteCount.copy(
-                    votes = if(voteCount.userVote == it) initial else initial + it,
-                    userVote = if(voteCount.userVote == it) 0 else it
+                    votes = if(voteCount.uservote == it) initial else initial + it,
+                    uservote = if(voteCount.uservote == it) 0 else it
                 )
             },
             clickable = true
@@ -142,7 +141,7 @@ fun VoterDisabledPreview() {
     val initial = 997
     var voteCount by remember { mutableStateOf<VoteCount>(VoteCount(
         votes = initial + 1,
-        userVote = 1,
+        uservote = 1,
         updated = Timestamp(System.currentTimeMillis())
     )) }
     Box(modifier = Modifier.padding(all = 16.dp)) {
@@ -150,8 +149,8 @@ fun VoterDisabledPreview() {
             voteCount = voteCount,
             onVote = {
                 voteCount = voteCount.copy(
-                    votes = if(voteCount.userVote == it) initial else initial + it,
-                    userVote = if(voteCount.userVote == it) 0 else it
+                    votes = if(voteCount.uservote == it) initial else initial + it,
+                    uservote = if(voteCount.uservote == it) 0 else it
                 )
             },
             clickable = false

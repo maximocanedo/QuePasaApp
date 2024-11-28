@@ -4,6 +4,6 @@ import java.sql.Timestamp
 
 data class VoteCount(
     val votes: Int,
-    val userVote: Int,
+    val uservote: Int,
     val updated: Timestamp
 )

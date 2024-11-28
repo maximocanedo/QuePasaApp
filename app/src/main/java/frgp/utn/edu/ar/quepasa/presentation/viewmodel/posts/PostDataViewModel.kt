@@ -278,7 +278,7 @@ class PostDataViewModel @Inject constructor(
             _votes.update { votes }
             _posts.update { it.copy(
                     content = it.content.map { post ->
-                        Log.d("User VOTE: ", votes.userVote.toString())
+                        Log.d("User VOTE: ", votes.uservote.toString())
                         if (post.id == id) {
                             post.copy(votes = votes)
                         } else {

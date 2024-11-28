@@ -2,7 +2,6 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.card
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.dto.Fail
 import frgp.utn.edu.ar.quepasa.data.dto.error

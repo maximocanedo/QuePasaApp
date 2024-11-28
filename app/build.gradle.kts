@@ -97,18 +97,19 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     /** Material Icons **/
     // https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
-    runtimeOnly("androidx.compose.material:material-icons-extended:1.7.5")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation("io.coil-kt.coil3:coil-compose:3.0.1")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.1")
-    implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.1")
-    implementation("io.coil-kt.coil3:coil-network-ktor3:3.0.1")
-    implementation("com.googlecode.libphonenumber:libphonenumber:8.13.17")
-    implementation ("com.valentinilk.shimmer:compose-shimmer:1.0.3")
-
-    implementation ("com.google.api-client:google-api-client:2.0.0")
-    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
-    implementation ("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+    runtimeOnly(libs.androidx.material.icons.extended)
+    implementation (libs.logging.interceptor)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.network.ktor2)
+    implementation(libs.coil.network.ktor3)
+    implementation(libs.libphonenumber)
+    implementation (libs.compose.shimmer)
+    // https://mvnrepository.com/artifact/org.ocpsoft.prettytime/prettytime
+    implementation(libs.prettytime)
+    implementation (libs.google.api.client)
+    implementation (libs.google.oauth.client.jetty)
+    implementation (libs.google.api.services.calendar)
 
 
 }

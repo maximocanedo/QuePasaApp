@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
@@ -47,12 +49,16 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.geo.Neighbourhood
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.LoadMoreButton
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentCard
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentParent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.geo.list.SF
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.CommenterIndicator
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.Voter
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.card.IndividualPostViewModel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalButton
 import frgp.utn.edu.ar.quepasa.utils.date.formatTimeAgo
+import kotlinx.coroutines.CoroutineScope
 import java.sql.Timestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +75,8 @@ fun FullPost(
     var showDel by remember { mutableStateOf(false) }
     val p by vm.post.collectAsState()
     val votes by vm.votes.collectAsState()
+    val cl by vm.cl.collectAsState()
+    val comments = remember { vm.comments }
 
     LaunchedEffect(postId) {
         vm.load(null, postId)
@@ -79,95 +87,116 @@ fun FullPost(
                 p!!.neighbourhood?.name != user.user?.neighbourhood?.name
                     )
         ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        ) {
-            val rm = Modifier.fillMaxWidth()
-            Spacer(Modifier.height(4.dp))
-            Row(rm, horizontalArrangement = Arrangement.SpaceBetween) {
-                Column(modifier = Modifier.weight(1f)) {
-                    p!!.owner?.let {
-                        UserHorizontalButton(user = p!!.owner!!, onClick = {
+        LazyColumn {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    val rm = Modifier.fillMaxWidth()
+                    Spacer(Modifier.height(4.dp))
+                    Row(rm, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            p!!.owner?.let {
+                                UserHorizontalButton(user = p!!.owner!!, onClick = {
 
-                        }, caption = p!!.timestamp.formatTimeAgo())
-                    }
-                }
-                Column(Modifier.height(64.dp), verticalArrangement = Arrangement.Center) {
-                    IconButton(
-                        onClick = {
-                            showMenu = true
+                                }, caption = p!!.timestamp.formatTimeAgo())
+                            }
                         }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.more_vert),
-                            contentDescription = "Menú"
-                        )
-                    }
-                }
-            }
-            Row(
-                rm
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 4.dp, top = 8.dp)) {
-                Text(
-                    text = p!!.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Row(
-                rm
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 4.dp, bottom = 8.dp))  {
-                Text(
-                    text = p!!.description,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            LazyRow(rm.padding(horizontal = 24.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                p!!.neighbourhood?.let {
-                    item {
-                        InputChip(
-                            selected = true,
-                            onClick = {  },
-                            label = { Text(p!!.neighbourhood!!.name) },
-                            leadingIcon = {
+                        Column(Modifier.height(64.dp), verticalArrangement = Arrangement.Center) {
+                            IconButton(
+                                onClick = {
+                                    showMenu = true
+                                }
+                            ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.location_on),
-                                    contentDescription = "Barrio"
+                                    painter = painterResource(id = R.drawable.more_vert),
+                                    contentDescription = "Menú"
                                 )
                             }
+                        }
+                    }
+                    Row(
+                        rm
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 4.dp, top = 8.dp)
+                    ) {
+                        Text(
+                            text = p!!.title,
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
-                }
-                item {
-                    InputChip(
-                        selected = true, onClick = { }, label = { Text(p!!.subtype.description) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.tag),
-                                contentDescription = "Subtipo"
+                    Row(
+                        rm
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 4.dp, bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = p!!.description,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    LazyRow(
+                        rm.padding(horizontal = 24.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        p!!.neighbourhood?.let {
+                            item {
+                                InputChip(
+                                    selected = true,
+                                    onClick = { },
+                                    label = { Text(p!!.neighbourhood!!.name) },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.location_on),
+                                            contentDescription = "Barrio"
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                        item {
+                            InputChip(
+                                selected = true,
+                                onClick = { },
+                                label = { Text(p!!.subtype.description) },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.tag),
+                                        contentDescription = "Subtipo"
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
+                    Row(
+                        modifier = rm
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 16.dp, top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        votes?.let {
+                            Voter(
+                                voteCount = votes!!,
+                                onVote = { if (it == 1) vm.upvote() else vm.downvote() },
+                                clickable = true
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+
                 }
             }
-            Row(
-                modifier = rm
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 16.dp, top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                votes?.let {
-                    Voter(
-                        voteCount = votes!!,
-                        onVote = { if(it == 1) vm.upvote() else vm.downvote() },
-                        clickable = true
-                    )
-                }
+            items(comments) {
+                CommentCard(comment = it, parentType = CommentParent.POST)
             }
-            Spacer(Modifier.height(4.dp))
+            item {
+                LoadMoreButton(
+                    loading = cl,
+                    onLoadRequest = { vm.loadComments() }
+                )
+            }
         }
     }
     if(showMenu) ModalBottomSheet(onDismissRequest = { showMenu = false }) {

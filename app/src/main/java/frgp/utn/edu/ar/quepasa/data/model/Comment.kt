@@ -4,7 +4,7 @@ import frgp.utn.edu.ar.quepasa.data.dto.response.VoteCount
 import java.sql.Timestamp
 import java.util.UUID
 
-data class Comment(
+open class Comment(
     var id: UUID,
     var content: String,
     var author: User? = null,

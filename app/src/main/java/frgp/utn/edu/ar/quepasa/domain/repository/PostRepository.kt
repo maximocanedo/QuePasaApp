@@ -91,6 +91,8 @@ class PostRepository @Inject constructor(
     suspend fun getComments(id: Int): Page<PostComment> =
         handleResponse { postService.getComments(id) }
 
+    suspend fun findComments(id: Int, page: Int = 0, size: Int = 10): ApiResponse<Page<PostComment>?> = handler.getResponse( postService.getComments(id) )
+
     suspend fun comment(id: Int, content: String): PostComment =
         handleResponse { postService.comment(id, content) }
 

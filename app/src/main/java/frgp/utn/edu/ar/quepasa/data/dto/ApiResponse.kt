@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package frgp.utn.edu.ar.quepasa.data.dto
 
 import quepasa.api.exceptions.ValidationError

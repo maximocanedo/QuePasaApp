@@ -104,78 +104,22 @@ fun PostDetailedScreen(
             title = "Publicación",
             back = true
         ) {
-            LazyColumn(
+            Column(
                 modifier = Modifier.padding(2.dp)
             ) {
-                item {
                     FullPost(
                         postId = postId,
                         navController = navController,
                         onEditClick = {  },
                         onRemoveClick = {  }
                     )
-                }
-                item {
                     Row(
                         modifier = Modifier.padding(top = 4.dp)
                     ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
-                }
-                item {
                     HorizontalDivider(
                         thickness = 2.dp,
                         color = MaterialTheme.colorScheme.primary
                     )
-                }
-                /* item {
-                    Row {
-                        if (comments.content.isNotEmpty()) {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                userScrollEnabled = true
-                            ) {
-                                items(comments.content) { comment ->
-                                    key(comment.id) {
-                                        user.user?.let {
-                                            PostCommentCard(
-                                                comment = comment,
-                                                voteCount = comment.votes,
-                                                user = it,
-                                                onUpvoteClick = {
-                                                    viewModel.viewModelScope.launch {
-                                                        commentViewModel.upVoteComment(comment.id)
-                                                        viewModel.getComments(postId)
-                                                    }
-                                                },
-                                                onDownvoteClick = {
-                                                    viewModel.viewModelScope.launch {
-                                                        commentViewModel.downVoteComment(comment.id)
-                                                        viewModel.getComments(postId)
-                                                    }
-                                                },
-                                                onDeleteClick = {
-                                                    viewModel.viewModelScope.launch {
-                                                        commentViewModel.deleteComment(comment.id)
-                                                        viewModel.getComments(postId)
-                                                    }
-                                                },
-                                                onEditClick = {
-                                                    commentEditUUID = comment.id
-                                                    commentEditText = comment.content
-                                                    commentEditState = true
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
-                        }
-                    }
-                } */
             }
         }
         if (commentDialogState) {

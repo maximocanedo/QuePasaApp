@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.viewmodel.posts
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import frgp.utn.edu.ar.quepasa.domain.repository.PostRepository
 import frgp.utn.edu.ar.quepasa.utils.pagination.Page
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -273,16 +275,18 @@ class PostDataViewModel @Inject constructor(
         try {
             _isLoading.value = true
             val votes = repository.upVote(id)
-            _votes.value = votes
-            _posts.value = _posts.value.copy(
-                content = _posts.value.content.map { post ->
-                    if (post.id == id) {
-                        post.copy(votes = votes)
-                    } else {
-                        post
+            _votes.update { votes }
+            _posts.update { it.copy(
+                    content = it.content.map { post ->
+                        Log.d("User VOTE: ", votes.userVote.toString())
+                        if (post.id == id) {
+                            post.copy(votes = votes)
+                        } else {
+                            post
+                        }
                     }
-                }
-            )
+                )
+            }
         } catch (e: Exception) {
             _errorMessage.value = e.message
         }finally {

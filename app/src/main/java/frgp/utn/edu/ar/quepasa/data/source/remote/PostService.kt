@@ -73,7 +73,7 @@ interface PostService {
 
     /** Comienza sección de COMENTARIOS **/
     @GET("posts/{id}/comments")
-    suspend fun getComments(@Path("id") id: Int): Response<Page<PostComment>>
+    suspend fun getComments(@Path("id") id: Int, @Query("page") page: Int = 0, @Query("size") size: Int = 10): Response<Page<PostComment>>
 
     @POST("posts/{id}/comments")
     suspend fun comment(@Path("id") id: Int, @Body content: String): Response<PostComment>

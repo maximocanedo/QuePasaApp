@@ -37,7 +37,7 @@ class CommentViewModel @Inject constructor(
 
     suspend fun getCommentById(id: UUID) {
         try {
-            val comment = repository.getCommentById(id)
+            val comment = repository.getCommentByIdLegacy(id)
             _comment.value = comment
         }
         catch(e: Exception) {

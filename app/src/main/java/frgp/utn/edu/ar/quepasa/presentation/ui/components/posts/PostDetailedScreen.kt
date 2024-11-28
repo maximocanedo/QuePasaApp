@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import FullPost
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.PostCommentCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.card.IndividualPostViewModel
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserHorizontalDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.commenting.CommentViewModel
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.media.PictureViewModel
@@ -64,29 +66,34 @@ import java.util.UUID
 fun PostDetailedScreen(
     navController: NavHostController,
     postId: Int,
+    vm: IndividualPostViewModel = hiltViewModel(key = "post@${postId}")
 ) {
     val user by LocalAuth.current.collectAsState()
 
-    val viewModel: PostViewModel = hiltViewModel()
     val postPictureViewModel: PostPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
     val commentViewModel: CommentViewModel = hiltViewModel()
 
     val coroutineScope = rememberCoroutineScope()
 
-    val post by viewModel.post.collectAsState()
-    val votes by viewModel.votes.collectAsState()
-    val comments by viewModel.comments.collectAsState()
+    val post by vm.post.collectAsState()
+    val votes by vm.votes.collectAsState()
+    // val comments by viewModel.comments.collectAsState()
     var commentDialogState by remember { mutableStateOf(false) }
     var commentEditState by remember { mutableStateOf(false) }
     var commentEditUUID by remember { mutableStateOf(UUID.randomUUID()) }
     var commentEditText by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        viewModel.getPostById(postId)
-        postPictureViewModel.getPicturesByPost(postId, 0, 10)
-        pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
-        viewModel.getComments(postId)
+    LaunchedEffect(postId) {
+        vm.load(id = postId)
+    }
+
+    LaunchedEffect(post) {
+        if(post != null) {
+            postPictureViewModel.getPicturesByPost(postId, 0, 10)
+            pictureViewModel.setPicturesBitmap(postPictureViewModel.picturesId.value)
+            // viewModel.getComments(postId)
+        }
     }
 
     val bitmaps = pictureViewModel.pictures.collectAsState()
@@ -98,236 +105,31 @@ fun PostDetailedScreen(
             back = true
         ) {
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(2.dp)
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row {
-                            Column {
-                                Text(text = post!!.title, fontSize = 24.sp)
-
-                                post!!.neighbourhood?.name?.let { neighbourhoodName ->
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.location),
-                                            contentDescription = "Location",
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = neighbourhoodName,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                }
-
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DateRange,
-                                        contentDescription = "Post Time Ago",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = post!!.timestamp.formatTimeAgo(),
-                                        fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-
-                        HorizontalDivider(
-                            thickness = 2.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-
-                        post!!.owner?.let {
-                            UserHorizontalDesign(
-                                user = it,
-                                modifier = Modifier
-                            )
-                        }
-
-                        Row(
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(text = post!!.description, textAlign = TextAlign.Center)
-                        }
-
-                        if(bitmaps.value.isNotEmpty()) {
-                            ImagesListPreview(bitmaps = bitmaps.value)
-                        }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        if(user.user?.role != Role.USER) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable(onClick = {
-                                        commentDialogState = true
-                                    })
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.baseline_add_comment_24),
-                                        contentDescription = "Comment",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable(onClick = {
-                                        coroutineScope.launch {
-                                            try {
-                                                viewModel.upVote(post!!.id)
-                                                Log.d("PostCard", "like ${post!!.id}")
-                                            } catch (e: Exception) {
-                                                Log.e("PostCard", "error: ${e.message}")
-                                            }
-                                        }
-                                    })
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.baseline_arrow_upward_24),
-                                        contentDescription = "Like",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = formatNumber(
-                                            votes?.votes ?: post!!.votes?.votes ?: 0
-                                        ),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                }
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable(onClick = {
-                                        coroutineScope.launch {
-                                            try {
-                                                viewModel.downVote(post!!.id)
-                                                Log.d("PostCard", "dislike ${post!!.id}")
-                                            } catch (e: Exception) {
-                                                Log.e("PostCard", "error: ${e.message}")
-                                            }
-                                        }
-                                    })
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.baseline_arrow_downward_24),
-                                        contentDescription = "Dislike",
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-
-                                if (post!!.owner?.id == user.id || user.user?.role == Role.ADMIN) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.edit),
-                                        contentDescription = "Edit",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .clickable { ->
-                                                post!!.id.let {
-                                                    navController.navigate("postEdit/$it")
-                                                }
-                                            }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.padding(top = 4.dp)
-                ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
-                HorizontalDivider(
-                    thickness = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Row {
-                    if (comments.content.isNotEmpty()) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            userScrollEnabled = true
-                        ) {
-                            items(comments.content) { comment ->
-                                key(comment.id) {
-                                    user.user?.let {
-                                        PostCommentCard(
-                                            comment = comment,
-                                            voteCount = comment.votes,
-                                            user = it,
-                                            onUpvoteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.upVoteComment(comment.id)
-                                                    viewModel.getComments(postId)
-                                                }
-                                            },
-                                            onDownvoteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.downVoteComment(comment.id)
-                                                    viewModel.getComments(postId)
-                                                }
-                                            },
-                                            onDeleteClick = {
-                                                viewModel.viewModelScope.launch {
-                                                    commentViewModel.deleteComment(comment.id)
-                                                    viewModel.getComments(postId)
-                                                }
-                                            },
-                                            onEditClick = {
-                                                commentEditUUID = comment.id
-                                                commentEditText = comment.content
-                                                commentEditState = true
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        Text("No hay comentarios", style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
+                    FullPost(
+                        postId = postId,
+                        navController = navController,
+                        onEditClick = {  },
+                        onRemoveClick = {  }
+                    )
+                    Row(
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) { Text("Comentarios", style = MaterialTheme.typography.bodyMedium) }
+                    HorizontalDivider(
+                        thickness = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
             }
         }
         if (commentDialogState) {
             CommentDialog(
                 onDismissRequest = { commentDialogState = false },
                 onConfirm = { content ->
-                    viewModel.viewModelScope.launch {
+                    /* viewModel.viewModelScope.launch {
                         viewModel.comment(postId, content)
                         viewModel.getComments(postId)
-                    }
+                    } */
                     commentDialogState = false
                 }
             )
@@ -337,10 +139,10 @@ fun PostDetailedScreen(
                 content = commentEditText,
                 onDismissRequest = { commentEditState = false },
                 onConfirm = { content ->
-                    viewModel.viewModelScope.launch {
+                    /* viewModel.viewModelScope.launch {
                         commentViewModel.updateComment(commentEditUUID, content)
                         viewModel.getComments(postId)
-                    }
+                    } */
                     commentEditText = ""
                     commentEditState = false
                 }

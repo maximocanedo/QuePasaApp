@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
+import BaseComponent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,6 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.EventCreateRequest
 import frgp.utn.edu.ar.quepasa.data.model.enums.Audience
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.dialog.NeighbourhoodDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.AddressField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.DateField

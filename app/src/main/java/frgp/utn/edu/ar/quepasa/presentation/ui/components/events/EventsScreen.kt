@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.events
 
+import BaseComponent
 import android.content.Intent
 import android.provider.CalendarContract
 import android.widget.Toast
@@ -37,7 +38,6 @@ import androidx.navigation.NavHostController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.EventCategory
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.card.EventCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.events.fields.EventCategoryField
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.events.EventViewModel

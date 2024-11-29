@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import BaseComponent
 import FullPost
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -47,7 +48,6 @@ import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.R
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.CommentDialog
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.comment.PostCommentCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.images.ImagesListPreview

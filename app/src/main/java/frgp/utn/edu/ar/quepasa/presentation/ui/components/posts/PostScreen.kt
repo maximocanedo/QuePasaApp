@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts
 
+import BaseComponent
 import PostCard
 import android.util.Log
 import androidx.compose.foundation.background
@@ -28,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.DialogProperties
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox

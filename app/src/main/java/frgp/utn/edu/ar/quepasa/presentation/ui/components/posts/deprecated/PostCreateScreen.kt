@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated
 
+import BaseComponent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -31,7 +32,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.AudienceField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.DescriptionField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.deprecated.fields.ImageField

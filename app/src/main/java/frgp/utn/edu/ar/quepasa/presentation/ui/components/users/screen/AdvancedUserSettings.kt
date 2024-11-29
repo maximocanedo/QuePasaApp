@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen
 
+import BaseComponent
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +35,6 @@ import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalSnack
 import frgp.utn.edu.ar.quepasa.presentation.activity.auth.LoginActivity
 import frgp.utn.edu.ar.quepasa.presentation.activity.users.ProfileScreenContent
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.mail.MailsCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.phone.PhonesCard
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewModel

@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.activity.users
 
+import BaseComponent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +31,6 @@ import frgp.utn.edu.ar.quepasa.data.dto.request.UserPatchEditRequest
 import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.domain.context.feedback.FeedbackProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.dataviewer.BasicUserInfoCard
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.def.UserDisplayDesign
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.users.ProfileScreenViewModel

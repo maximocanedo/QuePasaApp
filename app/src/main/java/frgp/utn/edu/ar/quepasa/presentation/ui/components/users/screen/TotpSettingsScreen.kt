@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen
 
+import BaseComponent
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -32,7 +33,6 @@ import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.AuthenticationProvider
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.BaseComponent
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.basic.ConfSwitch
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.auth.TotpSettingsScreenViewModel
 import kotlinx.coroutines.launch

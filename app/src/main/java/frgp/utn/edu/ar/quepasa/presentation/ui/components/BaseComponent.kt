@@ -1,5 +1,3 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +19,11 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.NavigationMainDra
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopBackBar
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.TopMainBar
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+
 @Composable
 fun BaseComponent(
     navController: NavHostController,
@@ -34,17 +37,44 @@ fun BaseComponent(
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-    ModalNavigationDrawer(drawerState = drawerState, drawerContent = { NavigationMainDrawer(navController, user.user) }) {
-        Scaffold(
-            topBar = { if(back) TopBackBar(title, navController, backRoute) else TopMainBar(title, scope, drawerState) },
-            snackbarHost = { SnackbarHost(hostState = snack) }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                content()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    val gestureStartEdge = 50.dp.toPx()
+                    when {
+                        drawerState.currentValue == DrawerValue.Closed &&
+                                change.position.x <= gestureStartEdge && dragAmount > 0 -> {
+                            scope.launch { drawerState.open() }
+                        }
+                        drawerState.currentValue == DrawerValue.Open &&
+                                dragAmount < 0 -> {
+                            scope.launch { drawerState.close() }
+                        }
+                    }
+                }
+            }
+    ) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            gesturesEnabled = false,
+            drawerContent = { NavigationMainDrawer(navController, user.user) }
+        ) {
+            Scaffold(
+                topBar = {
+                    if (back) TopBackBar(title, navController, backRoute)
+                    else TopMainBar(title, scope, drawerState)
+                },
+                snackbarHost = { SnackbarHost(hostState = snack) }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    content()
+                }
             }
         }
     }

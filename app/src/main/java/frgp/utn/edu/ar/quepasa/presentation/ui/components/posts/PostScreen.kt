@@ -202,7 +202,7 @@ fun PostScreen(
 
     if (wrapInBaseComponent) {
         val user by LocalAuth.current.collectAsState()
-        BaseComponent(navController, "Posts", false) {
+        BaseComponent(navController, "Posts", false, "postList") {
             content()
         }
     } else {

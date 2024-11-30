@@ -26,7 +26,8 @@ fun PostEdit(
     BaseComponent(
         navController = navController,
         title = "Editar publicación",
-        back = true
+        back = true,
+        "postEdit"
     ) {
         val scrollState = rememberScrollState()
         val formViewModel = PostFormViewModel()

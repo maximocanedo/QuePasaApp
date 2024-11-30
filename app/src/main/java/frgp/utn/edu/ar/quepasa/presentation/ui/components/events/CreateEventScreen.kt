@@ -51,7 +51,7 @@ fun CreateEventScreen(navController: NavHostController) {
     val viewModel: EventViewModel = hiltViewModel()
     val imageViewModel = ImageViewModel()
     val eventPictureViewModel: EventPictureViewModel = hiltViewModel()
-    BaseComponent(navController, "Crear de Evento", true) {
+    BaseComponent(navController, "Crear de Evento", true, "eventCreate") {
         val title by viewModel.title.collectAsState()
         val description by viewModel.description.collectAsState()
         val address by viewModel.address.collectAsState()

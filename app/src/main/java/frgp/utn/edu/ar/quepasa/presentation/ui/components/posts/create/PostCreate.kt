@@ -21,7 +21,7 @@ fun PostCreate(navController: NavHostController) {
     BaseComponent(
         navController = navController,
         title = "Crear publicación",
-        back = true
+        back = true, "postCreate"
     ) {
         val scrollState = rememberScrollState()
         val formViewModel = PostFormViewModel()

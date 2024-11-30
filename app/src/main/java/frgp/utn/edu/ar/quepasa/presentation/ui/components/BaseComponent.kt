@@ -29,13 +29,32 @@ fun BaseComponent(
     navController: NavHostController,
     title: String,
     back: Boolean,
-    backRoute: String = "home",
+    currentRoute: String,
     content: @Composable () -> Unit
 ) {
     val snack = LocalSnack.current
     val user by LocalAuth.current.collectAsState()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val navigationRoutes = mapOf(
+        "home" to "events",
+        "posts" to "home",
+        "userProfile" to "home",
+        "advancedProfileSettings" to "userProfile",
+        "totpSettings" to "advancedProfileSettings",
+        "updatePassword" to "advancedProfileSettings",
+        "postList" to "posts",
+        "postCreate" to "posts",
+        "postEdit" to "posts",
+        "postDetailedScreen" to "posts",
+        "events" to "home",
+        "eventCreate" to "events",
+        "eventEdit" to "events",
+        "eventDetailedScreen" to "events",
+        "roleRequestUserList" to "home",
+        "roleRequestAdminList" to "roleRequestUserList",
+        "roleRequest" to "roleRequestAdminList"
+    )
 
     Box(
         modifier = Modifier
@@ -52,6 +71,14 @@ fun BaseComponent(
                                 dragAmount < 0 -> {
                             scope.launch { drawerState.close() }
                         }
+                        drawerState.currentValue == DrawerValue.Closed && dragAmount < -50 -> {
+                            val previousRoute = navigationRoutes[currentRoute]
+                            previousRoute?.let {
+                                navController.navigate(it) {
+                                    popUpTo(it) { inclusive = true }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -63,7 +90,7 @@ fun BaseComponent(
         ) {
             Scaffold(
                 topBar = {
-                    if (back) TopBackBar(title, navController, backRoute)
+                    if (back) TopBackBar(title, navController, navigationRoutes[currentRoute] ?: "home")
                     else TopMainBar(title, scope, drawerState)
                 },
                 snackbarHost = { SnackbarHost(hostState = snack) }

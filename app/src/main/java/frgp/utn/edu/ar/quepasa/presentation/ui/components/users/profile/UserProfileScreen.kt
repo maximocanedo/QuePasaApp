@@ -30,7 +30,7 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.profile.readonly
 @Deprecated("Usar {ProfileScreen.kt}")
 @Composable
 fun UserProfileScreen(navController: NavHostController, user: User?) {
-    BaseComponent(navController, "Usuario", false) {
+    BaseComponent(navController, "Usuario", false, "user") {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

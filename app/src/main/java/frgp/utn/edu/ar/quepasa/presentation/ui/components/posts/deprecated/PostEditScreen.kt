@@ -69,7 +69,7 @@ fun PostEditScreen(navController: NavHostController, user: User?, postId: Int) {
     val postPictureViewModel: PostPictureViewModel = hiltViewModel()
     val pictureViewModel: PictureViewModel = hiltViewModel()
 
-    BaseComponent(navController, "Modificar publicación", true) {
+    BaseComponent(navController, "Modificar publicación", true, "postEdit") {
         LaunchedEffect(Unit) {
             viewModel.getPostById(postId)
             viewModel.toggleValidationField(0, true)

@@ -99,10 +99,11 @@ fun AdvancedUserSettings(
         navController = navController,
         title = "Cuenta",
         back = true,
-        backRoute = navController.backQueue
+        /*backRoute = navController.backQueue
             .takeIf { it.size > 1 }
             ?.let { it[it.size - 2] }
-            ?.destination?.route ?: "userProfile"
+            ?.destination?.route ?: "userProfile",*/
+        "advancedProfileSettings"
     ){
         PullToRefreshBox(
             isRefreshing = isRefreshing,

@@ -46,7 +46,7 @@ fun RoleUpdateUserListScreen(navController: NavHostController) {
         enabledHighestRole = role != Role.GOVT
     }
 
-    BaseComponent(navController, "Solicitudes de rol", false) {
+    BaseComponent(navController, "Solicitudes de rol", false, "roleRequestUserList") {
         LazyColumn(
             modifier = Modifier
                 .padding(16.dp)

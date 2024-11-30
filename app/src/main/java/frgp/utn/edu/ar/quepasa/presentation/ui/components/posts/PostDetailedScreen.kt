@@ -102,7 +102,8 @@ fun PostDetailedScreen(
         BaseComponent(
             navController = navController,
             title = "Publicación",
-            back = true
+            back = true,
+            "postDetailedScreen"
         ) {
             Column(
                 modifier = Modifier.padding(2.dp)

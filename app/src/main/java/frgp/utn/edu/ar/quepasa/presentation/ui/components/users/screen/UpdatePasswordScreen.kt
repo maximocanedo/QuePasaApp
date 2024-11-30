@@ -74,11 +74,12 @@ fun UpdatePasswordScreen(
     BaseComponent(
         navController = navController,
         title = "Cambiar contraseña",
-        back = true,
+        back = true,/*
         backRoute = navController.backQueue
             .takeIf { it.size > 1 }
             ?.let { it[it.size - 2] }
-            ?.destination?.route ?: "advancedProfileSettings"
+            ?.destination?.route ?: "advancedProfileSettings"*/
+        "updatePassword"
     ){
         Column(
             modifier = Modifier

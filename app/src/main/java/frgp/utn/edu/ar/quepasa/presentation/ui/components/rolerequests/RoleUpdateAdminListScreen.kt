@@ -34,7 +34,7 @@ fun RoleUpdateAdminListScreen(navController: NavHostController) {
         viewModel.getRequests()
     }
 
-    BaseComponent(navController, "Solicitudes de rol", false) {
+    BaseComponent(navController, "Solicitudes de rol", false, "roleRequestAdminList") {
         LazyColumn(
             modifier = Modifier
                 .padding(16.dp)

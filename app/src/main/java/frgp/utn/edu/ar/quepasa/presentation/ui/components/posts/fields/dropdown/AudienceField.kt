@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.utils.audience.audienceToEnglish
 
+@Deprecated("Usar DropdownAudienceField")
 @Composable
 fun AudienceField(
     modifier: Modifier,

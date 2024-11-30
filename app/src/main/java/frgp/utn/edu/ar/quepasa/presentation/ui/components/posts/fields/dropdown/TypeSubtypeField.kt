@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.data.model.PostSubtype
 
+@Deprecated("Usar DropdownPostField")
 @Composable
 fun TypeSubtypeField(
     modifier: Modifier,
@@ -88,7 +90,7 @@ fun TypeSubtypeField(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
             ) {
                 items.forEachIndexed() { index, item ->
                     DropdownMenuItem(

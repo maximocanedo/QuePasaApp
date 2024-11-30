@@ -6,8 +6,8 @@ import androidx.compose.foundation.border
 import frgp.utn.edu.ar.quepasa.data.model.PostType
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Deprecated("Usar DropdownPostField")
 @Composable
 fun TypeField(
     modifier: Modifier,
@@ -66,10 +67,10 @@ fun TypeField(
                     Icon(
                         imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.ArrowDropDown,
                         contentDescription = "Dropdown Icon",
-                        modifier = Modifier.clickable { expanded = !expanded }
+                        modifier = modifier.clickable { expanded = !expanded }
                     )
                 },
-                modifier = Modifier
+                modifier = modifier
                     .clickable { expanded = !expanded }
                     .background(
                         color = backgroundColor,
@@ -85,8 +86,7 @@ fun TypeField(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = modifier
             ) {
                 items.forEachIndexed { index, item ->
                     DropdownMenuItem(
@@ -96,7 +96,7 @@ fun TypeField(
                             onItemSelected(itemsId[index])
                             expanded = false
                         },
-                        modifier = Modifier.padding(8.dp)
+                        modifier = modifier.padding(8.dp)
                     )
                 }
             }
@@ -107,8 +107,7 @@ fun TypeField(
             value = "",
             onValueChange = {},
             readOnly = true,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = modifier
                 .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         )
@@ -118,5 +117,5 @@ fun TypeField(
 @Preview
 @Composable
 fun TypeFieldPreview() {
-    TypeField(modifier = Modifier.fillMaxWidth(), types = emptyList(), onItemSelected = {})
+    TypeField(modifier = Modifier.wrapContentWidth(), types = emptyList(), onItemSelected = {})
 }

@@ -53,7 +53,10 @@ fun PostDropdownSection(viewModel: PostFormViewModel) {
     var selectedAudience by remember { mutableStateOf("PUBLIC") }
     var selectedAudienceName by remember { mutableStateOf(audiences.firstOrNull() ?: "Público") }
     var selectedNeighbourhood by remember { mutableLongStateOf(user.user?.neighbourhood?.id ?: 1) }
-    viewModel.updateNeighbourhood(selectedNeighbourhood)
+
+    LaunchedEffect(Unit) {
+        viewModel.updateNeighbourhood(selectedNeighbourhood)
+    }
 
     LaunchedEffect(Unit, selectedType) {
         viewModel.updateType(selectedType)

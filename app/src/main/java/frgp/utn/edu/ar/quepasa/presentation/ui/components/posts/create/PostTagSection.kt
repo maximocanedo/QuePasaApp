@@ -40,9 +40,6 @@ fun PostTagSection(viewModel: PostFormViewModel) {
         }
     )
 
-    val text: String = if(tagCount != 1) "$tagCount etiquetas añadidas" else "$tagCount etiqueta añadida"
-    Text(modifier = Modifier.padding(4.dp), text = text)
-
     if(tags.isNotEmpty()) {
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -60,4 +57,7 @@ fun PostTagSection(viewModel: PostFormViewModel) {
             }
         }
     }
+
+    val text: String = if(tagCount != 1) "$tagCount etiquetas añadidas" else "$tagCount etiqueta añadida"
+    Text(modifier = Modifier.padding(4.dp), text = text)
 }

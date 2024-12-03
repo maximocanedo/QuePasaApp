@@ -113,6 +113,7 @@ class PostFormViewModel: ViewModel() {
 
     fun setTags(tags: String) {
         _tags.value = tags.split(",")
+        _tagCount.value = _tags.value.size
     }
 
     fun addTag(tag: String) {

@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,6 +23,7 @@ import quepasa.api.validators.commons.StringValidator
 fun PostTagSection(viewModel: PostFormViewModel) {
     val tag by viewModel.tag.collectAsState()
     val tags by viewModel.tags.collectAsState()
+    val tagCount by viewModel.tagCount.collectAsState()
 
     TagField(
         value = tag,
@@ -36,6 +39,9 @@ fun PostTagSection(viewModel: PostFormViewModel) {
             viewModel.updateTag("")
         }
     )
+
+    val text: String = if(tagCount != 1) "$tagCount etiquetas añadidas" else "$tagCount etiqueta añadida"
+    Text(modifier = Modifier.padding(4.dp), text = text)
 
     if(tags.isNotEmpty()) {
         FlowRow(

@@ -37,6 +37,7 @@ class PostFormViewModel: ViewModel() {
     val tags: StateFlow<List<String>> get() = _tags
 
     private var _tagCount = MutableStateFlow(0)
+    val tagCount: StateFlow<Int> get() = _tagCount
 
     private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }
 

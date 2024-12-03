@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.builders.ValidatorBuilder
@@ -36,6 +37,7 @@ fun <ValidatorClass: ValidatorBuilder<ValidatorClass, T>, T> OutlinedField(
     placeholder: @Composable() (() -> Unit)? = null,
     leadingIcon: @Composable() (() -> Unit)? = null,
     trailingIcon: @Composable() (() -> Unit)? = null,
+    textStyle: TextStyle = TextStyle(),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors()
 ) {
     var isValid by remember { mutableStateOf(serverError == null) }
@@ -61,6 +63,7 @@ fun <ValidatorClass: ValidatorBuilder<ValidatorClass, T>, T> OutlinedField(
         placeholder = placeholder,
         trailingIcon = trailingIcon,
         leadingIcon = leadingIcon,
+        textStyle = textStyle,
         colors = colors
     )
 

@@ -4,7 +4,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.editables.OutlinedField
 import quepasa.api.validators.commons.StringValidator
 
@@ -27,6 +30,7 @@ fun TitleField(
         onChange = onChange,
         serverError = serverError,
         label = "Título",
+        textStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,

@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import frgp.utn.edu.ar.quepasa.data.model.EventPictureDTO
 import frgp.utn.edu.ar.quepasa.domain.repository.media.PictureRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 import javax.inject.Inject
@@ -22,6 +23,9 @@ class PictureViewModel @Inject constructor(
 
     private val _picturesForDeletion = MutableStateFlow<List<UUID>>(emptyList())
     val picturesForDeletion = _picturesForDeletion.asStateFlow()
+
+    private var _pictureCount = MutableStateFlow(0)
+    val pictureCount: StateFlow<Int> get() = _pictureCount
 
     private val _bitmap = MutableStateFlow<Bitmap?>(null)
     val bitmap = _bitmap.asStateFlow()
@@ -43,12 +47,7 @@ class PictureViewModel @Inject constructor(
             }
         }
         _pictures.value = bitmaps
-    }
-
-    fun setPictureBitmap(pictureId: UUID) {
-        repository.viewPicture(pictureId, onComplete = {
-            _bitmap.value = it
-        })
+        _pictureCount.value = _pictures.value.size
     }
 
     fun setPicturesBitmap(pictureIds: List<UUID>) {
@@ -66,6 +65,7 @@ class PictureViewModel @Inject constructor(
                 }
             })
         }
+        _pictureCount.value = _pictures.value.size
     }
 
     fun arePicturesForDeletionEmpty(): Boolean {

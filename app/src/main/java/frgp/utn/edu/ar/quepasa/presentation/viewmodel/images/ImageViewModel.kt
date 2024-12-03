@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import frgp.utn.edu.ar.quepasa.data.model.media.EventPicture
 import frgp.utn.edu.ar.quepasa.data.model.media.PostPicture
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 import java.util.UUID
@@ -19,12 +20,17 @@ class ImageViewModel : ViewModel() {
     private val _selectedUrlsId = MutableStateFlow<List<UUID>>(emptyList())
     val selectedUrisId = _selectedUrlsId.asStateFlow()
 
+    private var _uriCount = MutableStateFlow(0)
+    val uriCount: StateFlow<Int> get() = _uriCount
+
     fun addImages(uris: List<Uri>) {
         _selectedUris.value += uris
+        _uriCount.value = _selectedUris.value.size
     }
 
     fun clearImages() {
         _selectedUris.value = emptyList()
+        _uriCount.value = 0
     }
 
     fun clearImage(uri: Uri) {
@@ -33,6 +39,7 @@ class ImageViewModel : ViewModel() {
             if(selUri.path != uri.path) uriList = uriList + selUri
         }
         _selectedUris.value = uriList
+        _uriCount.value = _selectedUris.value.size
     }
 
     fun areUrisEmpty(): Boolean {

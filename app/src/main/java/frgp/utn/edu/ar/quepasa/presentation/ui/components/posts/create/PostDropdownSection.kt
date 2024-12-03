@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -46,9 +47,17 @@ fun PostDropdownSection(viewModel: PostFormViewModel) {
     val neighbourhoods = neighViewModel.neighbourhoods.collectAsState()
 
     var selectedType by remember { mutableIntStateOf(1) }
-    var selectedTypeName by remember { mutableStateOf("General") }
+    val selectedTypeName by remember(types.value, selectedType) {
+        derivedStateOf {
+            types.value.content.find { it.id == selectedType }?.description ?: "General"
+        }
+    }
     var selectedSubtype by remember { mutableIntStateOf(1) }
-    var selectedSubtypeName by remember { mutableStateOf("General") }
+    val selectedSubtypeName by remember(subtypes.value, selectedSubtype) {
+        derivedStateOf {
+            subtypes.value.content.find { it.id == selectedSubtype }?.description ?: "General"
+        }
+    }
 
     var selectedAudience by remember { mutableStateOf("PUBLIC") }
     var selectedAudienceName by remember { mutableStateOf(audiences.firstOrNull() ?: "Público") }
@@ -60,20 +69,17 @@ fun PostDropdownSection(viewModel: PostFormViewModel) {
 
     LaunchedEffect(Unit, selectedType) {
         viewModel.updateType(selectedType)
-        selectedTypeName = types.value.content.find { it.id == selectedType }?.description ?: "General"
         subtypeViewModel.getSubtypesByType(selectedType, 0, 10)
     }
 
     LaunchedEffect(Unit, selectedSubtype) {
         viewModel.updateSubtype(selectedSubtype)
-        selectedSubtypeName = subtypes.value.content.find { it.id == selectedSubtype }?.description ?: "General"
     }
 
     LaunchedEffect(subtypes.value.content) {
         if(subtypes.value.content.isNotEmpty()) {
             val firstSubtype = subtypes.value.content.first()
             selectedSubtype = firstSubtype.id
-            selectedSubtypeName = firstSubtype.description
         }
     }
 

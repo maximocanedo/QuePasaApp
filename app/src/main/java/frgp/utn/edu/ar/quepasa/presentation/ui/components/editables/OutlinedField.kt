@@ -3,7 +3,9 @@ package frgp.utn.edu.ar.quepasa.presentation.ui.components.editables
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.input.VisualTransformation
 import quepasa.api.exceptions.ValidationError
 import quepasa.api.validators.commons.builders.ValidatorBuilder
@@ -34,7 +35,8 @@ fun <ValidatorClass: ValidatorBuilder<ValidatorClass, T>, T> OutlinedField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     placeholder: @Composable() (() -> Unit)? = null,
     leadingIcon: @Composable() (() -> Unit)? = null,
-    trailingIcon: @Composable() (() -> Unit)? = null
+    trailingIcon: @Composable() (() -> Unit)? = null,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors()
 ) {
     var isValid by remember { mutableStateOf(serverError == null) }
     var errorMessage by remember { mutableStateOf(serverError ?: "") }
@@ -58,7 +60,8 @@ fun <ValidatorClass: ValidatorBuilder<ValidatorClass, T>, T> OutlinedField(
         visualTransformation = visualTransformation,
         placeholder = placeholder,
         trailingIcon = trailingIcon,
-        leadingIcon = leadingIcon
+        leadingIcon = leadingIcon,
+        colors = colors
     )
 
     LaunchedEffect(debounceText) {

@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.user
 
 import BaseComponent
 import android.widget.Toast
@@ -23,7 +23,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.DocumentFileField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.DocumentNationalField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.NameField
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.fields.RoleRequesterField
@@ -36,7 +35,7 @@ import kotlinx.coroutines.withContext
 import quepasa.api.validators.commons.StringValidator
 
 @Composable
-fun RoleUpdateUserRequestScreen(navController: NavHostController) {
+fun RoleRequestScreen(navController: NavHostController) {
     val context = LocalContext.current
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val user by LocalAuth.current.collectAsState()
@@ -119,5 +118,5 @@ fun RoleUpdateUserRequestScreen(navController: NavHostController) {
 @Composable
 fun RoleUpdateUserRequestScreenPreview() {
     val navController = rememberNavController()
-    RoleUpdateUserRequestScreen(navController = navController)
+    RoleRequestScreen(navController = navController)
 }

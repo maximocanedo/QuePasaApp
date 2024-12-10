@@ -18,7 +18,7 @@ class RoleUpdateRequestViewModel @Inject constructor(
     private val _roleRequests = MutableStateFlow<List<RoleUpdateRequest>>(emptyList())
     val roleRequests: StateFlow<List<RoleUpdateRequest>> get() = _roleRequests
 
-    private val _roleRequest = MutableStateFlow(RoleUpdateRequest(null, null, null, null, "", null, RequestStatus.WAITING, false))
+    private val _roleRequest = MutableStateFlow(RoleUpdateRequest(UUID.randomUUID(), null, Role.USER, null, "", null, RequestStatus.WAITING, false))
     val roleRequest: StateFlow<RoleUpdateRequest> get() = _roleRequest
 
     private val _fieldsValidation: List<MutableStateFlow<Boolean>> = List(2) { MutableStateFlow(false) }

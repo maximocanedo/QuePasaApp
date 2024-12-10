@@ -20,9 +20,9 @@ import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostDetailedScre
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.PostScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.create.PostCreate
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.posts.edit.PostEdit
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateAdminListScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserListScreen
-import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.RoleUpdateUserRequestScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.admin.RoleAdminListScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.user.RoleUserListScreen
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.user.RoleRequestScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.AdvancedUserSettingsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.TotpSettingsScreen
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.users.screen.UpdatePasswordScreen
@@ -121,13 +121,13 @@ fun NavigationMainHost(navController: NavHostController, user: User?) {
                 }
             }
             composable("roleRequestUserList") {
-                RoleUpdateUserListScreen(navController)
+                RoleUserListScreen(navController)
             }
             composable("roleRequestAdminList") {
-                RoleUpdateAdminListScreen(navController)
+                RoleAdminListScreen(navController)
             }
             composable("roleRequest") {
-                RoleUpdateUserRequestScreen(navController)
+                RoleRequestScreen(navController)
             }
         }
     }

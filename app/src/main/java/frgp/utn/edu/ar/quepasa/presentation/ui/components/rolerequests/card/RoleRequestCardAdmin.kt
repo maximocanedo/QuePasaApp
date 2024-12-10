@@ -1,5 +1,6 @@
 package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card
 
+import androidx.compose.foundation.border
 import frgp.utn.edu.ar.quepasa.data.model.enums.RequestStatus
 
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,18 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
+import frgp.utn.edu.ar.quepasa.data.model.enums.Role
 import frgp.utn.edu.ar.quepasa.data.model.request.RoleUpdateRequest
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.basic.GradientDivider
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.dialog.RoleUpdateRespondDialog
 import frgp.utn.edu.ar.quepasa.utils.role.roleToSpanish
 import java.util.UUID
 
 @Composable
-fun RoleUpdateRequestCardAdmin(
+fun RoleRequestCardAdmin(
     request: RoleUpdateRequest,
     onUpdateRequest: (UUID, Boolean, String) -> Unit,
     onDeleteRequest: (UUID) -> Unit,
@@ -49,10 +52,20 @@ fun RoleUpdateRequestCardAdmin(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        shape = RoundedCornerShape(10.dp),
+            .padding(horizontal = 18.dp, vertical = 6.dp)
+            .border(
+                width = 1.dp,
+                shape = RoundedCornerShape(18.dp),
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.tertiary
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Row(
             modifier = Modifier
@@ -69,25 +82,20 @@ fun RoleUpdateRequestCardAdmin(
                     maxLines = 1
                 )
 
-                HorizontalDivider(
-                    thickness = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                GradientDivider(modifier = Modifier.fillMaxWidth())
 
-                if(request.requestedRole != null) {
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_supervised_user_circle_24),
-                            contentDescription = "Role Image",
-                        )
-                        Text(
-                            text = "Rol: ${roleToSpanish(request.requestedRole.name)}",
-                            modifier = Modifier.padding(6.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    }
+                Row {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_supervised_user_circle_24),
+                        contentDescription = "Role Image",
+                    )
+                    Text(
+                        text = "Rol: ${roleToSpanish(request.requestedRole.name)}",
+                        modifier = Modifier.padding(6.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
                 }
 
                 Row {
@@ -109,7 +117,7 @@ fun RoleUpdateRequestCardAdmin(
                         imageVector = Icons.Filled.Person,
                         contentDescription = "Role Reviewer",
                     )
-                    val requester = if(request.requester != null) request.requester.name else "No asignado"
+                    val requester = request.requester?.name?.ifBlank { "No asignado" }
                     Text(
                         text = "Solicitante: $requester",
                         modifier = Modifier.padding(6.dp),
@@ -189,26 +197,29 @@ fun RoleUpdateRequestCardAdmin(
 
     when {
         openDialog.value -> {
-            request.id?.let {
-                RoleUpdateRespondDialog(
-                    onDismissRequest = { openDialog.value = false },
-                    id = it,
-                    title = title.value,
-                    approve = approve.value,
-                    delete = delete.value,
-                    onUpdateRequest = onUpdateRequest,
-                    onDeleteRequest = onDeleteRequest
-                )
-            }
+            RoleUpdateRespondDialog(
+                onDismissRequest = { openDialog.value = false },
+                id = request.id,
+                title = title.value,
+                approve = approve.value,
+                delete = delete.value,
+                onUpdateRequest = onUpdateRequest,
+                onDeleteRequest = onDeleteRequest
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun RoleUpdateRequestCardAdminPreview() {
-    val roleUpdateRequest = RoleUpdateRequest()
-    RoleUpdateRequestCardAdmin(
+fun RoleRequestCardAdminPreview() {
+    val roleUpdateRequest = RoleUpdateRequest(
+        id = UUID.randomUUID(),
+        requester = null,
+        requestedRole = Role.NEIGHBOUR,
+        remarks = ""
+    )
+    RoleRequestCardAdmin(
         request = roleUpdateRequest,
         onUpdateRequest = { id, approve, remark -> println("Working $id $approve $remark")},
         onDeleteRequest = {}

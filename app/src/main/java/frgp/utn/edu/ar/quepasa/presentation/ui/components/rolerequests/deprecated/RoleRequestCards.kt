@@ -1,4 +1,4 @@
-package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card
+package frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.deprecated
 
 import android.widget.Toast
 import androidx.compose.material3.Text
@@ -12,6 +12,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import frgp.utn.edu.ar.quepasa.data.model.enums.RequestStatus
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.RoleRequestCardAdmin
+import frgp.utn.edu.ar.quepasa.presentation.ui.components.rolerequests.card.RoleRequestCardUser
 import frgp.utn.edu.ar.quepasa.presentation.viewmodel.request.RoleUpdateRequestViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +21,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Deprecated("Modularizado en RoleRequestsPending y RoleRequestsFulfilled")
 @Composable
-fun RoleUpdateRequestCards(
+fun RoleRequestCards(
     modifier: Modifier,
     viewModel: RoleUpdateRequestViewModel,
     navController: NavHostController,
@@ -36,28 +39,14 @@ fun RoleUpdateRequestCards(
         requests.forEach { request ->
             if(request.status == status) {
                 if(!isAdmin) {
-                    RoleUpdateRequestCardUser(
+                    RoleRequestCardUser(
                         request = request,
                         hasDeleteButton = hasDeleteButton,
-                        onUpdateRequest = { id ->
-                            CoroutineScope(IO).launch {
-                                val result = viewModel.deleteRoleRequest(id, true)
-
-                                withContext(Dispatchers.Main) {
-                                    if(result) {
-                                        Toast.makeText(context, "Solicitud cancelada", Toast.LENGTH_SHORT).show()
-                                    }
-                                    else {
-                                        Toast.makeText(context, "Solicitud no cancelada (error)", Toast.LENGTH_SHORT).show()
-                                    }
-                                    navController.navigate("roleRequestUserList")
-                                }
-                            }
-                        }
+                        onDeleteRequest = {}
                     )
                 }
                 else {
-                    RoleUpdateRequestCardAdmin(
+                    RoleRequestCardAdmin(
                         request = request,
                         onUpdateRequest = { id, approve, remark ->
                             CoroutineScope(IO).launch {
@@ -109,7 +98,7 @@ fun RoleUpdateRequestCards(
 fun RoleUpdateRequestCardsPreview() {
     val viewModel: RoleUpdateRequestViewModel = hiltViewModel()
     val navController = rememberNavController()
-    RoleUpdateRequestCards(
+    RoleRequestCards(
         modifier = Modifier,
         viewModel = viewModel,
         navController = navController,

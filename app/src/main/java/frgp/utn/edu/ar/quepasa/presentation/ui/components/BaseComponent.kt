@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import frgp.utn.edu.ar.quepasa.data.model.User
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalSnack
 import frgp.utn.edu.ar.quepasa.domain.context.user.LocalAuth
 import frgp.utn.edu.ar.quepasa.presentation.ui.components.main.NavigationMainDrawer
@@ -26,29 +25,18 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import frgp.utn.edu.ar.quepasa.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BaseComponent(
     navController: NavHostController,
@@ -77,8 +65,8 @@ fun BaseComponent(
         "eventEdit" to "events",
         "eventDetailedScreen" to "events",
         "roleRequestUserList" to "home",
-        "roleRequestAdminList" to "roleRequestUserList",
-        "roleRequest" to "roleRequestAdminList"
+        "roleRequestAdminList" to "home",
+        "roleRequest" to "roleRequestUserList"
     )
 
     Box(

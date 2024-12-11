@@ -45,7 +45,10 @@ class CommentRepository @Inject constructor(
     suspend fun updateComment(id: UUID, content: String): Comment =
         handleResponse { commentService.updateComment(id, content) }
 
-    suspend fun deleteComment(id: UUID) {
-        commentService.deleteComment(id)
+    suspend fun deleteComment(id: UUID): ApiResponse<Void?> {
+        return handler.getResponse(commentService.deleteComment(id))
     }
+
+    suspend fun update(id: UUID, content: String): ApiResponse<Comment?> =
+        handler.getResponse(commentService.updateComment(id, content));
 }

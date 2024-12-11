@@ -18,6 +18,8 @@ import frgp.utn.edu.ar.quepasa.domain.repository.commenting.CommentRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import quepasa.api.exceptions.ValidationError
+import quepasa.api.validators.commons.StringValidator
 import java.util.UUID
 import javax.inject.Inject
 
@@ -30,6 +32,7 @@ class CommentCardViewModel @Inject constructor(
     val comment = MutableStateFlow<AbsComment?>(null)
     val loading = MutableStateFlow<Boolean>(false)
     val votes = MutableStateFlow<VoteCount?>(null)
+    val msg = MutableSharedFlow<String?>(1)
     val fail = MutableSharedFlow<Fail?>(1)
 
     suspend fun load(p: AbsComment? = null, id: UUID?) {
@@ -59,8 +62,46 @@ class CommentCardViewModel @Inject constructor(
 
     }
 
+    suspend fun delete() {
+        if(comment.value == null) return
+        commentRepository
+            .deleteComment(comment.value!!.id)
+            .handle {
+                msg.tryEmit("El comentario fue eliminado. ")
+                comment.tryEmit(null)
+            }
+            .error(fail::tryEmit)
+    }
 
 
+    suspend fun update(value: String) {
+        if(comment.value == null) return
+        loading.update { true }
+        val com = comment.value!!
+        try {
+            StringValidator(value)
+                .trim()
+                .isNotBlank("El comentario no debe estar vacío. ")
+                .build()
+            comment.update {
+                val c = it
+                c.content = it.c
+                return c
+            }
+        } catch(err: ValidationError) {
+            msg.tryEmit(err.errors.first())
+            return
+        }
+        commentRepository
+            .update(com.id, value)
+            .handle {
+                loading.update { false }
+            }
+            .error {
+                loading.update { false }
+                fail.tryEmit(it)
+            }
+    }
 
     suspend fun upvote() {
         if(comment.value == null) return

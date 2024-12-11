@@ -189,7 +189,7 @@ fun FullPost(
                 }
             }
             items(comments) {
-                CommentCard(comment = it, parentType = CommentParent.POST)
+                CommentCard(comment = it)
             }
             item {
                 LoadMoreButton(
